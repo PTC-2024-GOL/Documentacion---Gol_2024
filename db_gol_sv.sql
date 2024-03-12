@@ -137,7 +137,7 @@ area_de_juego ENUM('Ofensiva','Defensiva', 'Ofensiva y defensiva') NOT NULL
 
 CREATE TABLE jugadores(
 id_jugador INT AUTO_INCREMENT PRIMARY KEY,
-playera INT NULL,
+dorsal INT NULL,
 nombre_jugador VARCHAR(50) NOT NULL,
 apellido_jugador VARCHAR(50) NOT NULL,
 estatus ENUM('Activo', 'Baja temporal', 'Baja definitiva') NOT NULL,
@@ -273,7 +273,8 @@ FOREIGN KEY (id_horario)
 REFERENCES horarios(id_horario),
 mes ENUM('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre') NOT NULL,
 fecha DATE NULL DEFAULT NOW(),
-asistencia ENUM('Asistencia', 'Permiso', 'Falta', 'Lesion') NOT NULL
+asistencia ENUM('Asistencia', 'Ausencia injustificada','Enfermedad', 'Estudio','Trabajo','Viaje', 'Permiso', 'Falta', 'Lesion', 'Otro') NOT NULL,
+observacion VARCHAR(999) NULL
 );
 
 CREATE TABLE tipos_contenidos(
@@ -281,6 +282,16 @@ id_tipo_contenido INT AUTO_INCREMENT PRIMARY KEY,
 tipo_contenido VARCHAR(60) NOT NULL,
 CONSTRAINT uq_tipo_contenido_unico
 UNIQUE(tipo_contenido)
+);
+
+CREATE TABLE contenidos(
+id_contenido INT AUTO_INCREMENT PRIMARY KEY,
+tema_contenido VARCHAR(60) NOT NULL,
+id_tipo_contenido INT NOT NULL,
+CONSTRAINT fk_tipo_contenido 
+FOREIGN KEY (id_tipo_contenido) 
+REFERENCES tipos_contenidos(id_tipo_contenido),
+cantidad INT NULL -- a saber que es
 );
 
 CREATE TABLE tipos_tareas(
@@ -297,17 +308,6 @@ CONSTRAINT fk_tipo_de_tarea
 FOREIGN KEY (id_tipo_tarea) 
 REFERENCES tipos_tareas(id_tipo_tarea),
 minutos INT NOT NULL
-);
-
-CREATE TABLE contenidos(
-id_contenido INT AUTO_INCREMENT PRIMARY KEY,
-tema_contenido VARCHAR(60) NOT NULL,
-subtema_contenido VARCHAR(60) NULL,
-id_tipo_contenido INT NOT NULL,
-CONSTRAINT fk_tipo_contenido 
-FOREIGN KEY (id_tipo_contenido) 
-REFERENCES tipos_contenidos(id_tipo_contenido),
-cantidad INT NULL
 );
 
 CREATE TABLE detalle_contenido(
@@ -358,8 +358,7 @@ CONSTRAINT fk_equipo
 FOREIGN KEY (id_equipo) 
 REFERENCES equipos(id_equipo),
 rival VARCHAR(50) NOT NULL,
-fecha DATE NOT NULL,
-hora TIME NOT NULL,
+fecha DATETIME NOT NULL,
 cancha VARCHAR(100) NOT NULL,
 resultado VARCHAR(10) NULL,
 localidad ENUM('Local', 'Visitante') NOT NULL,
@@ -373,22 +372,22 @@ CONSTRAINT uq_tipo_lesion_unico
 UNIQUE(tipo_lesion)
 );
 
-CREATE TABLE subtipologias(
-id_subtipologia INT AUTO_INCREMENT PRIMARY KEY,
-subtipologia VARCHAR(60) NOT NULL,
-CONSTRAINT uq_sub_tipologia_unico
-UNIQUE(subtipologia)
-);
-
 CREATE TABLE tipologias(
 id_tipologia INT AUTO_INCREMENT PRIMARY KEY,
 tipologia VARCHAR(60), 
 CONSTRAINT uq_tipologia_unico
-UNIQUE(tipologia),
-id_subtipologia INT NOT NULL,
-CONSTRAINT fk_subtipologias_de_la_tipologia
-FOREIGN KEY (id_subtipologia)
-REFERENCES subtipologias(id_subtipologia)
+UNIQUE(tipologia)
+);
+
+CREATE TABLE subtipologias(
+id_subtipologia INT AUTO_INCREMENT PRIMARY KEY,
+subtipologia VARCHAR(60) NOT NULL,
+CONSTRAINT uq_sub_tipologia_unico
+UNIQUE(subtipologia),
+id_tipologia INT NOT NULL,
+CONSTRAINT fk_tipologias_de_la_subtipologia
+FOREIGN KEY (id_tipologia)
+REFERENCES tipologias(id_tipologia)
 );
 
 CREATE TABLE lesiones(
@@ -397,10 +396,10 @@ id_tipo_lesion INT NOT NULL,
 CONSTRAINT fk_registro_medico_del_tipo_de_lesion 
 FOREIGN KEY (id_tipo_lesion)
 REFERENCES tipos_lesiones(id_tipo_lesion),
-id_tipologia INT NOT NULL,
-CONSTRAINT fk_tipologia_lesiones
-FOREIGN KEY (id_tipologia)
-REFERENCES tipologias(id_tipologia),
+id_subtipologia INT NOT NULL,
+CONSTRAINT fk_id_subtipologia_lesiones
+FOREIGN KEY (id_subtipologia)
+REFERENCES subtipologias(id_subtipologia),
 nombre_lesion VARCHAR(50) NOT NULL,
 numero_lesiones INT NOT NULL,
 promedio_lesiones INT NULL DEFAULT 0
@@ -435,9 +434,9 @@ id_tipo_juego INT NOT NULL,
 CONSTRAINT fk_tipo_de_juego 
 FOREIGN KEY (id_tipo_juego) 
 REFERENCES tipos_juegos(id_tipo_juego),
-nombre_tipo_gol VARCHAR(60) NOT NULL,
-cantidad INT NULL
+nombre_tipo_gol VARCHAR(60) NOT NULL
 );
+
 
 CREATE TABLE participaciones_partidos(
 id_participacion INT AUTO_INCREMENT PRIMARY KEY,
@@ -457,6 +456,7 @@ id_tipo_gol INT NULL,
 CONSTRAINT fk_tipo_gol_partido 
 FOREIGN KEY (id_tipo_gol) 
 REFERENCES tipos_goles(id_tipo_gol),
+cantidad_tipo_gol INT NULL,
 asistencias INT NULL DEFAULT 0,
 amonestacion ENUM('Tarjeta amarilla', 'Tarjeta roja', 'Ninguna') NULL DEFAULT 'Ninguna',
 numero_amonestacion INT NULL DEFAULT 0,
@@ -487,59 +487,6 @@ SET NEW.edad = YEAR(CURRENT_DATE) - YEAR(NEW.fecha_nacimiento) -
 END;
 //
 DELIMITER ;
-
-DELIMITER //
-CREATE TRIGGER calcular_promedio_caracteristicas BEFORE INSERT ON caracteristicas_generales
-FOR EACH ROW
-BEGIN
-DECLARE promedio_fisica DECIMAL(5,3);
-DECLARE promedio_tecnica DECIMAL(5,3);
-DECLARE promedio_tactica DECIMAL(5,3);
-DECLARE promedio_psicologica DECIMAL(5,3);
-
--- Calcula el promedio de las características físicas
-SELECT AVG(fuerza + resistencia + velocidad + agilidad) INTO promedio_fisica
-FROM caracteristicas_fisicas
-WHERE id_caracteristica_fisica = NEW.id_caracteristica_fisica;
-
--- Calcula el promedio de las características técnicas
-SELECT AVG(pase_corto + pase_medio + pase_largo + conduccion + recepcion + cabeceo + regate + definicion_a_gol) INTO promedio_tecnica
-FROM caracteristicas_tecnicas
-WHERE id_caracteristica_tecnica = NEW.id_caracteristica_tecnica;
-
--- Calcula el promedio de las características tácticas
-SELECT AVG(toma_de_decisiones + conceptos_ofensivos + conceptos_defensivos + interpretacion_del_juego) INTO promedio_tactica
-FROM caracteristicas_tacticas
-WHERE id_caracteristica_tactica = NEW.id_caracteristica_tactica;
-
--- Calcula el promedio de las características psicológicas
-SELECT AVG(concentracion + autoconfianza + sacrificio + autocontrol) INTO promedio_psicologica
-FROM caracteristicas_psicologicas
-WHERE id_caracteristica_psicologica = NEW.id_caracteristica_psicologica;
-
--- Calcula el promedio general
-SET NEW.promedio = (promedio_fisica + promedio_tecnica + promedio_tactica + promedio_psicologica) / 4;
-END;
-//
-DELIMITER ;
-
-DELIMITER //
-
-CREATE TRIGGER calcular_dias_lesionado
-BEFORE INSERT ON registro_medico
-FOR EACH ROW
-BEGIN
-    DECLARE dias_estimados INT;
-
-    -- Calcula los días estimados lesionados
-    SET dias_estimados = DATEDIFF(NEW.retorno_entreno, NEW.fecha_lesion);
-
-    -- Asigna el valor calculado a la columna dias_lesionado
-    SET NEW.dias_lesionado = dias_estimados;
-END;
-//
-DELIMITER ;
-
 
 INSERT INTO temporadas(anio) VALUES(2024);
 -- Inserción de posiciones de ataque
