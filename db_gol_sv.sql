@@ -89,14 +89,34 @@ FOREIGN KEY (id_horario)
 REFERENCES horarios(id_horario)
 );
 
+CREATE TABLE cuerpos_tecnicos(
+    id_cuerpo_tecnico INT AUTO_INCREMENT PRIMARY KEY,
+    primer_tecnico INT,
+    CONSTRAINT fk_primer_tecnico
+    FOREIGN KEY (primer_tecnico)
+    REFERENCES tecnicos(id_tecnico),
+    segundo_tecnico INT,
+    CONSTRAINT fk_segundo_tecnico
+    FOREIGN KEY (segundo_tecnico)
+    REFERENCES tecnicos(id_tecnico),
+    preparador_fisico INT,
+    CONSTRAINT fk_preparador_fisico
+    FOREIGN KEY (preparador_fisico)
+    REFERENCES tecnicos(id_tecnico),
+    delegado INT,
+    CONSTRAINT fk_delegado
+    FOREIGN KEY (delegado)
+    REFERENCES tecnicos(id_tecnico)
+);
+
 CREATE TABLE equipos(
 id_equipo INT AUTO_INCREMENT PRIMARY KEY,
 nombre_equipo VARCHAR(50) NOT NULL,
 telefono_contacto VARCHAR(14) NULL,
-id_tecnico INT NULL,
-CONSTRAINT fk_tecnico_del_equipo 
-FOREIGN KEY (id_tecnico)
-REFERENCES tecnicos(id_tecnico),
+id_cuerpo_tecnico INT NULL,
+CONSTRAINT fk_cuerpo_tecnico_del_equipo 
+FOREIGN KEY (id_cuerpo_tecnico)
+REFERENCES cuerpos_tecnicos(id_cuerpo_tecnico),
 id_administrador INT NULL,
 CONSTRAINT fk_administrador_del_equipo 
 FOREIGN KEY (id_administrador)
