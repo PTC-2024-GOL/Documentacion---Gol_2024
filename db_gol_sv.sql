@@ -381,8 +381,9 @@ id_tipologia INT NOT NULL,
 CONSTRAINT fk_tipologia_lesiones
 FOREIGN KEY (id_tipologia)
 REFERENCES tipologias(id_tipologia),
+nombre_lesion VARCHAR(50) NOT NULL,
 numero_lesiones INT NOT NULL,
-total_lesiones INT NULL DEFAULT 0
+promedio_lesiones INT NULL DEFAULT 0
 );
 
 CREATE TABLE registro_medico(
