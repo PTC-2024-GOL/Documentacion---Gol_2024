@@ -124,8 +124,8 @@ CREATE TABLE jugadores(
 
 CREATE TABLE sub_caracteristicas_jugadores(
   id_sub_caracteristica_jugador INT AUTO_INCREMENT PRIMARY KEY, 
-  nombre_sub_caracteristica_jugador VARCHAR(50) NOT NULL
-  caracteristica ENUM('Técnicos', 'Tácticos', 'Condicionales', 'Psicologicos', 'Personales')
+  nombre_sub_caracteristica_jugador VARCHAR(50) NOT NULL,
+  caracteristica ENUM('Técnicos', 'Tácticos', 'Condicionales', 'Psicologicos', 'Personales') NOT NULL
 );
 
 CREATE TABLE caracteristicas_generales(
@@ -134,8 +134,6 @@ CREATE TABLE caracteristicas_generales(
   promedio_caracteristica DECIMAL(5, 3) NULL, 
   id_jugador INT NOT NULL, 
   CONSTRAINT fk_jugador_caracteristica_general FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
-  id_caracteristica_jugador INT NOT NULL, 
-  CONSTRAINT fk_caracteristica_jugador_caracteristica_general FOREIGN KEY (id_caracteristica_jugador) REFERENCES caracteristicas_jugadores(id_caracteristica_jugador), 
   id_sub_caracteristica_jugador INT NOT NULL, 
   CONSTRAINT fk_sub_caracteristica_jugador_caracteristica_general FOREIGN KEY (id_sub_caracteristica_jugador) REFERENCES sub_caracteristicas_jugadores(id_sub_caracteristica_jugador)
 );
