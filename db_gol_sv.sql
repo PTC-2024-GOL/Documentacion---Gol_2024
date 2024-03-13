@@ -122,6 +122,9 @@ CREATE TABLE jugadores(
   CONSTRAINT chk_url_foto_jugador CHECK (foto_jugador LIKE '%.jpg' OR foto_jugador LIKE '%.png' OR foto_jugador LIKE '%.jpeg' OR foto_jugador LIKE '%.gif')
 );
 
+
+-- Eliminar tabla de caracteristicas_jugadores y en cambio agregar un campo nombre_caracteristica, que sea enum 
+-- y se le meten los cuatro tipos de caracteristicas que se evaluan.
 CREATE TABLE caracteristicas_jugadores (
   id_caracteristica_jugador INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_caracteristica VARCHAR(50) NOT NULL
@@ -134,7 +137,8 @@ CREATE TABLE sub_caracteristicas_jugadores(
 
 CREATE TABLE caracteristicas_generales(
   id_caracteristica_general INT AUTO_INCREMENT PRIMARY KEY, 
-  promedio DECIMAL(5, 3) NULL, 
+  nota_caracteristica DECIMAL(5,3) NOT NULL,
+  promedio_caracteristica DECIMAL(5, 3) NULL, 
   id_jugador INT NOT NULL, 
   CONSTRAINT fk_jugador_caracteristica_general FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
   id_caracteristica_jugador INT NOT NULL, 
