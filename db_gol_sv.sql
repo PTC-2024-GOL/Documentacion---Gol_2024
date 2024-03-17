@@ -173,6 +173,7 @@ CREATE TABLE tipos_tareas(
 
 CREATE TABLE tareas(
   id_tarea INT AUTO_INCREMENT PRIMARY KEY, 
+  nombre_tarea VARCHAR(60) NOT NULL,
   id_tipo_tarea INT NOT NULL, 
   CONSTRAINT fk_tipo_de_tarea FOREIGN KEY (id_tipo_tarea) REFERENCES tipos_tareas(id_tipo_tarea), 
   minutos INT NOT NULL
