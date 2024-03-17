@@ -4,8 +4,8 @@ CREATE DATABASE db_gol_sv;
 USE db_gol_sv;
 
 CREATE TABLE administradores(
-  nombre_administrador VARCHAR(50) NOT NULL, 
   id_administrador INT AUTO_INCREMENT PRIMARY KEY, 
+  nombre_administrador VARCHAR(50) NOT NULL, 
   apellido_administrador VARCHAR(50) NOT NULL, 
   alias_administrador VARCHAR(25) NOT NULL, 
   CONSTRAINT uq_alias_administrador_unico UNIQUE(alias_administrador), 
@@ -62,6 +62,7 @@ CREATE TABLE horarios(
 CREATE TABLE categorias(
   id_categoria INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_categoria VARCHAR(80) NOT NULL, 
+  CONSTRAINT uq_nombre_categoria_unico UNIQUE(nombre_categoria), 
   edad_minima_permitida DATE NOT NULL, 
   edad_maxima_permitida DATE NOT NULL, 
   CONSTRAINT chk_validacion_de_edades CHECK(edad_minima_permitida < edad_maxima_permitida), 
@@ -86,6 +87,7 @@ CREATE TABLE cuerpos_tecnicos(
 CREATE TABLE equipos(
   id_equipo INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_equipo VARCHAR(50) NOT NULL, 
+  CONSTRAINT uq_nombre_equipo_unico UNIQUE(nombre_equipo), 
   telefono_contacto VARCHAR(14) NULL, 
   id_cuerpo_tecnico INT NULL, 
   CONSTRAINT fk_cuerpo_tecnico_del_equipo FOREIGN KEY (id_cuerpo_tecnico) REFERENCES cuerpos_tecnicos(id_cuerpo_tecnico), 
@@ -122,23 +124,23 @@ CREATE TABLE jugadores(
   CONSTRAINT chk_url_foto_jugador CHECK (foto_jugador LIKE '%.jpg' OR foto_jugador LIKE '%.png' OR foto_jugador LIKE '%.jpeg' OR foto_jugador LIKE '%.gif')
 );
 
-CREATE TABLE sub_caracteristicas_jugadores(
-  id_sub_caracteristica_jugador INT AUTO_INCREMENT PRIMARY KEY, 
-  nombre_sub_caracteristica_jugador VARCHAR(50) NOT NULL,
+CREATE TABLE sub_caracteristicas(
+  id_sub_caracteristica INT AUTO_INCREMENT PRIMARY KEY, 
+  nombre_sub_caracteristica VARCHAR(50) NOT NULL,
+  CONSTRAINT uq_nombre_sub_caracteristica_unico UNIQUE(nombre_sub_caracteristica), 
   caracteristica ENUM('Técnicos', 'Tácticos', 'Condicionales', 'Psicologicos', 'Personales') NOT NULL
 );
 
 CREATE TABLE caracteristicas_generales(
   id_caracteristica_general INT AUTO_INCREMENT PRIMARY KEY, 
   nota_caracteristica DECIMAL(5,3) NOT NULL,
-  promedio_caracteristica DECIMAL(5, 3) NULL, 
   id_jugador INT NOT NULL, 
   CONSTRAINT fk_jugador_caracteristica_general FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
-  id_sub_caracteristica_jugador INT NOT NULL, 
-  CONSTRAINT fk_sub_caracteristica_jugador_caracteristica_general FOREIGN KEY (id_sub_caracteristica_jugador) REFERENCES sub_caracteristicas_jugadores(id_sub_caracteristica_jugador)
+  id_sub_caracteristica INT NOT NULL, 
+  CONSTRAINT fk_sub_caracteristica_jugador_caracteristica_general FOREIGN KEY (id_sub_caracteristica) REFERENCES sub_caracteristicas(id_sub_caracteristica)
 );
 
-CREATE TABLE control_asistencias(
+CREATE TABLE asistencias(
   id_asistencia INT AUTO_INCREMENT PRIMARY KEY, 
   id_jugador INT NOT NULL, 
   CONSTRAINT fk_jugador_asistencia FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
@@ -146,8 +148,8 @@ CREATE TABLE control_asistencias(
   CONSTRAINT fk_horario_asistencia FOREIGN KEY (id_horario) REFERENCES horarios(id_horario), 
   mes ENUM('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre') NOT NULL, 
   fecha DATE NULL DEFAULT NOW(), 
-  asistencia ENUM('Asistencia', 'Ausencia injustificada', 'Enfermedad', 'Estudio', 'Trabajo','Viaje', 'Permiso', 'Falta', 'Lesion','Otro') NOT NULL, 
-  observacion VARCHAR(999) NULL
+  asistencia ENUM('Asistencia', 'Ausencia injustificada', 'Enfermedad', 'Estudio', 'Trabajo', 'Viaje', 'Permiso', 'Falta', 'Lesion', 'Otro') NOT NULL, 
+  observacion VARCHAR(2000) NULL
 );
 
 CREATE TABLE tipos_contenidos(
@@ -160,8 +162,7 @@ CREATE TABLE contenidos(
   id_contenido INT AUTO_INCREMENT PRIMARY KEY, 
   tema_contenido VARCHAR(60) NOT NULL, 
   id_tipo_contenido INT NOT NULL, 
-  CONSTRAINT fk_tipo_contenido FOREIGN KEY (id_tipo_contenido) REFERENCES tipos_contenidos(id_tipo_contenido), 
-  cantidad INT NULL -- a saber que es
+  CONSTRAINT fk_tipo_contenido FOREIGN KEY (id_tipo_contenido) REFERENCES tipos_contenidos(id_tipo_contenido)
 );
 
 CREATE TABLE tipos_tareas(
@@ -184,7 +185,8 @@ CREATE TABLE detalle_contenido(
   id_contenido INT NOT NULL, 
   CONSTRAINT fk_contenido FOREIGN KEY (id_contenido) REFERENCES contenidos(id_contenido), 
   id_asistencia INT NOT NULL, 
-  CONSTRAINT fk_asistencia_contenidos FOREIGN KEY (id_asistencia) REFERENCES control_asistencias(id_asistencia)
+  CONSTRAINT fk_asistencia_contenidos FOREIGN KEY (id_asistencia) REFERENCES asistencias(id_asistencia),
+  cantidad_contenido INT NULL
 );
 
 CREATE TABLE jornadas(
@@ -194,7 +196,13 @@ CREATE TABLE jornadas(
   CONSTRAINT fk_temporada_jornada FOREIGN KEY (id_temporada) REFERENCES temporadas(id_temporada), 
   fecha_inicio DATE NOT NULL, 
   fecha_fin DATE NOT NULL, 
-  CONSTRAINT chk_validacion_de_fechas_de_jornada CHECK(fecha_inicio < fecha_fin), 
+  CONSTRAINT chk_validacion_de_fechas_de_jornada CHECK(fecha_inicio < fecha_fin)
+);
+
+CREATE TABLE detalles_jornadas(
+  id_detalle_jornada INT AUTO_INCREMENT PRIMARY KEY, 
+  id_jornada INT NOT NULL, 
+  CONSTRAINT fk_identificador_de_jornada FOREIGN KEY (id_jornada) REFERENCES jornadas(id_jornada),
   id_caracteristica_general INT NOT NULL, 
   CONSTRAINT fk_caracteristicas_generales_jornada FOREIGN KEY (id_caracteristica_general) REFERENCES caracteristicas_generales(id_caracteristica_general), 
   id_detalle_contenido INT NOT NULL, 
@@ -203,8 +211,8 @@ CREATE TABLE jornadas(
 
 CREATE TABLE partidos(
   id_partido INT AUTO_INCREMENT PRIMARY KEY, 
-  id_jornada INT NOT NULL, 
-  CONSTRAINT fk_jornada_partido FOREIGN KEY (id_jornada) REFERENCES jornadas(id_jornada), 
+  id_detalle_jornada INT NOT NULL, 
+  CONSTRAINT fk_jornada_partido FOREIGN KEY (id_detalle_jornada) REFERENCES detalles_jornadas(id_detalle_jornada), 
   id_equipo INT NOT NULL, 
   CONSTRAINT fk_equipo FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo), 
   rival VARCHAR(50) NOT NULL, 
@@ -215,48 +223,6 @@ CREATE TABLE partidos(
   tipo_resultado ENUM('Victoria', 'Empate', 'Derrota') NULL
 );
 
-CREATE TABLE tipos_lesiones(
-  id_tipo_lesion INT AUTO_INCREMENT PRIMARY KEY, 
-  tipo_lesion VARCHAR(50) NOT NULL, 
-  CONSTRAINT uq_tipo_lesion_unico UNIQUE(tipo_lesion)
-);
-
-CREATE TABLE tipologias(
-  id_tipologia INT AUTO_INCREMENT PRIMARY KEY, 
-  tipologia VARCHAR(60), 
-  CONSTRAINT uq_tipologia_unico UNIQUE(tipologia)
-);
-
-CREATE TABLE subtipologias(
-  id_subtipologia INT AUTO_INCREMENT PRIMARY KEY, 
-  subtipologia VARCHAR(60) NOT NULL, 
-  CONSTRAINT uq_sub_tipologia_unico UNIQUE(subtipologia), 
-  id_tipologia INT NOT NULL, 
-  CONSTRAINT fk_tipologias_de_la_subtipologia FOREIGN KEY (id_tipologia) REFERENCES tipologias(id_tipologia)
-);
-
-CREATE TABLE lesiones(
-  id_lesion INT AUTO_INCREMENT PRIMARY KEY, 
-  id_tipo_lesion INT NOT NULL, 
-  CONSTRAINT fk_registro_medico_del_tipo_de_lesion FOREIGN KEY (id_tipo_lesion) REFERENCES tipos_lesiones(id_tipo_lesion), 
-  id_subtipologia INT NOT NULL, 
-  CONSTRAINT fk_id_subtipologia_lesiones FOREIGN KEY (id_subtipologia) REFERENCES subtipologias(id_subtipologia),
-  numero_lesiones INT NOT NULL, 
-  promedio_lesiones INT NULL DEFAULT 0
-);
-
-CREATE TABLE registro_medico(
-  id_registro_medico INT AUTO_INCREMENT PRIMARY KEY,
-  fecha_lesion DATE NULL, 
-  fecha_registro DATE DEFAULT NOW(), 
-  dias_lesionado INT NULL, 
-  retorno_entreno DATE NOT NULL, 
-  retorno_partido INT NOT NULL,
-  id_jugador INT NOT NULL,
-  CONSTRAINT fk_registro_medico_jugador FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador),
-  id_lesion INT NOT NULL,
-  CONSTRAINT fk_lesiones_registro_medico FOREIGN KEY (id_lesion) REFERENCES  lesiones(id_lesion)
-);
 
 CREATE TABLE tipos_juegos(
   id_tipo_juego INT AUTO_INCREMENT PRIMARY KEY, 
@@ -293,6 +259,52 @@ CREATE TABLE participaciones_partidos(
   puntuacion INT NULL
 );
 
+
+CREATE TABLE tipos_lesiones(
+  id_tipo_lesion INT AUTO_INCREMENT PRIMARY KEY, 
+  tipo_lesion VARCHAR(50) NOT NULL, 
+  CONSTRAINT uq_tipo_lesion_unico UNIQUE(tipo_lesion)
+);
+
+CREATE TABLE tipologias(
+  id_tipologia INT AUTO_INCREMENT PRIMARY KEY, 
+  tipologia VARCHAR(60), 
+  CONSTRAINT uq_tipologia_unico UNIQUE(tipologia)
+);
+
+CREATE TABLE subtipologias(
+  id_subtipologia INT AUTO_INCREMENT PRIMARY KEY, 
+  subtipologia VARCHAR(60) NOT NULL, 
+  CONSTRAINT uq_sub_tipologia_unico UNIQUE(subtipologia), 
+  id_tipologia INT NOT NULL, 
+  CONSTRAINT fk_tipologias_de_la_subtipologia FOREIGN KEY (id_tipologia) REFERENCES tipologias(id_tipologia)
+);
+
+CREATE TABLE lesiones(
+  id_lesion INT AUTO_INCREMENT PRIMARY KEY, 
+  id_tipo_lesion INT NOT NULL, 
+  CONSTRAINT fk_registro_medico_del_tipo_de_lesion FOREIGN KEY (id_tipo_lesion) REFERENCES tipos_lesiones(id_tipo_lesion), 
+  id_subtipologia INT NOT NULL, 
+  CONSTRAINT fk_id_subtipologia_lesiones FOREIGN KEY (id_subtipologia) REFERENCES subtipologias(id_subtipologia), 
+  nombre_lesion VARCHAR(50) NOT NULL, 
+  numero_lesiones INT NOT NULL, 
+  promedio_lesiones INT NULL DEFAULT 0
+);
+
+CREATE TABLE registro_medico(
+  id_registro_medico INT AUTO_INCREMENT PRIMARY KEY, 
+  id_jugador INT NOT NULL, 
+  CONSTRAINT fk_registro_medico_jugador FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
+  fecha_lesion DATE NULL, 
+  fecha_registro DATE DEFAULT NOW(), 
+  dias_lesionado INT NULL, 
+  id_lesion INT NOT NULL, 
+  CONSTRAINT fk_lesion_jugador FOREIGN KEY (id_lesion) REFERENCES lesiones(id_lesion), 
+  retorno_entreno DATE NOT NULL, 
+  retorno_partido INT NOT NULL, 
+  CONSTRAINT fk_retorno_partido FOREIGN KEY (retorno_partido) REFERENCES partidos(id_partido)
+);
+
 CREATE TABLE pagos(
   id_pago INT AUTO_INCREMENT PRIMARY KEY, 
   fecha DATE NOT NULL, 
@@ -314,6 +326,14 @@ SET
 END;
 
 // 
+DELIMITER ;
+
+DELIMITER //
+CREATE VIEW vista_promedio_subcaracteristicas_por_jugador AS
+SELECT id_jugador, AVG(nota_caracteristica) AS promedio_subcaracteristicas
+FROM caracteristicas_generales
+GROUP BY id_jugador;
+//
 DELIMITER ;
 
 INSERT INTO temporadas(anio) VALUES(2024);
