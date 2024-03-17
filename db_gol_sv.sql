@@ -175,8 +175,7 @@ CREATE TABLE tareas(
   id_tarea INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_tarea VARCHAR(60) NOT NULL,
   id_tipo_tarea INT NOT NULL, 
-  CONSTRAINT fk_tipo_de_tarea FOREIGN KEY (id_tipo_tarea) REFERENCES tipos_tareas(id_tipo_tarea), 
-  minutos INT NOT NULL
+  CONSTRAINT fk_tipo_de_tarea FOREIGN KEY (id_tipo_tarea) REFERENCES tipos_tareas(id_tipo_tarea)
 );
 
 CREATE TABLE detalle_contenido(
@@ -187,7 +186,8 @@ CREATE TABLE detalle_contenido(
   CONSTRAINT fk_contenido FOREIGN KEY (id_contenido) REFERENCES contenidos(id_contenido), 
   id_asistencia INT NOT NULL, 
   CONSTRAINT fk_asistencia_contenidos FOREIGN KEY (id_asistencia) REFERENCES asistencias(id_asistencia),
-  cantidad_contenido INT NULL
+  cantidad_contenido INT NULL, 
+  minutos_tarea INT NOT NULL
 );
 
 CREATE TABLE jornadas(
