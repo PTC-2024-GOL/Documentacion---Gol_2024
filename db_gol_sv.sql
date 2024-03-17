@@ -240,22 +240,22 @@ CREATE TABLE lesiones(
   id_tipo_lesion INT NOT NULL, 
   CONSTRAINT fk_registro_medico_del_tipo_de_lesion FOREIGN KEY (id_tipo_lesion) REFERENCES tipos_lesiones(id_tipo_lesion), 
   id_subtipologia INT NOT NULL, 
-  CONSTRAINT fk_id_subtipologia_lesiones FOREIGN KEY (id_subtipologia) REFERENCES subtipologias(id_subtipologia), 
-  nombre_lesion VARCHAR(50) NOT NULL, 
+  CONSTRAINT fk_id_subtipologia_lesiones FOREIGN KEY (id_subtipologia) REFERENCES subtipologias(id_subtipologia),
   numero_lesiones INT NOT NULL, 
   promedio_lesiones INT NULL DEFAULT 0
 );
 
 CREATE TABLE registro_medico(
-  id_registro_medico INT AUTO_INCREMENT PRIMARY KEY, 
-  id_jugador INT NOT NULL, 
-  CONSTRAINT fk_registro_medico_jugador FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
+  id_registro_medico INT AUTO_INCREMENT PRIMARY KEY,
   fecha_lesion DATE NULL, 
   fecha_registro DATE DEFAULT NOW(), 
   dias_lesionado INT NULL, 
   retorno_entreno DATE NOT NULL, 
-  retorno_partido INT NOT NULL, 
-  CONSTRAINT fk_retorno_partido FOREIGN KEY (retorno_partido) REFERENCES partidos(id_partido)
+  retorno_partido INT NOT NULL,
+  id_jugador INT NOT NULL,
+  CONSTRAINT fk_registro_medico_jugador FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador),
+  id_lesion INT NOT NULL,
+  CONSTRAINT fk_lesiones_registro_medico FOREIGN KEY (id_lesion) REFERENCES  lesiones(id_lesion)
 );
 
 CREATE TABLE tipos_juegos(
