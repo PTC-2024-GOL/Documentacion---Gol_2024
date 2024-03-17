@@ -187,7 +187,7 @@ CREATE TABLE detalle_contenido(
   id_asistencia INT NOT NULL, 
   CONSTRAINT fk_asistencia_contenidos FOREIGN KEY (id_asistencia) REFERENCES asistencias(id_asistencia),
   cantidad_contenido INT NULL, 
-  minutos_tarea INT NOT NULL
+  minutos_tarea INT NULL
 );
 
 CREATE TABLE jornadas(
