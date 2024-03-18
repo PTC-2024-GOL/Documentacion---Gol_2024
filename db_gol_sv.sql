@@ -46,8 +46,8 @@ CREATE TABLE tecnicos(
 
 CREATE TABLE temporadas(
   id_temporada INT AUTO_INCREMENT PRIMARY KEY, 
-  anio YEAR NOT NULL, 
-  CONSTRAINT uq_anio_temporada_unico UNIQUE(anio)
+  anioanio_temporada YEAR NOT NULL,
+  CONSTRAINT uq_anio_temporada_unico UNIQUE(anioanio_temporada)
 );
 
 CREATE TABLE horarios(
@@ -106,38 +106,38 @@ CREATE TABLE posiciones(
 
 CREATE TABLE jugadores(
   id_jugador INT AUTO_INCREMENT PRIMARY KEY, 
-  dorsal INT NULL, 
+  dorsal_jugador INT NULL,
   nombre_jugador VARCHAR(50) NOT NULL, 
   apellido_jugador VARCHAR(50) NOT NULL, 
-  estatus ENUM('Activo', 'Baja temporal', 'Baja definitiva') NOT NULL, 
-  fecha_nacimiento DATE NULL, 
-  edad INT NULL, 
-  perfil ENUM('Zurdo', 'Diestro', 'Ambidiestro') NOT NULL, 
+  estatus_jugador ENUM('Activo', 'Baja temporal', 'Baja definitiva') NOT NULL,
+  fecha_nacimiento_jugador DATE NULL,
+  edad_jugador INT NULL,
+  perfil_jugador ENUM('Zurdo', 'Diestro', 'Ambidiestro') NOT NULL,
   id_posicion_principal INT NOT NULL, 
   CONSTRAINT fk_posicion_principal FOREIGN KEY (id_posicion_principal) REFERENCES posiciones(id_posicion), 
   id_posicion_secundaria INT NULL, 
   CONSTRAINT fk_posicion_secundaria FOREIGN KEY (id_posicion_secundaria) REFERENCES posiciones(id_posicion), 
-  altura DECIMAL(4, 2) NOT NULL, 
-  peso DECIMAL(5, 2) NOT NULL, 
+  altura_jugador DECIMAL(4, 2) NOT NULL,
+  peso_jugador DECIMAL(5, 2) NOT NULL,
   indice_masa_corporal DECIMAL(5, 2) NULL, 
   foto_jugador VARCHAR(36) NULL, 
   CONSTRAINT chk_url_foto_jugador CHECK (foto_jugador LIKE '%.jpg' OR foto_jugador LIKE '%.png' OR foto_jugador LIKE '%.jpeg' OR foto_jugador LIKE '%.gif')
 );
 
-CREATE TABLE sub_caracteristicas(
-  id_sub_caracteristica INT AUTO_INCREMENT PRIMARY KEY, 
-  nombre_sub_caracteristica VARCHAR(50) NOT NULL,
-  CONSTRAINT uq_nombre_sub_caracteristica_unico UNIQUE(nombre_sub_caracteristica), 
-  caracteristica ENUM('Técnicos', 'Tácticos', 'Condicionales', 'Psicologicos', 'Personales') NOT NULL
+CREATE TABLE caracteristicas_jugadores(
+  id_caracteristica_jugador INT AUTO_INCREMENT PRIMARY KEY,
+  nombre_caracteristica_jugador VARCHAR(50) NOT NULL,
+  CONSTRAINT uq_nombre_sub_caracteristica_unico UNIQUE(nombre_caracteristica_jugador),
+  clasificacion_caracteristica_jugador ENUM('Técnicos', 'Tácticos', 'Condicionales', 'Psicologicos', 'Personales') NOT NULL
 );
 
-CREATE TABLE caracteristicas_generales(
-  id_caracteristica_general INT AUTO_INCREMENT PRIMARY KEY, 
-  nota_caracteristica DECIMAL(5,3) NOT NULL,
+CREATE TABLE caracteristicas_analisis(
+  id_caracteristica_analisis INT AUTO_INCREMENT PRIMARY KEY,
+  nota_caracteristica_analisis DECIMAL(5,3) NOT NULL,
   id_jugador INT NOT NULL, 
   CONSTRAINT fk_jugador_caracteristica_general FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
-  id_sub_caracteristica INT NOT NULL, 
-  CONSTRAINT fk_sub_caracteristica_jugador_caracteristica_general FOREIGN KEY (id_sub_caracteristica) REFERENCES sub_caracteristicas(id_sub_caracteristica)
+  id_caracteristica_jugador INT NOT NULL,
+  CONSTRAINT fk_sub_caracteristica_jugador_caracteristica_general FOREIGN KEY (id_caracteristica_jugador) REFERENCES caracteristicas_jugadores(id_caracteristica_jugador)
 );
 
 CREATE TABLE asistencias(
@@ -146,28 +146,28 @@ CREATE TABLE asistencias(
   CONSTRAINT fk_jugador_asistencia FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
   id_horario INT NOT NULL, 
   CONSTRAINT fk_horario_asistencia FOREIGN KEY (id_horario) REFERENCES horarios(id_horario), 
-  mes ENUM('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre') NOT NULL, 
-  fecha DATE NULL DEFAULT NOW(), 
+  mes_asistencia ENUM('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre') NOT NULL,
+  fecha_asistencia DATE NULL DEFAULT NOW(),
   asistencia ENUM('Asistencia', 'Ausencia injustificada', 'Enfermedad', 'Estudio', 'Trabajo', 'Viaje', 'Permiso', 'Falta', 'Lesion', 'Otro') NOT NULL, 
-  observacion VARCHAR(2000) NULL
+  observacion_asistencia VARCHAR(2000) NULL
 );
 
-CREATE TABLE tipos_contenidos(
-  id_tipo_contenido INT AUTO_INCREMENT PRIMARY KEY, 
-  tipo_contenido VARCHAR(60) NOT NULL, 
-  CONSTRAINT uq_tipo_contenido_unico UNIQUE(tipo_contenido)
+CREATE TABLE temas_contenidos(
+  id_tema_contenido INT AUTO_INCREMENT PRIMARY KEY,
+  nombre_tema_contenido VARCHAR(60) NOT NULL,
+  CONSTRAINT uq_tema_contenido_unico UNIQUE(nombre_tema_contenido)
 );
 
-CREATE TABLE contenidos(
-  id_contenido INT AUTO_INCREMENT PRIMARY KEY, 
-  tema_contenido VARCHAR(60) NOT NULL, 
-  id_tipo_contenido INT NOT NULL, 
-  CONSTRAINT fk_tipo_contenido FOREIGN KEY (id_tipo_contenido) REFERENCES tipos_contenidos(id_tipo_contenido)
+CREATE TABLE sub_temas_contenidos(
+  id_sub_tema_contenido INT AUTO_INCREMENT PRIMARY KEY,
+  sub_tema_contenido VARCHAR(60) NOT NULL,
+  id_tema_contenido INT NOT NULL,
+  CONSTRAINT fk_tipo_contenido FOREIGN KEY (id_tema_contenido) REFERENCES temas_contenidos(id_tema_contenido)
 );
 
 CREATE TABLE tipos_tareas(
-  id_tipo_tarea INT AUTO_INCREMENT PRIMARY KEY, 
-  tipo_tarea VARCHAR(50) NOT NULL, 
+  id_tipo_tarea INT AUTO_INCREMENT PRIMARY KEY,
+  tipo_tarea VARCHAR(50) NOT NULL,
   CONSTRAINT uq_tipo_tarea_unico UNIQUE(tipo_tarea)
 );
 
@@ -182,8 +182,8 @@ CREATE TABLE detalle_contenido(
   id_detalle_contenido INT AUTO_INCREMENT PRIMARY KEY, 
   id_tarea INT NULL, 
   CONSTRAINT fk_tarea FOREIGN KEY (id_tarea) REFERENCES tareas(id_tarea), 
-  id_contenido INT NOT NULL, 
-  CONSTRAINT fk_contenido FOREIGN KEY (id_contenido) REFERENCES contenidos(id_contenido), 
+  id_sub_tema_contenido INT NOT NULL,
+  CONSTRAINT fk_contenido FOREIGN KEY (id_sub_tema_contenido) REFERENCES sub_temas_contenidos(id_sub_tema_contenido),
   id_asistencia INT NOT NULL, 
   CONSTRAINT fk_asistencia_contenidos FOREIGN KEY (id_asistencia) REFERENCES asistencias(id_asistencia),
   cantidad_contenido INT NULL, 
@@ -195,17 +195,17 @@ CREATE TABLE jornadas(
   numero_jornada INT NOT NULL, 
   id_temporada INT NOT NULL, 
   CONSTRAINT fk_temporada_jornada FOREIGN KEY (id_temporada) REFERENCES temporadas(id_temporada), 
-  fecha_inicio DATE NOT NULL, 
-  fecha_fin DATE NOT NULL, 
-  CONSTRAINT chk_validacion_de_fechas_de_jornada CHECK(fecha_inicio < fecha_fin)
+  fecha_inicio_jornada DATE NOT NULL,
+  fecha_fin_jornada DATE NOT NULL,
+  CONSTRAINT chk_validacion_de_fechas_de_jornada CHECK(fecha_inicio_jornada < fecha_fin_jornada)
 );
 
 CREATE TABLE detalles_jornadas(
   id_detalle_jornada INT AUTO_INCREMENT PRIMARY KEY, 
   id_jornada INT NOT NULL, 
   CONSTRAINT fk_identificador_de_jornada FOREIGN KEY (id_jornada) REFERENCES jornadas(id_jornada),
-  id_caracteristica_general INT NOT NULL, 
-  CONSTRAINT fk_caracteristicas_generales_jornada FOREIGN KEY (id_caracteristica_general) REFERENCES caracteristicas_generales(id_caracteristica_general), 
+  id_caracteristica_analisis INT NOT NULL,
+  CONSTRAINT fk_caracteristicas_analisis_jornada FOREIGN KEY (id_caracteristica_analisis) REFERENCES caracteristicas_analisis(id_caracteristica_analisis),
   id_detalle_contenido INT NOT NULL, 
   CONSTRAINT fk_detalle_contenido_jornada FOREIGN KEY (id_detalle_contenido) REFERENCES detalle_contenido(id_detalle_contenido)
 );
@@ -216,12 +216,12 @@ CREATE TABLE partidos(
   CONSTRAINT fk_jornada_partido FOREIGN KEY (id_detalle_jornada) REFERENCES detalles_jornadas(id_detalle_jornada), 
   id_equipo INT NOT NULL, 
   CONSTRAINT fk_equipo FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo), 
-  rival VARCHAR(50) NOT NULL, 
-  fecha DATETIME NOT NULL, 
-  cancha VARCHAR(100) NOT NULL, 
-  resultado VARCHAR(10) NULL, 
-  localidad ENUM('Local', 'Visitante') NOT NULL, 
-  tipo_resultado ENUM('Victoria', 'Empate', 'Derrota') NULL
+  rival_partido VARCHAR(50) NOT NULL,
+  fecha_partido DATETIME NOT NULL,
+  cancha_partido VARCHAR(100) NOT NULL,
+  resultado_partido VARCHAR(10) NULL,
+  localidad_partido ENUM('Local', 'Visitante') NOT NULL,
+  tipo_resultado_partido ENUM('Victoria', 'Empate', 'Derrota') NULL
 );
 
 
@@ -273,10 +273,10 @@ CREATE TABLE tipologias(
   CONSTRAINT uq_tipologia_unico UNIQUE(tipologia)
 );
 
-CREATE TABLE subtipologias(
-  id_subtipologia INT AUTO_INCREMENT PRIMARY KEY, 
-  subtipologia VARCHAR(60) NOT NULL, 
-  CONSTRAINT uq_sub_tipologia_unico UNIQUE(subtipologia), 
+CREATE TABLE sub_tipologias(
+  id_sub_tipologia INT AUTO_INCREMENT PRIMARY KEY,
+  nombre_sub_tipologia VARCHAR(60) NOT NULL,
+  CONSTRAINT uq_sub_tipologia_unico UNIQUE(nombre_sub_tipologia),
   id_tipologia INT NOT NULL, 
   CONSTRAINT fk_tipologias_de_la_subtipologia FOREIGN KEY (id_tipologia) REFERENCES tipologias(id_tipologia)
 );
@@ -285,9 +285,8 @@ CREATE TABLE lesiones(
   id_lesion INT AUTO_INCREMENT PRIMARY KEY, 
   id_tipo_lesion INT NOT NULL, 
   CONSTRAINT fk_registro_medico_del_tipo_de_lesion FOREIGN KEY (id_tipo_lesion) REFERENCES tipos_lesiones(id_tipo_lesion), 
-  id_subtipologia INT NOT NULL, 
-  CONSTRAINT fk_id_subtipologia_lesiones FOREIGN KEY (id_subtipologia) REFERENCES subtipologias(id_subtipologia), 
-  nombre_lesion VARCHAR(50) NOT NULL, 
+  id_sub_tipologia INT NOT NULL,
+  CONSTRAINT fk_id_subtipologia_lesiones FOREIGN KEY (id_sub_tipologia) REFERENCES sub_tipologias(id_sub_tipologia),
   numero_lesiones INT NOT NULL, 
   promedio_lesiones INT NULL DEFAULT 0
 );
@@ -308,11 +307,11 @@ CREATE TABLE registro_medico(
 
 CREATE TABLE pagos(
   id_pago INT AUTO_INCREMENT PRIMARY KEY, 
-  fecha DATE NOT NULL, 
-  cantidad DECIMAL(5, 2) NOT NULL, 
+  fecha_pago DATE NOT NULL,
+  cantidad_pago DECIMAL(5, 2) NOT NULL,
   pago_tardio BOOLEAN NULL DEFAULT 0, 
-  mora DECIMAL(5, 2) NULL, 
-  mes ENUM('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre') NOT NULL, 
+  mora_pago DECIMAL(5, 2) NULL,
+  mes_pago ENUM('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre') NOT NULL,
   id_jugador INT NOT NULL, 
   CONSTRAINT fk_jugador_pago FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador)
 );
@@ -321,8 +320,8 @@ DELIMITER //
 
 CREATE TRIGGER calcular_edad BEFORE INSERT ON jugadores FOR EACH ROW BEGIN 
 SET 
-  NEW.edad = YEAR(CURRENT_DATE) - YEAR(NEW.fecha_nacimiento) - (
-    DATE_FORMAT(CURRENT_DATE, '%m%d') < DATE_FORMAT(NEW.fecha_nacimiento, '%m%d')
+  NEW.edad_jugador= YEAR(CURRENT_DATE) - YEAR(NEW.fecha_nacimiento_jugador) - (
+    DATE_FORMAT(CURRENT_DATE, '%m%d') < DATE_FORMAT(NEW.fecha_nacimiento_jugador, '%m%d')
   );
 END;
 
@@ -331,13 +330,13 @@ DELIMITER ;
 
 DELIMITER //
 CREATE VIEW vista_promedio_subcaracteristicas_por_jugador AS
-SELECT id_jugador, AVG(nota_caracteristica) AS promedio_subcaracteristicas
-FROM caracteristicas_generales
+SELECT id_jugador, AVG(nota_caracteristica_analisis) AS promedio_subcaracteristicas
+FROM caracteristicas_analisis
 GROUP BY id_jugador;
 //
 DELIMITER ;
 
-INSERT INTO temporadas(anio) VALUES(2024);
+INSERT INTO temporadas(anioanio_temporada) VALUES(2024);
 -- Inserción de posiciones de ataque
 INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Delantero centro', 'Ofensiva');
 INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Segundo delantero', 'Ofensiva');
