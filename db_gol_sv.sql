@@ -297,7 +297,7 @@ CREATE TABLE registro_medico(
   id_jugador INT NOT NULL, 
   CONSTRAINT fk_registro_medico_jugador FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
   fecha_lesion DATE NULL, 
-  fecha_registro DATE DEFAULT NOW(), 
+  fecha_registro DATE NULL DEFAULT NOW(), 
   dias_lesionado INT NULL, 
   id_lesion INT NOT NULL, 
   CONSTRAINT fk_lesion_jugador FOREIGN KEY (id_lesion) REFERENCES lesiones(id_lesion), 
