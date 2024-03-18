@@ -111,7 +111,6 @@ CREATE TABLE jugadores(
   apellido_jugador VARCHAR(50) NOT NULL, 
   estatus_jugador ENUM('Activo', 'Baja temporal', 'Baja definitiva') NOT NULL,
   fecha_nacimiento_jugador DATE NULL,
-  edad_jugador INT NULL,
   perfil_jugador ENUM('Zurdo', 'Diestro', 'Ambidiestro') NOT NULL,
   id_posicion_principal INT NOT NULL, 
   CONSTRAINT fk_posicion_principal FOREIGN KEY (id_posicion_principal) REFERENCES posiciones(id_posicion), 
@@ -146,7 +145,6 @@ CREATE TABLE asistencias(
   CONSTRAINT fk_jugador_asistencia FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
   id_horario INT NOT NULL, 
   CONSTRAINT fk_horario_asistencia FOREIGN KEY (id_horario) REFERENCES horarios(id_horario), 
-  mes_asistencia ENUM('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre') NOT NULL,
   fecha_asistencia DATE NULL DEFAULT NOW(),
   asistencia ENUM('Asistencia', 'Ausencia injustificada', 'Enfermedad', 'Estudio', 'Trabajo', 'Viaje', 'Permiso', 'Falta', 'Lesion', 'Otro') NOT NULL, 
   observacion_asistencia VARCHAR(2000) NULL
@@ -170,7 +168,7 @@ CREATE TABLE tareas(
   nombre_tarea VARCHAR(60) NOT NULL
 );
 
-CREATE TABLE detalle_contenido(
+CREATE TABLE detalle_contenidos(
   id_detalle_contenido INT AUTO_INCREMENT PRIMARY KEY, 
   id_tarea INT NULL, 
   CONSTRAINT fk_tarea FOREIGN KEY (id_tarea) REFERENCES tareas(id_tarea), 
@@ -178,7 +176,7 @@ CREATE TABLE detalle_contenido(
   CONSTRAINT fk_contenido FOREIGN KEY (id_sub_tema_contenido) REFERENCES sub_temas_contenidos(id_sub_tema_contenido),
   id_asistencia INT NOT NULL, 
   CONSTRAINT fk_asistencia_contenidos FOREIGN KEY (id_asistencia) REFERENCES asistencias(id_asistencia),
-  cantidad_contenido INT NULL, 
+  minutos_contenido INT NULL, 
   minutos_tarea INT NULL
 );
 
@@ -217,7 +215,7 @@ CREATE TABLE partidos(
 );
 
 
-CREATE TABLE tipos_juegos(
+CREATE TABLE tipos_jugadas(
   id_tipo_juego INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_tipo_juego VARCHAR(50) NOT NULL, 
   CONSTRAINT uq_nombre_tipo_juego_unico UNIQUE(nombre_tipo_juego)
@@ -226,7 +224,7 @@ CREATE TABLE tipos_juegos(
 CREATE TABLE tipos_goles(
   id_tipo_gol INT AUTO_INCREMENT PRIMARY KEY, 
   id_tipo_juego INT NOT NULL, 
-  CONSTRAINT fk_tipo_de_juego FOREIGN KEY (id_tipo_juego) REFERENCES tipos_juegos(id_tipo_juego), 
+  CONSTRAINT fk_tipo_de_juego FOREIGN KEY (id_tipo_juego) REFERENCES tipos_jugadas(id_tipo_juego), 
   nombre_tipo_gol VARCHAR(60) NOT NULL
 );
 
