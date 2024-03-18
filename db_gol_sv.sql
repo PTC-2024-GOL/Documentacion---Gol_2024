@@ -165,17 +165,9 @@ CREATE TABLE sub_temas_contenidos(
   CONSTRAINT fk_tipo_contenido FOREIGN KEY (id_tema_contenido) REFERENCES temas_contenidos(id_tema_contenido)
 );
 
-CREATE TABLE tipos_tareas(
-  id_tipo_tarea INT AUTO_INCREMENT PRIMARY KEY,
-  tipo_tarea VARCHAR(50) NOT NULL,
-  CONSTRAINT uq_tipo_tarea_unico UNIQUE(tipo_tarea)
-);
-
 CREATE TABLE tareas(
   id_tarea INT AUTO_INCREMENT PRIMARY KEY, 
-  nombre_tarea VARCHAR(60) NOT NULL,
-  id_tipo_tarea INT NOT NULL, 
-  CONSTRAINT fk_tipo_de_tarea FOREIGN KEY (id_tipo_tarea) REFERENCES tipos_tareas(id_tipo_tarea)
+  nombre_tarea VARCHAR(60) NOT NULL
 );
 
 CREATE TABLE detalle_contenido(
