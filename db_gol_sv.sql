@@ -168,7 +168,7 @@ CREATE TABLE tareas(
   nombre_tarea VARCHAR(60) NOT NULL
 );
 
-CREATE TABLE detalle_contenidos(
+CREATE TABLE detalles_contenidos(
   id_detalle_contenido INT AUTO_INCREMENT PRIMARY KEY, 
   id_tarea INT NULL, 
   CONSTRAINT fk_tarea FOREIGN KEY (id_tarea) REFERENCES tareas(id_tarea), 
@@ -197,7 +197,7 @@ CREATE TABLE detalles_jornadas(
   id_caracteristica_analisis INT NOT NULL,
   CONSTRAINT fk_caracteristicas_analisis_jornada FOREIGN KEY (id_caracteristica_analisis) REFERENCES caracteristicas_analisis(id_caracteristica_analisis),
   id_detalle_contenido INT NOT NULL, 
-  CONSTRAINT fk_detalle_contenido_jornada FOREIGN KEY (id_detalle_contenido) REFERENCES detalle_contenido(id_detalle_contenido)
+  CONSTRAINT fk_detalle_contenido_jornada FOREIGN KEY (id_detalle_contenido) REFERENCES detalles_contenidos(id_detalle_contenido)
 );
 
 CREATE TABLE partidos(
