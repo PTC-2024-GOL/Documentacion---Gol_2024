@@ -109,7 +109,7 @@ CREATE TABLE jugadores(
   dorsal_jugador INT NULL,
   nombre_jugador VARCHAR(50) NOT NULL, 
   apellido_jugador VARCHAR(50) NOT NULL, 
-  estatus_jugador ENUM('Activo', 'Baja temporal', 'Baja definitiva') NOT NULL,
+  estatus_jugador ENUM('Activo', 'Baja temporal', 'Baja definitiva') DEFAULT 'Activo',
   fecha_nacimiento_jugador DATE NULL,
   perfil_jugador ENUM('Zurdo', 'Diestro', 'Ambidiestro') NOT NULL,
   id_posicion_principal INT NOT NULL, 
@@ -237,16 +237,16 @@ CREATE TABLE participaciones_partidos(
   titular BOOLEAN NOT NULL, 
   sustitucion BOOLEAN NOT NULL, 
   minutos_jugados INT NOT NULL, 
-  goles INT NULL DEFAULT 0, 
+  goles INT NULL DEFAULT 0 CHECK (goles >= 0), 
   id_tipo_gol INT NULL, 
   CONSTRAINT fk_tipo_gol_partido FOREIGN KEY (id_tipo_gol) REFERENCES tipos_goles(id_tipo_gol), 
   cantidad_tipo_gol INT NULL, 
-  asistencias INT NULL DEFAULT 0, 
+  asistencias INT NULL DEFAULT 0 CHECK (goles >= 0), 
   amonestacion ENUM(
     'Tarjeta amarilla', 'Tarjeta roja', 
     'Ninguna'
   ) NULL DEFAULT 'Ninguna', 
-  numero_amonestacion INT NULL DEFAULT 0, 
+  numero_amonestacion INT NULL DEFAULT 0 CHECK (goles >= 0), 
   puntuacion INT NULL
 );
 
@@ -281,7 +281,7 @@ CREATE TABLE lesiones(
   promedio_lesiones INT NULL DEFAULT 0
 );
 
-CREATE TABLE registro_medico(
+CREATE TABLE registros_medicos(
   id_registro_medico INT AUTO_INCREMENT PRIMARY KEY, 
   id_jugador INT NOT NULL, 
   CONSTRAINT fk_registro_medico_jugador FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
