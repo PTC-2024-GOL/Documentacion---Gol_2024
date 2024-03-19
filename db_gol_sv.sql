@@ -217,15 +217,15 @@ CREATE TABLE partidos(
 
 
 CREATE TABLE tipos_jugadas(
-  id_tipo_juego INT AUTO_INCREMENT PRIMARY KEY, 
+  id_tipo_jugada INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_tipo_juego VARCHAR(50) NOT NULL, 
   CONSTRAINT uq_nombre_tipo_juego_unico UNIQUE(nombre_tipo_juego)
 );
 
 CREATE TABLE tipos_goles(
   id_tipo_gol INT AUTO_INCREMENT PRIMARY KEY, 
-  id_tipo_juego INT NOT NULL, 
-  CONSTRAINT fk_tipo_de_juego FOREIGN KEY (id_tipo_juego) REFERENCES tipos_jugadas(id_tipo_juego), 
+  id_tipo_jugada INT NOT NULL, 
+  CONSTRAINT fk_tipo_de_jugada FOREIGN KEY (id_tipo_jugada) REFERENCES tipos_jugadas(id_tipo_jugada), 
   nombre_tipo_gol VARCHAR(60) NOT NULL
 );
 
