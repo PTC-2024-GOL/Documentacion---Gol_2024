@@ -246,6 +246,9 @@ CREATE TABLE participaciones_partidos(
     'Tarjeta amarilla', 'Tarjeta roja', 
     'Ninguna'
   ) NULL DEFAULT 'Ninguna', 
+  estado_animo ENUM (
+    'Desanimado', 'Agotado', 'Normal', 'Satisfecho', 'Energetico'
+  )
   numero_amonestacion INT NULL DEFAULT 0 CHECK (goles >= 0), 
   puntuacion INT NULL
 );
