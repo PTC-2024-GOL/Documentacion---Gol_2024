@@ -248,7 +248,7 @@ CREATE TABLE participaciones_partidos(
   ) NULL DEFAULT 'Ninguna', 
   estado_animo ENUM (
     'Desanimado', 'Agotado', 'Normal', 'Satisfecho', 'Energetico'
-  )
+  ) NULL DEFAULT 'Normal',
   numero_amonestacion INT NULL DEFAULT 0 CHECK (goles >= 0), 
   puntuacion INT NULL
 );
@@ -308,18 +308,6 @@ CREATE TABLE pagos(
   id_jugador INT NOT NULL, 
   CONSTRAINT fk_jugador_pago FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador)
 );
-
-DELIMITER // 
-
-CREATE TRIGGER calcular_edad BEFORE INSERT ON jugadores FOR EACH ROW BEGIN 
-SET 
-  NEW.edad_jugador= YEAR(CURRENT_DATE) - YEAR(NEW.fecha_nacimiento_jugador) - (
-    DATE_FORMAT(CURRENT_DATE, '%m%d') < DATE_FORMAT(NEW.fecha_nacimiento_jugador, '%m%d')
-  );
-END;
-
-// 
-DELIMITER ;
 
 DELIMITER //
 CREATE VIEW vista_promedio_subcaracteristicas_por_jugador AS
