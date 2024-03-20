@@ -1,3 +1,4 @@
+
 DROP DATABASE if EXISTS db_gol_sv;
 
 CREATE DATABASE db_gol_sv;
@@ -216,15 +217,15 @@ CREATE TABLE partidos(
 
 
 CREATE TABLE tipos_jugadas(
-  id_tipo_juego INT AUTO_INCREMENT PRIMARY KEY, 
+  id_tipo_jugada INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_tipo_juego VARCHAR(50) NOT NULL, 
   CONSTRAINT uq_nombre_tipo_juego_unico UNIQUE(nombre_tipo_juego)
 );
 
 CREATE TABLE tipos_goles(
   id_tipo_gol INT AUTO_INCREMENT PRIMARY KEY, 
-  id_tipo_juego INT NOT NULL, 
-  CONSTRAINT fk_tipo_de_juego FOREIGN KEY (id_tipo_juego) REFERENCES tipos_jugadas(id_tipo_juego), 
+  id_tipo_jugada INT NOT NULL, 
+  CONSTRAINT fk_tipo_de_jugada FOREIGN KEY (id_tipo_jugada) REFERENCES tipos_jugadas(id_tipo_jugada), 
   nombre_tipo_gol VARCHAR(60) NOT NULL
 );
 
@@ -237,11 +238,13 @@ CREATE TABLE participaciones_partidos(
   titular BOOLEAN NOT NULL, 
   sustitucion BOOLEAN NOT NULL, 
   minutos_jugados INT NOT NULL, 
-  goles INT NULL DEFAULT 0 CHECK (goles >= 0), 
+  goles INT NULL DEFAULT 0,
+  CONSTRAINT chk_goles_anotados CHECK (goles >= 0), 
   id_tipo_gol INT NULL, 
   CONSTRAINT fk_tipo_gol_partido FOREIGN KEY (id_tipo_gol) REFERENCES tipos_goles(id_tipo_gol), 
   cantidad_tipo_gol INT NULL, 
-  asistencias INT NULL DEFAULT 0 CHECK (goles >= 0), 
+  asistencias INT NULL DEFAULT 0, 
+  CONSTRAINT chk_asistencias_hechas CHECK (asistencias >= 0), 
   amonestacion ENUM(
     'Tarjeta amarilla', 'Tarjeta roja', 
     'Ninguna'
@@ -249,7 +252,8 @@ CREATE TABLE participaciones_partidos(
   estado_animo ENUM (
     'Desanimado', 'Agotado', 'Normal', 'Satisfecho', 'Energetico'
   ) NULL DEFAULT 'Normal',
-  numero_amonestacion INT NULL DEFAULT 0 CHECK (goles >= 0), 
+  numero_amonestacion INT NULL DEFAULT 0, 
+  CONSTRAINT chk_numero_amonestacion CHECK (numero_amonestacion >= 0), 
   puntuacion INT NULL
 );
 
