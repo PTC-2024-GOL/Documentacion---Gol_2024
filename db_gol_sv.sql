@@ -120,6 +120,9 @@ CREATE TABLE jugadores(
   altura_jugador DECIMAL(4, 2) NOT NULL,
   peso_jugador DECIMAL(5, 2) NOT NULL,
   indice_masa_corporal DECIMAL(5, 2) NULL, 
+  alias_jugador VARCHAR(25) NOT NULL,
+  CONSTRAINT uq_alias_jugador_unico UNIQUE(alias_jugador), 
+  clave_jugador VARCHAR(100) NOT NULL, 
   foto_jugador VARCHAR(36) NULL, 
   CONSTRAINT chk_url_foto_jugador CHECK (foto_jugador LIKE '%.jpg' OR foto_jugador LIKE '%.png' OR foto_jugador LIKE '%.jpeg' OR foto_jugador LIKE '%.gif')
 );
