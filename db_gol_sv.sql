@@ -75,6 +75,8 @@ CREATE TABLE categorias(
 
 CREATE TABLE cuerpos_tecnicos(
   id_cuerpo_tecnico INT AUTO_INCREMENT PRIMARY KEY, 
+  nombre_cuerpo_tecnico VARCHAR(60),
+  CONSTRAINT uq_nombre_cuerpo_tecnico_unico UNIQUE(nombre_cuerpo_tecnico), 
   primer_tecnico INT, 
   CONSTRAINT fk_primer_tecnico FOREIGN KEY (primer_tecnico) REFERENCES tecnicos(id_tecnico), 
   segundo_tecnico INT, 
@@ -95,7 +97,9 @@ CREATE TABLE equipos(
   id_administrador INT NULL, 
   CONSTRAINT fk_administrador_del_equipo FOREIGN KEY (id_administrador) REFERENCES administradores(id_administrador), 
   id_categoria INT NOT NULL, 
-  CONSTRAINT fk_categoria_del_equipo FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
+  CONSTRAINT fk_categoria_del_equipo FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria),
+  logo_equipo VARCHAR(50) NULL, 
+  CONSTRAINT chk_url_logo_equipo CHECK (logo_equipo LIKE '%.jpg' OR logo_equipo LIKE '%.png' OR logo_equipo LIKE '%.jpeg' OR logo_equipo LIKE '%.gif')
 );
 
 CREATE TABLE posiciones(
@@ -194,8 +198,8 @@ CREATE TABLE jornadas(
   CONSTRAINT chk_validacion_de_fechas_de_jornada CHECK(fecha_inicio_jornada < fecha_fin_jornada)
 );
 
-CREATE TABLE detalles_jornadas(
-  id_detalle_jornada INT AUTO_INCREMENT PRIMARY KEY, 
+CREATE TABLE entrenamientos(
+  id_entrenamiento INT AUTO_INCREMENT PRIMARY KEY, 
   id_jornada INT NOT NULL, 
   CONSTRAINT fk_identificador_de_jornada FOREIGN KEY (id_jornada) REFERENCES jornadas(id_jornada),
   id_caracteristica_analisis INT NOT NULL,
@@ -206,10 +210,12 @@ CREATE TABLE detalles_jornadas(
 
 CREATE TABLE partidos(
   id_partido INT AUTO_INCREMENT PRIMARY KEY, 
-  id_detalle_jornada INT NOT NULL, 
-  CONSTRAINT fk_jornada_partido FOREIGN KEY (id_detalle_jornada) REFERENCES detalles_jornadas(id_detalle_jornada), 
+  id_entrenamiento INT NOT NULL, 
+  CONSTRAINT fk_jornada_partido FOREIGN KEY (id_entrenamiento) REFERENCES entrenamientos(id_entrenamiento), 
   id_equipo INT NOT NULL, 
   CONSTRAINT fk_equipo FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo), 
+  logo_rival VARCHAR(50) NULL, 
+  CONSTRAINT chk_url_logo_equipo_rival CHECK (logo_rival LIKE '%.jpg' OR logo_rival LIKE '%.png' OR logo_rival LIKE '%.jpeg' OR logo_rival LIKE '%.gif'),
   rival_partido VARCHAR(50) NOT NULL,
   fecha_partido DATETIME NOT NULL,
   cancha_partido VARCHAR(100) NOT NULL,
