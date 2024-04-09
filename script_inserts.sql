@@ -70,8 +70,7 @@ INSERT INTO tipos_jugadas (id_tipo_jugada, nombre_tipo_juego) VALUES
 (7, 'Touchdown'),
 (8, 'Field goal'),
 (9, 'Safety'),
-(10, 'Penalty'),
-(11, 'Fumble');
+(10, 'Penalty');
 
 -- 21. tipos_goles
 INSERT INTO tipos_goles (id_tipo_gol, id_tipo_jugada, nombre_tipo_gol) VALUES
