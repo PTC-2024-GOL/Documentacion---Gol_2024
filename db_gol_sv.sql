@@ -46,8 +46,8 @@ CREATE TABLE tecnicos(
 
 CREATE TABLE temporadas(
   id_temporada INT AUTO_INCREMENT PRIMARY KEY, 
-  anioanio_temporada YEAR NOT NULL,
-  CONSTRAINT uq_anio_temporada_unico UNIQUE(anioanio_temporada)
+  anio_temporada YEAR NOT NULL,
+  CONSTRAINT uq_anio_temporada_unico UNIQUE(anio_temporada)
 );
 
 CREATE TABLE horarios(
@@ -90,11 +90,10 @@ CREATE TABLE equipos(
   id_equipo INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_equipo VARCHAR(50) NOT NULL, 
   CONSTRAINT uq_nombre_equipo_unico UNIQUE(nombre_equipo), 
+  genero_equipo ENUM('Masculino ', 'Femenino') NOT NULL,
   telefono_contacto VARCHAR(14) NULL, 
   id_cuerpo_tecnico INT NULL, 
   CONSTRAINT fk_cuerpo_tecnico_del_equipo FOREIGN KEY (id_cuerpo_tecnico) REFERENCES cuerpos_tecnicos(id_cuerpo_tecnico), 
-  id_administrador INT NULL, 
-  CONSTRAINT fk_administrador_del_equipo FOREIGN KEY (id_administrador) REFERENCES administradores(id_administrador), 
   id_categoria INT NOT NULL, 
   CONSTRAINT fk_categoria_del_equipo FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria),
   logo_equipo VARCHAR(50) NULL, 
@@ -110,19 +109,20 @@ CREATE TABLE posiciones(
 
 CREATE TABLE jugadores(
   id_jugador INT AUTO_INCREMENT PRIMARY KEY, 
-  dorsal_jugador INT NULL,
+  dorsal_jugador INT UNSIGNED NULL,
   nombre_jugador VARCHAR(50) NOT NULL, 
   apellido_jugador VARCHAR(50) NOT NULL, 
   estatus_jugador ENUM('Activo', 'Baja temporal', 'Baja definitiva') DEFAULT 'Activo',
   fecha_nacimiento_jugador DATE NULL,
+  genero_jugador ENUM('Masculino ', 'Femenino') NOT NULL,
   perfil_jugador ENUM('Zurdo', 'Diestro', 'Ambidiestro') NOT NULL,
   id_posicion_principal INT NOT NULL, 
   CONSTRAINT fk_posicion_principal FOREIGN KEY (id_posicion_principal) REFERENCES posiciones(id_posicion), 
   id_posicion_secundaria INT NULL, 
   CONSTRAINT fk_posicion_secundaria FOREIGN KEY (id_posicion_secundaria) REFERENCES posiciones(id_posicion), 
-  altura_jugador DECIMAL(4, 2) NOT NULL,
-  peso_jugador DECIMAL(5, 2) NOT NULL,
-  indice_masa_corporal DECIMAL(5, 2) NULL, 
+  altura_jugador DECIMAL(4, 2) UNSIGNED NOT NULL,
+  peso_jugador DECIMAL(5, 2) UNSIGNED NOT NULL,
+  indice_masa_corporal DECIMAL(5, 2) UNSIGNED NULL, 
   alias_jugador VARCHAR(25) NOT NULL,
   CONSTRAINT uq_alias_jugador_unico UNIQUE(alias_jugador), 
   clave_jugador VARCHAR(100) NOT NULL, 
@@ -139,7 +139,7 @@ CREATE TABLE caracteristicas_jugadores(
 
 CREATE TABLE caracteristicas_analisis(
   id_caracteristica_analisis INT AUTO_INCREMENT PRIMARY KEY,
-  nota_caracteristica_analisis DECIMAL(5,3) NOT NULL,
+  nota_caracteristica_analisis DECIMAL(5,3) UNSIGNED NOT NULL,
   id_jugador INT NOT NULL, 
   CONSTRAINT fk_jugador_caracteristica_general FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
   id_caracteristica_jugador INT NOT NULL,
@@ -183,13 +183,14 @@ CREATE TABLE detalles_contenidos(
   CONSTRAINT fk_contenido FOREIGN KEY (id_sub_tema_contenido) REFERENCES sub_temas_contenidos(id_sub_tema_contenido),
   id_asistencia INT NOT NULL, 
   CONSTRAINT fk_asistencia_contenidos FOREIGN KEY (id_asistencia) REFERENCES asistencias(id_asistencia),
-  minutos_contenido INT NULL, 
-  minutos_tarea INT NULL
+  minutos_contenido INT UNSIGNED NULL, 
+  minutos_tarea INT UNSIGNED NULL
 );
 
 CREATE TABLE jornadas(
   id_jornada INT AUTO_INCREMENT PRIMARY KEY, 
-  numero_jornada INT NOT NULL, 
+  nombre_jornada VARCHAR(60) NULL,
+  numero_jornada INT UNSIGNED NOT NULL, 
   id_temporada INT NOT NULL, 
   CONSTRAINT fk_temporada_jornada FOREIGN KEY (id_temporada) REFERENCES temporadas(id_temporada), 
   fecha_inicio_jornada DATE NOT NULL,
@@ -243,25 +244,22 @@ CREATE TABLE participaciones_partidos(
   CONSTRAINT fk_partido_participacion FOREIGN KEY (id_partido) REFERENCES partidos(id_partido), 
   id_jugador INT NOT NULL, 
   CONSTRAINT fk_jugador_participacion FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
-  titular BOOLEAN NOT NULL, 
-  sustitucion BOOLEAN NOT NULL, 
-  minutos_jugados INT NOT NULL, 
-  goles INT NULL DEFAULT 0,
-  CONSTRAINT chk_goles_anotados CHECK (goles >= 0),
-  asistencias INT NULL DEFAULT 0, 
-  CONSTRAINT chk_asistencias_hechas CHECK (asistencias >= 0),
+  titular BOOLEAN NULL DEFAULT 0, 
+  sustitucion BOOLEAN NULL DEFAULT 0, 
+  minutos_jugados INT UNSIGNED NULL DEFAULT 0, 
+  goles INT UNSIGNED NULL DEFAULT 0,
+  asistencias INT UNSIGNED NULL DEFAULT 0, 
   estado_animo ENUM (
     'Desanimado', 'Agotado', 'Normal', 'Satisfecho', 'Energetico'
   ) NULL DEFAULT 'Normal',
-  puntuacion INT NULL
+  puntuacion INT UNSIGNED NULL DEFAULT 0
 );
 
 CREATE TABLE detalles_goles (
   id_detalle_gol INT AUTO_INCREMENT PRIMARY KEY,
   id_participacion INT NOT NULL,
   CONSTRAINT fk_participacion_detalle_gol FOREIGN KEY (id_participacion) REFERENCES participaciones_partidos(id_participacion),
-  cantidad_tipo_gol INT NULL,
-  CONSTRAINT chk_cantidad_tipo_gol CHECK (cantidad_tipo_gol >= 0),
+  cantidad_tipo_gol INT UNSIGNED NULL,
   id_tipo_gol INT NOT NULL,
   CONSTRAINT fk_tipo_gol_detalle_gol FOREIGN KEY (id_tipo_gol) REFERENCES tipos_goles(id_tipo_gol)
 );
@@ -273,8 +271,7 @@ CREATE TABLE detalles_amonestaciones (
     'Tarjeta amarilla', 'Tarjeta roja',
     'Ninguna'
   ) NULL DEFAULT 'Ninguna',
-  numero_amonestacion INT NULL,
- CONSTRAINT chk_numero_amonestacion CHECK (numero_amonestacion >= 0)
+  numero_amonestacion INT UNSIGNED NULL
 );
 
 CREATE TABLE tipos_lesiones(
@@ -303,8 +300,8 @@ CREATE TABLE lesiones(
   CONSTRAINT fk_registro_medico_del_tipo_de_lesion FOREIGN KEY (id_tipo_lesion) REFERENCES tipos_lesiones(id_tipo_lesion), 
   id_sub_tipologia INT NOT NULL,
   CONSTRAINT fk_id_subtipologia_lesiones FOREIGN KEY (id_sub_tipologia) REFERENCES sub_tipologias(id_sub_tipologia),
-  numero_lesiones INT NOT NULL, 
-  promedio_lesiones INT NULL DEFAULT 0
+  numero_lesiones INT UNSIGNED NOT NULL, 
+  promedio_lesiones INT UNSIGNED NULL DEFAULT 0
 );
 
 CREATE TABLE registros_medicos(
@@ -313,7 +310,7 @@ CREATE TABLE registros_medicos(
   CONSTRAINT fk_registro_medico_jugador FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
   fecha_lesion DATE NULL, 
   fecha_registro DATE NULL DEFAULT NOW(), 
-  dias_lesionado INT NULL, 
+  dias_lesionado INT UNSIGNED NULL, 
   id_lesion INT NOT NULL, 
   CONSTRAINT fk_lesion_jugador FOREIGN KEY (id_lesion) REFERENCES lesiones(id_lesion), 
   retorno_entreno DATE NOT NULL, 
@@ -324,9 +321,9 @@ CREATE TABLE registros_medicos(
 CREATE TABLE pagos(
   id_pago INT AUTO_INCREMENT PRIMARY KEY, 
   fecha_pago DATE NOT NULL,
-  cantidad_pago DECIMAL(5, 2) NOT NULL,
+  cantidad_pago DECIMAL(5, 2)UNSIGNED NOT NULL,
   pago_tardio BOOLEAN NULL DEFAULT 0, 
-  mora_pago DECIMAL(5, 2) NULL,
+  mora_pago DECIMAL(5, 2) UNSIGNED NULL DEFAULT 0,
   mes_pago ENUM('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre') NOT NULL,
   id_jugador INT NOT NULL, 
   CONSTRAINT fk_jugador_pago FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador)
@@ -340,7 +337,7 @@ GROUP BY id_jugador;
 //
 DELIMITER ;
 
-INSERT INTO temporadas(anioanio_temporada) VALUES(2024);
+INSERT INTO temporadas(anio_temporada) VALUES(2024);
 -- Inserción de posiciones de ataque
 INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Delantero centro', 'Ofensiva');
 INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Segundo delantero', 'Ofensiva');
