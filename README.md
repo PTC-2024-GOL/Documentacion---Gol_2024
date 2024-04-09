@@ -1,3 +1,4 @@
+**Sección:** 2B
 **Nombre del proyecto:** One Goal
 **Descripción:** Sistema administrativo para el control de partidos y entrenos para la Fundación un Gol para El Salvador
 **Integrantes:**
