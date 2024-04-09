@@ -1,4 +1,3 @@
-
 DROP DATABASE if EXISTS db_gol_sv;
 
 CREATE DATABASE db_gol_sv;
@@ -248,24 +247,35 @@ CREATE TABLE participaciones_partidos(
   sustitucion BOOLEAN NOT NULL, 
   minutos_jugados INT NOT NULL, 
   goles INT NULL DEFAULT 0,
-  CONSTRAINT chk_goles_anotados CHECK (goles >= 0), 
-  id_tipo_gol INT NULL, 
-  CONSTRAINT fk_tipo_gol_partido FOREIGN KEY (id_tipo_gol) REFERENCES tipos_goles(id_tipo_gol), 
-  cantidad_tipo_gol INT NULL, 
+  CONSTRAINT chk_goles_anotados CHECK (goles >= 0),
   asistencias INT NULL DEFAULT 0, 
-  CONSTRAINT chk_asistencias_hechas CHECK (asistencias >= 0), 
-  amonestacion ENUM(
-    'Tarjeta amarilla', 'Tarjeta roja', 
-    'Ninguna'
-  ) NULL DEFAULT 'Ninguna', 
+  CONSTRAINT chk_asistencias_hechas CHECK (asistencias >= 0),
   estado_animo ENUM (
     'Desanimado', 'Agotado', 'Normal', 'Satisfecho', 'Energetico'
   ) NULL DEFAULT 'Normal',
-  numero_amonestacion INT NULL DEFAULT 0, 
-  CONSTRAINT chk_numero_amonestacion CHECK (numero_amonestacion >= 0), 
   puntuacion INT NULL
 );
 
+CREATE TABLE detalles_goles (
+  id_detalle_gol INT AUTO_INCREMENT PRIMARY KEY,
+  id_participacion INT NOT NULL,
+  CONSTRAINT fk_participacion_detalle_gol FOREIGN KEY (id_participacion) REFERENCES participaciones_partidos(id_participacion),
+  cantidad_tipo_gol INT NULL,
+  CONSTRAINT chk_cantidad_tipo_gol CHECK (cantidad_tipo_gol >= 0),
+  id_tipo_gol INT NOT NULL,
+  CONSTRAINT fk_tipo_gol_detalle_gol FOREIGN KEY (id_tipo_gol) REFERENCES tipos_goles(id_tipo_gol)
+);
+
+CREATE TABLE detalles_amonestaciones (
+  id_detalle_amonestacion INT AUTO_INCREMENT PRIMARY KEY,
+  id_participacion INT NOT NULL,
+  amonestacion ENUM(
+    'Tarjeta amarilla', 'Tarjeta roja',
+    'Ninguna'
+  ) NULL DEFAULT 'Ninguna',
+  numero_amonestacion INT NULL,
+ CONSTRAINT chk_numero_amonestacion CHECK (numero_amonestacion >= 0)
+);
 
 CREATE TABLE tipos_lesiones(
   id_tipo_lesion INT AUTO_INCREMENT PRIMARY KEY, 
