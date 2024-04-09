@@ -8,7 +8,11 @@ USE db_gol_sv;
 
 
 -- 3. temporadas
-
+INSERT INTO temporadas(anio_temporada) VALUES(2020);
+INSERT INTO temporadas(anio_temporada) VALUES(2021);
+INSERT INTO temporadas(anio_temporada) VALUES(2022);
+INSERT INTO temporadas(anio_temporada) VALUES(2023);
+INSERT INTO temporadas(anio_temporada) VALUES(2024);
 
 -- 4. horarios
 
@@ -24,6 +28,28 @@ USE db_gol_sv;
 
 -- 8. posiciones
 
+-- Inserción de posiciones de ataque
+INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Delantero centro', 'Ofensiva');
+INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Segundo delantero', 'Ofensiva');
+INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Mediapunta', 'Ofensiva');
+INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Falso nueve', 'Ofensiva');
+INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Extremo izquierdo', 'Ofensiva');
+INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Extremo derecho', 'Ofensiva');
+-- Inserción de posiciones de mediocampista
+INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Mediocentro', 'Ofensiva y defensiva');
+INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Mediocentro ofensivo', 'Ofensiva');
+INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Mediocentro defensivo', 'Defensiva');
+INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Pivote', 'Defensiva');
+INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Interior izquierdo', 'Ofensiva y defensiva');
+INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Interior derecho', 'Ofensiva y defensiva');
+-- Inserción de posiciones de defensa
+INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Defensa central', 'Defensiva');
+INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Defensa izquierdo', 'Defensiva');
+
+INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Defensa derecho', 'Defensiva');
+INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Lateral izquierdo', 'Defensiva');
+INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Lateral derecho', 'Defensiva');
+INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Portero', 'Defensiva');
 
 -- 9. jugadores
 
@@ -95,18 +121,61 @@ INSERT INTO detalles_goles (id_participacion, cantidad_tipo_gol, id_tipo_gol)
 INSERT INTO detalles_amonestaciones (id_participacion, amonestacion, numero_amonestacion)
 
 -- 25. tipos_lesiones
-
+INSERT INTO tipos_lesiones (tipo_lesion) VALUES 
+('LESIONES TREN INFERIOR'),
+('LESIONES TREN SUPERIOR');
 
 -- 26. tipologias
+INSERT INTO tipologias (tipologia) VALUES 
+('ISQUIOS'),
+('CUÁDRICEPS'),
+('SÓLEO'),
+('GEMELO'),
+('ROTURA DE LIGAMENTO CRUZADO'),
+('ROTURA FIBRILAR'),
+('ESGUINCE TOBILLO'),
+('ROTURA LIG.RODILLA'),
+('ESGUINCE RODILLA'),
+('TENDÓN AQUILES');
 
 
 -- 27. sub_tipologias
+INSERT INTO sub_tipologias (nombre_sub_tipologia, id_tipologia) VALUES 
+('Rotura de fibras', 1),
+('Fractura de brazo', 2),
+('Hematoma', 3),
+('Tirón muscular', 1),
+('Luxación de hombro', 5),
+('ROTURA ESCAFOIDES', 1),
+('TENDINITIS CODO', 2),
+('FRACTURA', 3),
+('FISURA', 1),
+('INTERNO', 5);
 
 
 -- 28. lesiones
+INSERT INTO lesiones (id_tipo_lesion, id_sub_tipologia, numero_lesiones, promedio_lesiones) VALUES 
+(1, 1, 5, 3),
+(2, 3, 2, 2),
+(2, 4, 3, 2),
+(2, 5, 1, 1),
+(1, 2, 4, 3),
+(1, 1, 5, 3),
+(2, 3, 2, 2),
+(2, 4, 3, 2),
+(2, 5, 1, 1),
+(1, 2, 4, 3);
 
 
 -- 29. registro_medico
+INSERT INTO registros_medicos (id_jugador, fecha_lesion, dias_lesionado, id_lesion, retorno_entreno, retorno_partido) VALUES 
+(1, '2024-03-15', 10, 1, '2024-03-25', 102),
+(1, '2024-02-10', 15, 3, '2024-02-25', 101),
+(1, '2024-01-20', 7, 5, '2024-01-27', 100);
 
 
 -- 30. pago 
+INSERT INTO pagos (fecha_pago, cantidad_pago, pago_tardio, mora_pago, mes_pago, id_jugador) VALUES 
+('2024-04-01', 100.00, 0, 0.00, 'Abril', 1),
+('2024-03-01', 100.00, 1, 5.00, 'Marzo', 1),
+('2024-02-01', 100.00, 0, 0.00, 'Febrero', 1);
