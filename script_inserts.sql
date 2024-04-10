@@ -63,7 +63,17 @@ INSERT INTO cuerpos_tecnicos (nombre_cuerpo_tecnico, primer_tecnico, segundo_tec
 ('Cuerpo Técnico 10', 10, 1, 2, 3);
 
 -- 7. equipos
-
+INSERT INTO equipos (nombre_equipo, genero_equipo, telefono_contacto, id_cuerpo_tecnico, id_administrador, id_categoria, logo_equipo) VALUES
+('Barcelona', 'Masculino', '9865-2546', 1, 1, 1, 'default.jpg'),
+('Girona', 'Masculino', '3287-6854', 1, 1, 1, 'default.jpg'),
+('Real Madrid', 'Masculino', '2862-5882', 1, 1, 1, 'default.jpg'),
+('Inter milan', 'Femenino', '2012-8676', 1, 1, 1, 'default.jpg'),
+('Arsenal', 'Masculino', '0428-8654', 1, 1, 1, 'default.jpg'),
+('Chelsea', 'Masculino', '7986-5687', 1, 1, 1, 'default.jpg'),
+('Liverpool', 'Masculino', '3559-8751', 1, 1, 1, 'default.jpg'),
+('Villarreal', 'Masculino', '6597-6578', 1, 1, 1, 'default.jpg'),
+('Cádiz', 'Masculino', '5204-5687', 1, 1, 1, 'default.jpg'),
+('Getafe', 'Masculino', '7687-6554', 1, 1, 1, 'default.jpg');
 
 -- 8. posiciones
 
@@ -91,40 +101,83 @@ INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Lateral derecho', 'Def
 INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Portero', 'Defensiva');
 
 -- 9. jugadores
-
+INSERT INTO jugadores (dorsal_jugador, nombre_jugador, apellido_jugador, estatus_jugador, fecha_nacimiento_jugador, genero_jugador, perfil_jugador, id_posicion_principal, id_posicion_secundaria, altura_jugador, peso_jugador, indice_masa_corporal, alias_jugador, clave_jugador, foto_jugador) VALUES
+(10, 'Lionel', 'Messi', 'Activo', '1987-06-24', 'Masculino', 'Zurdo', 6, 4, 1.70, 72, 24.91, 'Leo', 'leomessi10', 'default.jpg'),
+(7, 'Cristiano', 'Ronaldo', 'Activo', '1985-02-05', 'Masculino', 'Diestro', 5, 1, 1.87, 83, 23.77, 'CR7', 'ronaldo7', 'default.jpg'),
+(10, 'Neymar', 'Jr.', 'Baja temporal', '1992-02-05', 'Masculino', 'Ambidiestro', 6, 3, 1.75, 68, 22.2, 'Ney', 'neymar10', 'default.jpg'),
+(4, 'Sergio', 'Ramos', 'Activo', '1986-03-30', 'Masculino', 'Diestro', 13, 17, 1.83, 82, 24.43, 'SR4', 'ramos4', 'default.jpg'),
+(17, 'Kevin', 'De Bruyne', 'Activo', '1991-06-28', 'Masculino', 'Ambidiestro', 8, 4, 1.81, 70, 21.39, 'KDB', 'debruyne17', 'default.jpg'),
+(8, 'Andrés', 'Iniesta', 'Baja definitiva', '1984-05-11', 'Masculino', 'Diestro', 7, 11, 1.70, 68, 23.53, 'El Ilusionista', 'iniesta8', 'default.jpg'),
+(9, 'Robert', 'Lewandowski', 'Activo', '1988-08-21', 'Masculino', 'Diestro', 1, 2, 1.84, 80, 23.62, 'Lewy', 'lewandowski9', 'foto7.jpg'),
+(1, 'Manuel', 'Neuer', 'Activo', '1986-03-27', 'Masculino', 'Diestro', 18, 18, 1.93, 92, 24.69, 'Manu', 'neuer1', 'default.jpg'),
+(7, 'Kylian', 'Mbappé', 'Activo', '1998-12-20', 'Masculino', 'Diestro', 1, 6, 1.78, 73, 23.05, 'Kyky', 'mbappe11', 'default.jpg'),
+(6, 'Virgil', 'van Dijk', 'Baja temporal', '1991-07-08', 'Masculino', 'Diestro', 13, 14, 1.93, 92, 24.69, 'Big', 'virgil6', 'default.jpg');
 
 -- 10. caracteristicas_jugadores
+INSERT INTO caracteristicas_jugadores (nombre_caracteristica_jugador, clasificacion_caracteristica_jugador) VALUES
+('PASE CORTO', 'Técnicos'),
+('PASE MEDIO', 'Técnicos'),
+('PASE LARGO', 'Técnicos'),
+('CONDUCCIÓN', 'Técnicos'),
+('RECEPCIÓN', 'Técnicos'),
+('TOMA DE DECISIONES', 'Tácticos'),
+('CONCEPTOS OFENSIVOS', 'Tácticos'),
+('CONCEPTOS DEFENSIVOS', 'Tácticos'),
+('CONCENTRACIÓN', 'Psicologicos'),
+('SACRIFICIO', 'Psicologicos');
+
+-- 11. plantillas_equipos
+INSERT INTO plantillas_equipos (id_jugador, id_temporada, id_equipo) VALUES
+(1, 1, 1),
+(2, 2, 2),
+(3, 3, 3),
+(4, 4, 4),
+(5, 5, 5),
+(6, 1, 6),
+(7, 2, 7),
+(8, 3, 8),
+(9, 4, 9),
+(10, 5, 10);
+
+-- 12. caracteristicas_analisis
+INSERT INTO caracteristicas_analisis (nota_caracteristica_analisis, id_jugador, id_caracteristica_jugador) VALUES
+(9.5, 1, 1),
+(5.0, 2, 2),
+(6.3, 3, 3),
+(5.5, 4, 4),
+(8.9, 5, 5),
+(2.4, 6, 6),
+(6.8, 7, 7),
+(3.5, 8, 8),
+(7.9, 9, 9),
+(5.6, 10, 10);
+
+-- 13. asistencias
 
 
--- 11. caracteristicas_analisis
+-- 14. temas_contenidos
 
 
--- 12. asistencias
+-- 15. sub_temas_contenidos
 
 
--- 13. temas_contenidos
+-- 16. tareas
 
 
--- 14. sub_temas_contenidos
+-- 17. detalles_contenidos
 
 
--- 15. tareas
+-- 18. jornadas
 
 
--- 16. detalles_contenidos
+-- 19. entrenamientos
 
 
--- 17. jornadas
-
-
--- 18. entrenamientos
-
-
--- 19. partidos
+-- 20. partidos
 INSERT INTO partidos (id_entrenamiento, id_equipo, logo_rival, rival_partido, fecha_partido, cancha_partido, resultado_partido, localidad_partido, tipo_resultado_partido)
 
 
--- 20. tipos_jugadas
+-- 21. tipos_jugadas
 INSERT INTO tipos_jugadas (id_tipo_jugada, nombre_tipo_juego) VALUES
 (1, 'Tiro libre'),
 (2, 'Juego directo'),
@@ -137,7 +190,7 @@ INSERT INTO tipos_jugadas (id_tipo_jugada, nombre_tipo_juego) VALUES
 (9, 'Safety'),
 (10, 'Penalty');
 
--- 21. tipos_goles
+-- 22. tipos_goles
 INSERT INTO tipos_goles (id_tipo_gol, id_tipo_jugada, nombre_tipo_gol) VALUES
 (1, 1, 'Tiro de esquina'),
 (2, 2, 'Dentro del area'),
@@ -150,21 +203,21 @@ INSERT INTO tipos_goles (id_tipo_gol, id_tipo_jugada, nombre_tipo_gol) VALUES
 (9, 9, 'Penalty'),
 (10, 10, 'Fumble');
 
--- 22. participaciones_partidos
+-- 23. participaciones_partidos
 INSERT INTO participaciones_partidos (id_partido, id_jugador, titular, sustitucion, minutos_jugados, goles, asistencias, estado_animo, puntuacion)
 
--- 23. detalles_goles
+-- 24. detalles_goles
 INSERT INTO detalles_goles (id_participacion, cantidad_tipo_gol, id_tipo_gol)
 
--- 24. detalles_amonestaciones
+-- 25. detalles_amonestaciones
 INSERT INTO detalles_amonestaciones (id_participacion, amonestacion, numero_amonestacion)
 
--- 25. tipos_lesiones
+-- 26. tipos_lesiones
 INSERT INTO tipos_lesiones (tipo_lesion) VALUES 
 ('LESIONES TREN INFERIOR'),
 ('LESIONES TREN SUPERIOR');
 
--- 26. tipologias
+-- 27. tipologias
 INSERT INTO tipologias (tipologia) VALUES 
 ('ISQUIOS'),
 ('CUÁDRICEPS'),
@@ -178,7 +231,7 @@ INSERT INTO tipologias (tipologia) VALUES
 ('TENDÓN AQUILES');
 
 
--- 27. sub_tipologias
+-- 28. sub_tipologias
 INSERT INTO sub_tipologias (nombre_sub_tipologia, id_tipologia) VALUES 
 ('Rotura de fibras', 1),
 ('Fractura de brazo', 2),
@@ -192,7 +245,7 @@ INSERT INTO sub_tipologias (nombre_sub_tipologia, id_tipologia) VALUES
 ('INTERNO', 5);
 
 
--- 28. lesiones
+-- 29. lesiones
 INSERT INTO lesiones (id_tipo_lesion, id_sub_tipologia, numero_lesiones, promedio_lesiones) VALUES 
 (1, 1, 5, 3),
 (2, 3, 2, 2),
@@ -206,14 +259,14 @@ INSERT INTO lesiones (id_tipo_lesion, id_sub_tipologia, numero_lesiones, promedi
 (1, 2, 4, 3);
 
 
--- 29. registro_medico
+-- 30. registro_medico
 INSERT INTO registros_medicos (id_jugador, fecha_lesion, dias_lesionado, id_lesion, retorno_entreno, retorno_partido) VALUES 
 (1, '2024-03-15', 10, 1, '2024-03-25', 102),
 (1, '2024-02-10', 15, 3, '2024-02-25', 101),
 (1, '2024-01-20', 7, 5, '2024-01-27', 100);
 
 
--- 30. pago 
+-- 31. pago 
 INSERT INTO pagos (fecha_pago, cantidad_pago, pago_tardio, mora_pago, mes_pago, id_jugador) VALUES 
 ('2024-04-01', 100.00, 0, 0.00, 'Abril', 1),
 ('2024-03-01', 100.00, 1, 5.00, 'Marzo', 1),
