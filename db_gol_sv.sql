@@ -65,7 +65,7 @@ CREATE TABLE categorias(
   CONSTRAINT uq_nombre_categoria_unico UNIQUE(nombre_categoria), 
   edad_minima_permitida DATE NOT NULL, 
   edad_maxima_permitida DATE NOT NULL, 
-  CONSTRAINT chk_validacion_de_edades CHECK(edad_minima_permitida < edad_maxima_permitida), 
+  CONSTRAINT chk_validacion_de_edades CHECK(edad_minima_permitida > edad_maxima_permitida), 
   id_temporada INT NOT NULL, 
   CONSTRAINT fk_temporada_de_la_categoria FOREIGN KEY (id_temporada) REFERENCES temporadas(id_temporada), 
   id_horario INT NOT NULL, 
@@ -336,27 +336,3 @@ FROM caracteristicas_analisis
 GROUP BY id_jugador;
 //
 DELIMITER ;
-
-INSERT INTO temporadas(anio_temporada) VALUES(2024);
--- Inserción de posiciones de ataque
-INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Delantero centro', 'Ofensiva');
-INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Segundo delantero', 'Ofensiva');
-INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Mediapunta', 'Ofensiva');
-INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Falso nueve', 'Ofensiva');
-INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Extremo izquierdo', 'Ofensiva');
-INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Extremo derecho', 'Ofensiva');
--- Inserción de posiciones de mediocampista
-INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Mediocentro', 'Ofensiva y defensiva');
-INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Mediocentro ofensivo', 'Ofensiva');
-INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Mediocentro defensivo', 'Defensiva');
-INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Pivote', 'Defensiva');
-INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Interior izquierdo', 'Ofensiva y defensiva');
-INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Interior derecho', 'Ofensiva y defensiva');
--- Inserción de posiciones de defensa
-INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Defensa central', 'Defensiva');
-INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Defensa izquierdo', 'Defensiva');
-
-INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Defensa derecho', 'Defensiva');
-INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Lateral izquierdo', 'Defensiva');
-INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Lateral derecho', 'Defensiva');
-INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Portero', 'Defensiva');
