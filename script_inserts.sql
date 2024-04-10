@@ -2,10 +2,25 @@
 USE db_gol_sv;
 
 -- 1. Admin
+SET @fecha_creacion := NOW();
 
+SET @alias := generar_alias_administrador('Juan', 'Pérez', @fecha_creacion);
+
+INSERT INTO administradores (nombre_administrador, apellido_administrador, alias_administrador, clave_administrador, correo_administrador, telefono_administrador, dui_administrador, fecha_nacimiento_administrador, fecha_creacion) 
+VALUES ('José', 'Martínez', @alias, 'onegoalsv', 'chepemart@gmail.com', '1234-5678', '07070707-7', '1979-09-30', @fecha_creacion);
 
 -- 2. tecnicos
-
+INSERT INTO tecnicos (nombre_tecnico, apellido_tecnico, alias_tecnico, clave_tecnico, correo_tecnico, telefono_tecnico, dui_tecnico, fecha_nacimiento_tecnico) VALUES
+('Roberto', 'Martínez', 'roberto_m', 'pass123', 'roberto@gmail.com', '7771-8234', '01010101-1', '1976-02-28'),
+('María', 'Gutiérrez', 'maria_g', 'password123', 'maria@gmail.com', '6664-8321', '02020202-2', '1980-09-15'),
+('José', 'Dominguez', 'jose_d', 'abc123', 'jose@gmail.com', '5551-7234', '03030303-3', '1978-11-10'),
+('Verónica', 'Castro', 'veronica_c', 'clave456', 'veronica@gmail.com', '4444-7321', '04040404-4', '1983-07-22'),
+('Daniel', 'Fernández', 'daniel_f', 'dani123', 'daniel@gmail.com', '3335-7678', '05050505-5', '1975-05-20'),
+('Carolina', 'Santos', 'carolina_s', 'password456', 'carolina@gmail.com', '2221-7234', '06060606-6', '1982-08-18'),
+('Jorge', 'Ruiz', 'jorge_r', 'qwerty123', 'jorge@gmail.com', '1114-7321', '08080808-8', '1977-03-30'),
+('Paula', 'Ortega', 'paula_o', 'paula123', 'paula@gmail.com', '9995-7678', '09090909-9', '1984-12-05'),
+('Alberto', 'Mendoza', 'alberto_m', 'contraseña123', 'alberto@gmail.com', '8881-7234', '10101010-0', '1979-06-08'),
+('Carmen', 'Vargas', 'carmen_v', 'clave789', 'carmen@gmail.com', '7774-7321', '11111111-1', '1981-01-12');
 
 -- 3. temporadas
 INSERT INTO temporadas(anio_temporada) VALUES(2020);
@@ -15,12 +30,37 @@ INSERT INTO temporadas(anio_temporada) VALUES(2023);
 INSERT INTO temporadas(anio_temporada) VALUES(2024);
 
 -- 4. horarios
-
+INSERT INTO horarios (dia, hora_inicial, hora_final, campo_de_entrenamiento) VALUES
+('Miércoles', '16:00:00', '18:00:00', 'Cancha Bayer'),
+('Jueves', '16:00:00', '18:00:00', 'Cancha Bayer'),
+('Viernes', '16:00:00', '18:00:00', 'Cancha Bayer'),
+('Sábado', '16:00:00', '18:00:00', 'Cancha Bayer'),
+('Domingo', '16:00:00', '18:00:00', 'Cancha Bayer'),
+('Lunes', '16:00:00', '18:00:00', 'Cancha Bayer'),
+('Martes', '16:00:00', '18:00:00', 'Cancha Bayer'),
+('Miércoles', '16:00:00', '18:00:00', 'Cancha Bayer'),
+('Jueves', '16:00:00', '18:00:00', 'Cancha Bayer'),
+('Viernes', '16:00:00', '18:00:00', 'Cancha Bayer');
 
 -- 5. categorias
-
+INSERT INTO categorias (nombre_categoria, edad_minima_permitida, edad_maxima_permitida, id_temporada, id_horario) VALUES
+('Nivel 1', '2020-01-01', '2017-12-31', 1, 1),
+('Nivel 2', '2016-01-01', '2011-12-31', 2, 2),
+('Nivel 3', '2009-01-01', '2008-12-31', 3, 1),
+('Nivel 4', '2007-01-01', '2005-12-31', 4, 2);
 
 -- 6. cuerpos_tecnicos
+INSERT INTO cuerpos_tecnicos (nombre_cuerpo_tecnico, primer_tecnico, segundo_tecnico, preparador_fisico, delegado) VALUES
+('Cuerpo Técnico 1', 1, 2, 3, 4),
+('Cuerpo Técnico 2', 2, 3, 4, 5),
+('Cuerpo Técnico 3', 3, 4, 5, 6),
+('Cuerpo Técnico 4', 4, 5, 6, 7),
+('Cuerpo Técnico 5', 5, 6, 7, 8),
+('Cuerpo Técnico 6', 6, 7, 8, 9),
+('Cuerpo Técnico 7', 7, 8, 9, 10),
+('Cuerpo Técnico 8', 8, 9, 10, 1),
+('Cuerpo Técnico 9', 9, 10, 1, 2),
+('Cuerpo Técnico 10', 10, 1, 2, 3);
 
 
 -- 7. equipos
