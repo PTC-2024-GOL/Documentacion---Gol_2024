@@ -65,7 +65,7 @@ CREATE TABLE categorias(
   CONSTRAINT uq_nombre_categoria_unico UNIQUE(nombre_categoria), 
   edad_minima_permitida DATE NOT NULL, 
   edad_maxima_permitida DATE NOT NULL, 
-  CONSTRAINT chk_validacion_de_edades CHECK(edad_minima_permitida > edad_maxima_permitida), 
+  CONSTRAINT chk_validacion_de_edades CHECK(edad_minima_permitida < edad_maxima_permitida), 
   id_temporada INT NOT NULL, 
   CONSTRAINT fk_temporada_de_la_categoria FOREIGN KEY (id_temporada) REFERENCES temporadas(id_temporada), 
   id_horario INT NOT NULL, 
@@ -94,6 +94,8 @@ CREATE TABLE equipos(
   telefono_contacto VARCHAR(14) NULL, 
   id_cuerpo_tecnico INT NULL, 
   CONSTRAINT fk_cuerpo_tecnico_del_equipo FOREIGN KEY (id_cuerpo_tecnico) REFERENCES cuerpos_tecnicos(id_cuerpo_tecnico), 
+  id_administrador INT NULL, 
+  CONSTRAINT fk_administrador_del_equipo FOREIGN KEY (id_administrador) REFERENCES administradores(id_administrador), 
   id_categoria INT NOT NULL, 
   CONSTRAINT fk_categoria_del_equipo FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria),
   logo_equipo VARCHAR(50) NULL, 
@@ -130,6 +132,16 @@ CREATE TABLE jugadores(
   CONSTRAINT chk_url_foto_jugador CHECK (foto_jugador LIKE '%.jpg' OR foto_jugador LIKE '%.png' OR foto_jugador LIKE '%.jpeg' OR foto_jugador LIKE '%.gif')
 );
 
+CREATE TABLE plantillas_equipos(
+  id_plantilla INT AUTO_INCREMENT PRIMARY KEY,
+  id_jugador INT NOT NULL, 
+  CONSTRAINT fk_jugador_plantilla FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
+  id_temporada INT NOT NULL, 
+  CONSTRAINT fk_temporada_plantilla FOREIGN KEY (id_temporada) REFERENCES temporadas(id_temporada), 
+  id_equipo INT NOT NULL, 
+  CONSTRAINT fk_equipo_plantilla FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo)
+);
+
 CREATE TABLE caracteristicas_jugadores(
   id_caracteristica_jugador INT AUTO_INCREMENT PRIMARY KEY,
   nombre_caracteristica_jugador VARCHAR(50) NOT NULL,
@@ -141,7 +153,7 @@ CREATE TABLE caracteristicas_analisis(
   id_caracteristica_analisis INT AUTO_INCREMENT PRIMARY KEY,
   nota_caracteristica_analisis DECIMAL(5,3) UNSIGNED NOT NULL,
   id_jugador INT NOT NULL, 
-  CONSTRAINT fk_jugador_caracteristica_general FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
+  CONSTRAINT fk_jugador_caracteristica_general FOREIGN KEY (id_jugador) REFERENCES plantillas_equipos(id_plantilla), 
   id_caracteristica_jugador INT NOT NULL,
   CONSTRAINT fk_sub_caracteristica_jugador_caracteristica_general FOREIGN KEY (id_caracteristica_jugador) REFERENCES caracteristicas_jugadores(id_caracteristica_jugador)
 );
@@ -149,7 +161,7 @@ CREATE TABLE caracteristicas_analisis(
 CREATE TABLE asistencias(
   id_asistencia INT AUTO_INCREMENT PRIMARY KEY, 
   id_jugador INT NOT NULL, 
-  CONSTRAINT fk_jugador_asistencia FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
+  CONSTRAINT fk_jugador_asistencia FOREIGN KEY (id_jugador) REFERENCES plantillas_equipos(id_plantilla), 
   id_horario INT NOT NULL, 
   CONSTRAINT fk_horario_asistencia FOREIGN KEY (id_horario) REFERENCES horarios(id_horario), 
   fecha_asistencia DATE NULL DEFAULT NOW(),
@@ -213,7 +225,7 @@ CREATE TABLE partidos(
   id_entrenamiento INT NOT NULL, 
   CONSTRAINT fk_jornada_partido FOREIGN KEY (id_entrenamiento) REFERENCES entrenamientos(id_entrenamiento), 
   id_equipo INT NOT NULL, 
-  CONSTRAINT fk_equipo FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo), 
+  CONSTRAINT fk_equipo_partido FOREIGN KEY (id_equipo) REFERENCES plantillas_equipos(id_plantilla), 
   logo_rival VARCHAR(50) NULL, 
   CONSTRAINT chk_url_logo_equipo_rival CHECK (logo_rival LIKE '%.jpg' OR logo_rival LIKE '%.png' OR logo_rival LIKE '%.jpeg' OR logo_rival LIKE '%.gif'),
   rival_partido VARCHAR(50) NOT NULL,
@@ -243,7 +255,7 @@ CREATE TABLE participaciones_partidos(
   id_partido INT NOT NULL, 
   CONSTRAINT fk_partido_participacion FOREIGN KEY (id_partido) REFERENCES partidos(id_partido), 
   id_jugador INT NOT NULL, 
-  CONSTRAINT fk_jugador_participacion FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
+  CONSTRAINT fk_jugador_participacion FOREIGN KEY (id_jugador) REFERENCES plantillas_equipos(id_plantilla),  
   titular BOOLEAN NULL DEFAULT 0, 
   sustitucion BOOLEAN NULL DEFAULT 0, 
   minutos_jugados INT UNSIGNED NULL DEFAULT 0, 
