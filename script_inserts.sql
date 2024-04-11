@@ -311,12 +311,16 @@ INSERT INTO detalles_goles (id_participacion, cantidad_tipo_gol, id_tipo_gol) VA
 
 -- 25. detalles_amonestaciones
 INSERT INTO detalles_amonestaciones (id_participacion, amonestacion, numero_amonestacion) VALUES
-
-
-
-
-
-
+(1, 'Tarjeta amarilla', 1),
+(2, 'Tarjeta amarilla', 1),
+(3, 'Tarjeta roja', 1),
+(4, 'Tarjeta amarilla', 2),
+(5, 'Tarjeta roja', 2),
+(6, 'Ninguna', NULL),
+(7, 'Tarjeta amarilla', 1),
+(8, 'Ninguna', NULL),
+(9, 'Tarjeta roja', 1),
+(10, 'Ninguna', NULL);
 
 -- 26. tipos_lesiones
 INSERT INTO tipos_lesiones (tipo_lesion) VALUES 
