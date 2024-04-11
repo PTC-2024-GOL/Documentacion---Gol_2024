@@ -165,19 +165,71 @@ INSERT INTO asistencias (id_jugador, id_horario, asistencia, observacion_asisten
 (10, 5, 'Otro', 'Asunto personal, se comunicará con el entrenador luego');
 
 -- 14. temas_contenidos
-
+INSERT INTO lesiones (id_tipo_lesion, id_sub_tipologia, numero_lesiones, promedio_lesiones) VALUES
+(1, 1, 1, 60),
+(2, 2, 3, 20),
+(3, 3, 1, 80),
+(4, 4, 3, 20),
+(5, 5, 1, 30),
+(6, 6, 2, 29),
+(7, 7, 7, 60),
+(8, 8, 6, 91),
+(9, 9, 1, 30),
+(10, 10, 2, 20);
 
 -- 15. sub_temas_contenidos
+INSERT INTO sub_temas_contenidos(sub_tema_contenido, id_tema_contenido) VALUES
+('Ejercicios de agilidad', 1),
+('Entrenamiento de resistencia',2),
+('Técnica de regate',3),
+('Trabajo de fuerza',4),
+('Entrenamiento de velocidad',5),
+('Técnica de tiro',6),
+('Trabajo de coordinación',7),
+('Ejercicios de flexibilidad',8),
+('Tácticas de juego',9,
+('Entrenamiento de porteros',10);
 
 
 -- 16. tareas
-
+INSERT INTO tareas(nombre_tarea) VALUES
+('Entrenamiento de fuerza con pesas libres'),
+('Entrenamiento de fuerza con máquinas de resistencia'),
+('Cardio en máquinas como cintas de correr, elípticas o bicicletas estáticas'),
+('Entrenamiento de intervalos de alta intensidad (HIIT)'),
+('Clases grupales como aeróbic, spinning, zumba, yoga, etc.'),
+('Entrenamiento funcional con TRX, kettlebells o balones medicinales'),
+('Estiramientos y flexibilidad'),
+('Entrenamiento de habilidades específicas como boxeo, artes marciales, etc.'),
+('Asesoramiento nutricional y planificación de dietas'),
+('Evaluación física y seguimiento de progreso');
 
 -- 17. detalles_contenidos
+INSERT INTO detalles_contenidos(id_tarea, id_sub_tema_contenido, id_asistencia, minutos_contenido, minutos_tarea) VALUES
+(1, 1, 1, 25, 30),
+(2, 2, 2, 20, 35),
+(3, 3, 3, 30, 40),
+(4, 4, 4, 35, 25),
+(5, 5, 5, 40, 20),
+(6, 6, 6, 25, 30),
+(7, 7, 7, 30, 35),
+(8, 8, 8, 20, 40),
+(9, 9, 9, 35, 25),
+(10, 10, 10, 40, 20);
 
 
 -- 18. jornadas
-
+INSERT INTO jornadas(nombre_jornada, numero_jornada, id_temporada, fecha_inicio_jornada, fecha_fin_jornada) VALUES
+('Jornada 1', 1, 1, '2024-01-01', '2024-01-31'),
+('Jornada 2', 2, 1, '2024-02-01', '2024-02-29'),
+('Jornada 3', 3, 1, '2024-03-01', '2024-03-31'),
+('Jornada 4', 4, 1, '2024-04-01', '2024-04-30'),
+('Jornada 5', 5, 1, '2024-05-01', '2024-05-31'),
+('Jornada 6', 6, 1, '2024-06-01', '2024-06-30'),
+('Jornada 7', 7, 1, '2024-07-01', '2024-07-31'),
+('Jornada 8', 8, 1, '2024-08-01', '2024-08-31'),
+('Jornada 9', 9, 1, '2024-09-01', '2024-09-30'),
+('Jornada 10', 10, 1, '2024-10-01', '2024-11-13');
 
 -- 19. entrenamientos
 INSERT INTO entrenamientos(id_jornada, id_caracteristica_analisis, id_detalle_contenido) VALUES
