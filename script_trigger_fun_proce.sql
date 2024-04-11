@@ -17,7 +17,7 @@ END;
 DELIMITER ;
 
 -- FUNCION
-
+-- Esta función generá el alías del administador automáticamente.
 DELIMITER //
 
 CREATE FUNCTION generar_alias_administrador(nombre VARCHAR(50), apellido VARCHAR(50), fecha_creacion DATETIME) RETURNS VARCHAR(25)
@@ -42,3 +42,18 @@ END //
 DELIMITER ;
 
 -- PROCEDIMIENTO ALMACENADO
+
+
+
+
+
+
+
+-- VISTA
+DELIMITER //
+CREATE VIEW vista_promedio_subcaracteristicas_por_jugador AS
+SELECT id_jugador, AVG(nota_caracteristica_analisis) AS promedio_subcaracteristicas
+FROM caracteristicas_analisis
+GROUP BY id_jugador;
+//
+DELIMITER ;

@@ -262,7 +262,7 @@ CREATE TABLE participaciones_partidos(
   goles INT UNSIGNED NULL DEFAULT 0,
   asistencias INT UNSIGNED NULL DEFAULT 0, 
   estado_animo ENUM (
-    'Desanimado', 'Agotado', 'Normal', 'Satisfecho', 'Energetico'
+    'Desanimado', 'Agotado', 'Normal', 'Satisfecho', 'Energético'
   ) NULL DEFAULT 'Normal',
   puntuacion INT UNSIGNED NULL DEFAULT 0
 );
@@ -341,10 +341,3 @@ CREATE TABLE pagos(
   CONSTRAINT fk_jugador_pago FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador)
 );
 
-DELIMITER //
-CREATE VIEW vista_promedio_subcaracteristicas_por_jugador AS
-SELECT id_jugador, AVG(nota_caracteristica_analisis) AS promedio_subcaracteristicas
-FROM caracteristicas_analisis
-GROUP BY id_jugador;
-//
-DELIMITER ;

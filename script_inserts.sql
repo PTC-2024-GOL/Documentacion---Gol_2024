@@ -76,7 +76,6 @@ INSERT INTO equipos (nombre_equipo, genero_equipo, telefono_contacto, id_cuerpo_
 ('Getafe', 'Masculino', '7687-6554', 1, 1, 1, 'default.jpg');
 
 -- 8. posiciones
-
 -- Inserción de posiciones de ataque
 INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Delantero centro', 'Ofensiva');
 INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Segundo delantero', 'Ofensiva');
@@ -171,11 +170,30 @@ INSERT INTO caracteristicas_analisis (nota_caracteristica_analisis, id_jugador, 
 
 
 -- 19. entrenamientos
-
+INSERT INTO entrenamientos(id_jornada, id_caracteristica_analisis, id_detalle_contenido) VALUES
+(1,1,1),
+(2,2,2),
+(3,3,3),
+(4,4,4),
+(5,5,5),
+(6,6,6),
+(7,7,7),
+(8,8,8),
+(9,9,9),
+(10,10,10);
 
 -- 20. partidos
-INSERT INTO partidos (id_entrenamiento, id_equipo, logo_rival, rival_partido, fecha_partido, cancha_partido, resultado_partido, localidad_partido, tipo_resultado_partido)
-
+INSERT INTO partidos (id_entrenamiento, id_equipo, logo_rival, rival_partido, fecha_partido, cancha_partido, resultado_partido, localidad_partido, tipo_resultado_partido) VALUES
+(1, 1, 'logoRival.png', 'Mocaco', 2023-05-12, 'San Benito', '3 - 4', 'Localidad', 'Victoria'),
+(2, 2, 'logoTigres.png', 'Tigres', 2023-05-15, 'Mejicanos', '2 - 1', 'Visitante', 'Victoria'),
+(3, 3, 'logoLeon.png', 'León', 2023-05-18, 'San Jacinto', '1 - 1', 'Localidad', 'Empate'),
+(4, 4, 'logoÁguila.png', 'Águila', 2023-05-21, 'Soyapango', '0 - 2', 'Visitante', 'Derrota'),
+(5, 1, 'logoAlianza.png', 'Alianza', 2023-05-24, 'San Salvador', '4 - 0', 'Localidad', 'Victoria'),
+(6, 2, 'logoFAS.png', 'FAS', 2023-05-27, 'Santa Ana', '2 - 3', 'Visitante', 'Derrota'),
+(7, 3, 'logoMetapán.png', 'Metapán', 2023-05-30, 'Chalatenango', '3 - 1', 'Localidad', 'Victoria'),
+(8, 4, 'logoChalatenango.png', 'Chalatenango', 2023-06-02, 'San Miguel', '1 - 0', 'Visitante', 'Victoria'),
+(9, 1, 'logoIsidroMetapán.png', 'Isidro Metapán', 2023-06-05, 'Usulután', '2 - 2', 'Localidad', 'Empate'),
+(10, 2, 'logoOnceLobos.png', 'Once Lobos', 2023-06-08, 'Ahuachapán', '4 - 1', 'Visitante', 'Victoria');
 
 -- 21. tipos_jugadas
 INSERT INTO tipos_jugadas (id_tipo_jugada, nombre_tipo_juego) VALUES
@@ -204,13 +222,40 @@ INSERT INTO tipos_goles (id_tipo_gol, id_tipo_jugada, nombre_tipo_gol) VALUES
 (10, 10, 'Fumble');
 
 -- 23. participaciones_partidos
-INSERT INTO participaciones_partidos (id_partido, id_jugador, titular, sustitucion, minutos_jugados, goles, asistencias, estado_animo, puntuacion)
+INSERT INTO participaciones_partidos (id_partido, id_jugador, titular, sustitucion, minutos_jugados, goles, asistencias, estado_animo, puntuacion) VALUES
+(1, 1, true, false, 20, 5, 2, 'Agotado', 8),
+(2, 2, false, true, 15, 1, 0, 'Desanimado', 7),
+(3, 3, true, false, 90, 0, 1, 'Normal', 9),
+(4, 4, false, true, 30, 2, 0, 'Agotado', 8),
+(5, 1, true, false, 60, 0, 1, 'Satisfecho', 7),
+(6, 2, false, true, 45, 0, 0, 'Energético', 6),
+(7, 3, true, false, 90, 3, 2, 'Agotado', 10),
+(8, 4, false, true, 20, 1, 0, 'Normal', 7),
+(9, 1, true, false, 75, 1, 1, 'Normal', 8),
+(10, 2, false, true, 15, 0, 0, 'Normal', 6);
 
 -- 24. detalles_goles
-INSERT INTO detalles_goles (id_participacion, cantidad_tipo_gol, id_tipo_gol)
+INSERT INTO detalles_goles (id_participacion, cantidad_tipo_gol, id_tipo_gol) VALUES
+(1, 2, 2),
+(1, 1, 4),
+(1, 1, 2),
+(1, 3, 3),
+(1, 1, 5),
+(1, 2, 2),
+(1, 1, 4),
+(1, 2, 5),
+(1, 3, 5),
+(1, 2, 2);
 
 -- 25. detalles_amonestaciones
-INSERT INTO detalles_amonestaciones (id_participacion, amonestacion, numero_amonestacion)
+INSERT INTO detalles_amonestaciones (id_participacion, amonestacion, numero_amonestacion) VALUES
+
+
+
+
+
+
+
 
 -- 26. tipos_lesiones
 INSERT INTO tipos_lesiones (tipo_lesion) VALUES 
