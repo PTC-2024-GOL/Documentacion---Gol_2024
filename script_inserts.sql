@@ -187,7 +187,7 @@ INSERT INTO sub_temas_contenidos(sub_tema_contenido, id_tema_contenido) VALUES
 ('Técnica de tiro',6),
 ('Trabajo de coordinación',7),
 ('Ejercicios de flexibilidad',8),
-('Tácticas de juego',9,
+('Tácticas de juego',9),
 ('Entrenamiento de porteros',10);
 
 
