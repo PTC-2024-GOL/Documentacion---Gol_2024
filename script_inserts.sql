@@ -165,17 +165,17 @@ INSERT INTO asistencias (id_jugador, id_horario, asistencia, observacion_asisten
 (10, 5, 'Otro', 'Asunto personal, se comunicará con el entrenador luego');
 
 -- 14. temas_contenidos
-INSERT INTO lesiones (id_tipo_lesion, id_sub_tipologia, numero_lesiones, promedio_lesiones) VALUES
-(1, 1, 1, 60),
-(2, 2, 3, 20),
-(3, 3, 1, 80),
-(4, 4, 3, 20),
-(5, 5, 1, 30),
-(6, 6, 2, 29),
-(7, 7, 7, 60),
-(8, 8, 6, 91),
-(9, 9, 1, 30),
-(10, 10, 2, 20);
+INSERT INTO temas_contenidos (nombre_tema_contenido) VALUES
+('Ocupación y equilibrios'),
+('Progresión'),
+('Amplitud y profundidad'),
+('Cerrar espacios'),
+('Marcaje2'),
+('Marcaje1'),
+('Vigilancias2'),
+('Ganar duelos'),
+('Vigilancias1'),
+('Conservación');
 
 -- 15. sub_temas_contenidos
 INSERT INTO sub_temas_contenidos(sub_tema_contenido, id_tema_contenido) VALUES
@@ -318,7 +318,6 @@ INSERT INTO detalles_amonestaciones (id_participacion, amonestacion, numero_amon
 
 
 
-
 -- 26. tipos_lesiones
 INSERT INTO tipos_lesiones (tipo_lesion) VALUES 
 ('LESIONES TREN INFERIOR'),
@@ -367,10 +366,10 @@ INSERT INTO lesiones (id_tipo_lesion, id_sub_tipologia, numero_lesiones, promedi
 
 
 -- 30. registro_medico
-INSERT INTO registros_medicos (id_jugador, fecha_lesion, dias_lesionado, id_lesion, retorno_entreno, retorno_partido) VALUES 
-(1, '2024-03-15', 10, 1, '2024-03-25', 102),
-(1, '2024-02-10', 15, 3, '2024-02-25', 101),
-(1, '2024-01-20', 7, 5, '2024-01-27', 100);
+INSERT INTO registros_medicos (id_jugador, fecha_lesion, dias_lesionado, id_lesion, retorno_entreno, retorno_partido) VALUES
+(1, '2024-03-15', 10, 1, '2024-03-25', 1),
+(2, '2024-02-10', 15, 3, '2024-02-25', 2),
+(3, '2024-01-20', 7, 5, '2024-01-27', 3);
 
 
 -- 31. pago 

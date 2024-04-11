@@ -17,7 +17,6 @@ END;
 //
 DELIMITER ;
 
-
 -- FUNCION
 -- Esta función generá el alías del administador automáticamente.
 DELIMITER //

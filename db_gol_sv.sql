@@ -265,9 +265,7 @@ CREATE TABLE participaciones_partidos(
   minutos_jugados INT UNSIGNED NULL DEFAULT 0,
   CONSTRAINT check_minutos_jugados CHECK (minutos_jugados > 0),
   goles INT UNSIGNED NULL DEFAULT 0,
-  CONSTRAINT check_goles CHECK (goles > 0),
   asistencias INT UNSIGNED NULL DEFAULT 0,
-  CONSTRAINT check_asistencias CHECK (asistencias > 0),
   estado_animo ENUM (
     'Desanimado', 'Agotado', 'Normal', 'Satisfecho', 'Energético'
   ) NULL DEFAULT 'Normal',
