@@ -139,8 +139,6 @@ CREATE TABLE plantillas_equipos(
   id_plantilla INT AUTO_INCREMENT PRIMARY KEY,
   id_jugador INT NOT NULL,
   CONSTRAINT fk_jugador_plantilla FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador),
-  id_temporada INT NOT NULL,
-  CONSTRAINT fk_temporada_plantilla FOREIGN KEY (id_temporada) REFERENCES temporadas(id_temporada),
   id_equipo INT NOT NULL,
   CONSTRAINT fk_equipo_plantilla FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo)
 );
