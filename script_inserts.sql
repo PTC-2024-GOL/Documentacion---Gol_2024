@@ -126,17 +126,17 @@ INSERT INTO caracteristicas_jugadores (nombre_caracteristica_jugador, clasificac
 ('SACRIFICIO', 'Psicologicos');
 
 -- 11. plantillas_equipos
-INSERT INTO plantillas_equipos (id_jugador, id_temporada, id_equipo) VALUES
-(1, 1, 1),
-(2, 2, 2),
-(3, 3, 3),
-(4, 4, 4),
-(5, 5, 5),
-(6, 1, 6),
-(7, 2, 7),
-(8, 3, 8),
-(9, 4, 9),
-(10, 5, 10);
+INSERT INTO plantillas_equipos (id_jugador, id_equipo) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 6),
+(7, 7),
+(8, 8),
+(9, 9),
+(10, 10);
 
 -- 12. caracteristicas_analisis
 INSERT INTO caracteristicas_analisis (nota_caracteristica_analisis, id_jugador, id_caracteristica_jugador) VALUES
