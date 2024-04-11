@@ -44,10 +44,10 @@ INSERT INTO horarios (dia, hora_inicial, hora_final, campo_de_entrenamiento) VAL
 
 -- 5. categorias
 INSERT INTO categorias (nombre_categoria, edad_minima_permitida, edad_maxima_permitida, id_temporada, id_horario) VALUES
-('Nivel 1', '2020-01-01', '2017-12-31', 1, 1),
-('Nivel 2', '2016-01-01', '2011-12-31', 2, 2),
-('Nivel 3', '2009-01-01', '2008-12-31', 3, 1),
-('Nivel 4', '2007-01-01', '2005-12-31', 4, 2);
+('Nivel 1', '2000-01-01', '2017-12-31', 1, 1),
+('Nivel 2', '2000-01-01', '2011-12-31', 2, 2),
+('Nivel 3', '2000-01-01', '2008-12-31', 3, 1),
+('Nivel 4', '2000-01-01', '2005-12-31', 4, 2);
 
 -- 6. cuerpos_tecnicos
 INSERT INTO cuerpos_tecnicos (nombre_cuerpo_tecnico, primer_tecnico, segundo_tecnico, preparador_fisico, delegado) VALUES

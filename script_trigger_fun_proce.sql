@@ -3,18 +3,20 @@
 USE db_gol_sv;
 
 -- TRIGGER
--- El trigger calcula el promedio de las notas de las subcaracterísticas para el jugador que ha sido modificado.
+-- Cuando se haga un insert en la tabla registro médico, automaticamente el campo de estado en la tabla jugador
+-- va camibar a Baja por lesión
 DELIMITER //
-CREATE TRIGGER update_promedio_subcaracteristicas
-AFTER UPDATE ON caracteristicas_analisis
+CREATE TRIGGER registrar_lesion
+AFTER INSERT ON registros_medicos
 FOR EACH ROW
 BEGIN
-  UPDATE vista_promedio_subcaracteristicas_por_jugador
-  SET promedio_subcaracteristicas = AVG(nota_caracteristica_analisis)
+  UPDATE jugadores
+  SET estatus_jugador = 'Baja temporal'
   WHERE id_jugador = NEW.id_jugador;
 END;
 //
 DELIMITER ;
+
 
 -- FUNCION
 -- Esta función generá el alías del administador automáticamente.
@@ -57,3 +59,5 @@ FROM caracteristicas_analisis
 GROUP BY id_jugador;
 //
 DELIMITER ;
+
+SELECT * FROM vista_promedio_subcaracteristicas_por_jugador;
