@@ -152,7 +152,17 @@ INSERT INTO caracteristicas_analisis (nota_caracteristica_analisis, id_jugador, 
 (5.6, 10, 10);
 
 -- 13. asistencias
-
+INSERT INTO asistencias (id_jugador, id_horario, asistencia, observacion_asistencia) VALUES
+(1, 1, 'Asistencia', NULL),
+(2, 2, 'Asistencia', NULL),
+(3, 3, 'Enfermedad', 'El jugador está enfermo con fiebre alta'),
+(4, 2, 'Estudio', 'Preparándose para un examen importante'),
+(5, 3, 'Trabajo', 'Horario laboral coincide con el entrenamiento'),
+(6, 3, 'Viaje', 'Fuera de la ciudad por asuntos familiares'),
+(7, 4, 'Permiso', 'Autorización del entrenador para no asistir'),
+(8, 4, 'Falta', 'No se ha presentado ninguna razón para la ausencia'),
+(9, 5, 'Lesion', 'Lesión en la rodilla, se está recuperando'),
+(10, 5, 'Otro', 'Asunto personal, se comunicará con el entrenador luego');
 
 -- 14. temas_contenidos
 
