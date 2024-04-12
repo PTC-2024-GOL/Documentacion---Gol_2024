@@ -4,7 +4,7 @@ USE db_gol_sv;
 
 -- TRIGGER
 -- Cuando se haga un insert en la tabla registro médico, automaticamente el campo de estado en la tabla jugador
--- va camibar a Baja por lesión
+-- va cambiar a Baja por lesión
 DELIMITER //
 CREATE TRIGGER registrar_lesion
 AFTER INSERT ON registros_medicos
@@ -98,11 +98,8 @@ END //
 
 DELIMITER ;
 
-
-
-
-
 -- VISTA
+-- Vista que calcula el promedio de las notas de las subcaracteristicas de los jugadores.
 DELIMITER //
 CREATE VIEW vista_promedio_subcaracteristicas_por_jugador AS
 SELECT id_jugador, AVG(nota_caracteristica_analisis) AS promedio_subcaracteristicas
@@ -110,5 +107,3 @@ FROM caracteristicas_analisis
 GROUP BY id_jugador;
 //
 DELIMITER ;
-
-SELECT * FROM vista_promedio_subcaracteristicas_por_jugador;

@@ -14,6 +14,7 @@ CREATE TABLE administradores(
   CONSTRAINT uq_correo_administrador_unico UNIQUE(correo_administrador),
   CONSTRAINT chk_correo_administrador_formato CHECK (correo_administrador REGEXP '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$'),
   telefono_administrador VARCHAR(15) NOT NULL,
+  CONSTRAINT uq_telefono_administrador_unico UNIQUE(telefono_administrador),
   dui_administrador VARCHAR(10) NOT NULL,
   CONSTRAINT uq_dui_administrador_unico UNIQUE(dui_administrador),
   fecha_nacimiento_administrador DATE NOT NULL,
@@ -36,6 +37,7 @@ CREATE TABLE tecnicos(
   CONSTRAINT uq_correo_tecnico_unico UNIQUE(correo_tecnico),
   CONSTRAINT chk_correo_tecnico_formato CHECK (correo_tecnico REGEXP '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$'),
   telefono_tecnico VARCHAR(15) NOT NULL,
+  CONSTRAINT uq_telefono_tecnico_unico UNIQUE(telefono_tecnico),
   dui_tecnico VARCHAR(10) NOT NULL,
   CONSTRAINT uq_dui_tecnico_unico UNIQUE(dui_tecnico),
   fecha_nacimiento_tecnico DATE NOT NULL,
@@ -92,6 +94,7 @@ CREATE TABLE equipos(
   CONSTRAINT uq_nombre_equipo_unico UNIQUE(nombre_equipo),
   genero_equipo ENUM('Masculino ', 'Femenino') NOT NULL,
   telefono_contacto VARCHAR(14) NULL,
+  CONSTRAINT uq_telefono_equipo_unico UNIQUE(telefono_contacto),
   id_cuerpo_tecnico INT NULL,
   CONSTRAINT fk_cuerpo_tecnico_del_equipo FOREIGN KEY (id_cuerpo_tecnico) REFERENCES cuerpos_tecnicos(id_cuerpo_tecnico),
   id_administrador INT NULL,
@@ -153,6 +156,7 @@ CREATE TABLE caracteristicas_jugadores(
 CREATE TABLE caracteristicas_analisis(
   id_caracteristica_analisis INT AUTO_INCREMENT PRIMARY KEY,
   nota_caracteristica_analisis DECIMAL(5,3) UNSIGNED NOT NULL,
+  CONSTRAINT check_nota CHECK (nota_caracteristica_analisis >=0 ),
   id_jugador INT NOT NULL,
   CONSTRAINT fk_jugador_caracteristica_general FOREIGN KEY (id_jugador) REFERENCES plantillas_equipos(id_plantilla),
   id_caracteristica_jugador INT NOT NULL,
@@ -197,16 +201,16 @@ CREATE TABLE detalles_contenidos(
   id_asistencia INT NOT NULL,
   CONSTRAINT fk_asistencia_contenidos FOREIGN KEY (id_asistencia) REFERENCES asistencias(id_asistencia),
   minutos_contenido INT UNSIGNED NULL,
-  CONSTRAINT check_minutos_contenido CHECK (minutos_contenido > 0),
+  CONSTRAINT check_minutos_contenido CHECK (minutos_contenido >= 0),
   minutos_tarea INT UNSIGNED NULL,
-  CONSTRAINT check_minutos_tarea CHECK (minutos_tarea > 0)
+  CONSTRAINT check_minutos_tarea CHECK (minutos_tarea >= 0)
 );
 
 CREATE TABLE jornadas(
   id_jornada INT AUTO_INCREMENT PRIMARY KEY,
   nombre_jornada VARCHAR(60) NULL,
   numero_jornada INT UNSIGNED NOT NULL,
-  CONSTRAINT check_numero_jornada CHECK (numero_jornada > 0),
+  CONSTRAINT check_numero_jornada CHECK (numero_jornada >= 0),
   id_temporada INT NOT NULL,
   CONSTRAINT fk_temporada_jornada FOREIGN KEY (id_temporada) REFERENCES temporadas(id_temporada),
   fecha_inicio_jornada DATE NOT NULL,
@@ -263,9 +267,11 @@ CREATE TABLE participaciones_partidos(
   titular BOOLEAN NULL DEFAULT 0,
   sustitucion BOOLEAN NULL DEFAULT 0,
   minutos_jugados INT UNSIGNED NULL DEFAULT 0,
-  CONSTRAINT check_minutos_jugados CHECK (minutos_jugados > 0),
+  CONSTRAINT check_minutos_jugados CHECK (minutos_jugados >= 0),
   goles INT UNSIGNED NULL DEFAULT 0,
+  CONSTRAINT check_goles CHECK (goles >= 0),
   asistencias INT UNSIGNED NULL DEFAULT 0,
+  CONSTRAINT check_asistencias CHECK (asistencias >= 0),
   estado_animo ENUM (
     'Desanimado', 'Agotado', 'Normal', 'Satisfecho', 'Energético'
   ) NULL DEFAULT 'Normal',
@@ -278,7 +284,7 @@ CREATE TABLE detalles_goles (
   id_participacion INT NOT NULL,
   CONSTRAINT fk_participacion_detalle_gol FOREIGN KEY (id_participacion) REFERENCES participaciones_partidos(id_participacion),
   cantidad_tipo_gol INT UNSIGNED NULL,
-  CONSTRAINT check_cantidad_tipo_gol CHECK (cantidad_tipo_gol> 0),
+  CONSTRAINT check_cantidad_tipo_gol CHECK (cantidad_tipo_gol >= 0),
   id_tipo_gol INT NOT NULL,
   CONSTRAINT fk_tipo_gol_detalle_gol FOREIGN KEY (id_tipo_gol) REFERENCES tipos_goles(id_tipo_gol)
 );
@@ -291,7 +297,7 @@ CREATE TABLE detalles_amonestaciones (
     'Ninguna'
   ) NULL DEFAULT 'Ninguna',
   numero_amonestacion INT UNSIGNED NULL,
-  CONSTRAINT check_numero_amonestacion CHECK (numero_amonestacion > 0)
+  CONSTRAINT check_numero_amonestacion CHECK (numero_amonestacion >= 0)
 );
 
 CREATE TABLE tipos_lesiones(
@@ -321,9 +327,9 @@ CREATE TABLE lesiones(
   id_sub_tipologia INT NOT NULL,
   CONSTRAINT fk_id_subtipologia_lesiones FOREIGN KEY (id_sub_tipologia) REFERENCES sub_tipologias(id_sub_tipologia),
   numero_lesiones INT UNSIGNED NOT NULL,
-  CONSTRAINT check_numero_lesiones CHECK (numero_lesiones > 0),
+  CONSTRAINT check_numero_lesiones CHECK (numero_lesiones >= 0),
   promedio_lesiones INT UNSIGNED NULL DEFAULT 0,
-  CONSTRAINT check_promedio_lesiones CHECK (promedio_lesiones > 0)
+  CONSTRAINT check_promedio_lesiones CHECK (promedio_lesiones >= 0)
 );
 
 CREATE TABLE registros_medicos(
@@ -345,9 +351,10 @@ CREATE TABLE pagos(
   id_pago INT AUTO_INCREMENT PRIMARY KEY,
   fecha_pago DATE NOT NULL,
   cantidad_pago DECIMAL(5, 2)UNSIGNED NOT NULL,
-  CONSTRAINT check_cantidad_pago CHECK (cantidad_pago > 0),
+  CONSTRAINT check_cantidad_pago CHECK (cantidad_pago >= 0),
   pago_tardio BOOLEAN NULL DEFAULT 0,
   mora_pago DECIMAL(5, 2) UNSIGNED NULL DEFAULT 0,
+  CONSTRAINT check_mora_pago CHECK (mora_pago >= 0),
   mes_pago ENUM('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre') NOT NULL,
   id_jugador INT NOT NULL,
   CONSTRAINT fk_jugador_pago FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador)
