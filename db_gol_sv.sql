@@ -1,7 +1,7 @@
-DROP DATABASE if EXISTS prueba_gol;
+DROP DATABASE if EXISTS db_gol_sv;
 
-CREATE DATABASE prueba_gol;
-USE prueba_gol;
+CREATE DATABASE db_gol_sv;
+USE db_gol_sv;
 
 #No hubo cambios
 CREATE TABLE administradores(
