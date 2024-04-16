@@ -40,7 +40,7 @@ CREATE TABLE tecnicos(
   telefono_tecnico VARCHAR(15) NOT NULL, 
   dui_tecnico VARCHAR(10) NOT NULL, 
   CONSTRAINT uq_dui_tecnico_unico UNIQUE(dui_tecnico),
-  estado_tecnico ENUM('Activo', 'Baja temporal', 'Baja definitiva') DEFAULT 'Activo',
+  estado_tecnico BOOLEAN,
   fecha_nacimiento_tecnico DATE NOT NULL, 
   fecha_creacion DATETIME NULL DEFAULT NOW(), 
   foto_tecnico VARCHAR(50) NULL, 
