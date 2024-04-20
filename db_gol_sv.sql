@@ -22,7 +22,6 @@ CREATE TABLE administradores(
   intentos_administrador INT DEFAULT 0, 
   fecha_clave DATETIME NULL, 
   fecha_bloqueo DATETIME NULL,
-  fecha_creacion DATETIME NULL DEFAULT NOW(),
   foto_administrador VARCHAR(50) NULL, 
   CONSTRAINT chk_url_foto_administrador CHECK (foto_administrador LIKE '%.jpg' OR foto_administrador LIKE '%.png' OR foto_administrador LIKE '%.jpeg' OR foto_administrador LIKE '%.gif')
 );
