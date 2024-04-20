@@ -21,12 +21,12 @@ CREATE TABLE administradores(
   fecha_creacion DATETIME NULL DEFAULT NOW(), 
   intentos_administrador INT DEFAULT 0, 
   fecha_clave DATETIME NULL, 
-  fecha_bloqueo DATETIME NULL, 
+  fecha_bloqueo DATETIME NULL,
+  fecha_creacion DATETIME NULL DEFAULT NOW(),
   foto_administrador VARCHAR(50) NULL, 
   CONSTRAINT chk_url_foto_administrador CHECK (foto_administrador LIKE '%.jpg' OR foto_administrador LIKE '%.png' OR foto_administrador LIKE '%.jpeg' OR foto_administrador LIKE '%.gif')
 );
 
-#No hubo cambios
 CREATE TABLE tecnicos(
   id_tecnico INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_tecnico VARCHAR(50) NOT NULL, 
@@ -41,8 +41,8 @@ CREATE TABLE tecnicos(
   dui_tecnico VARCHAR(10) NOT NULL, 
   CONSTRAINT uq_dui_tecnico_unico UNIQUE(dui_tecnico),
   estado_tecnico BOOLEAN NOT NULL DEFAULT 0,
-  fecha_nacimiento_tecnico DATE NOT NULL, 
-  fecha_creacion DATETIME NULL DEFAULT NOW(), 
+  fecha_nacimiento_tecnico DATE NOT NULL,
+  fecha_creacion DATETIME NULL DEFAULT NOW(),
   foto_tecnico VARCHAR(50) NULL, 
   CONSTRAINT chk_url_foto_administrador CHECK (foto_tecnico LIKE '%.jpg' OR foto_tecnico LIKE '%.png' OR foto_tecnico LIKE '%.jpeg' OR foto_tecnico LIKE '%.gif')
 );
@@ -59,7 +59,7 @@ CREATE TABLE temporadas(
 #que agarre el dia ejemplo "Lunes", además de un contador que aumente en 1, un texto quemado que diga
 #"Horario del" para que al final termine siendo algo por el estilo "Horario del lunes 1"
 CREATE TABLE horarios(
-  id_horario INT AUTO_INCREMENT PRIMARY KEY, 
+  id_horario INT AUTO_INCREMENT PRIMARY KEY,
   nombre_horario VARCHAR(60) NOT NULL,
   CONSTRAINT uq_nombre_horario_unico UNIQUE(nombre_horario),
   dia ENUM('Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo') NOT NULL, 
@@ -132,8 +132,7 @@ CREATE TABLE equipos(
   id_categoria INT NOT NULL, 
   CONSTRAINT fk_categoria_del_equipo FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria),
   logo_equipo VARCHAR(50) NULL, 
-  CONSTRAINT chk_url_logo_equipo CHECK (logo_equipo LIKE '%.jpg' OR logo_equipo LIKE '%.png' OR logo_equipo LIKE '%.jpeg' OR logo_equipo LIKE '%.gif'), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT chk_url_logo_equipo CHECK (logo_equipo LIKE '%.jpg' OR logo_equipo LIKE '%.png' OR logo_equipo LIKE '%.jpeg' OR logo_equipo LIKE '%.gif')
 );
 
 CREATE TABLE posiciones(
@@ -161,7 +160,8 @@ CREATE TABLE jugadores(
   alias_jugador VARCHAR(25) NOT NULL,
   CONSTRAINT uq_alias_jugador_unico UNIQUE(alias_jugador), 
   clave_jugador VARCHAR(100) NOT NULL, 
-  foto_jugador VARCHAR(36) NULL, 
+  foto_jugador VARCHAR(36) NULL,
+  fecha_creacion DATETIME NULL DEFAULT NOW(),
   CONSTRAINT chk_url_foto_jugador CHECK (foto_jugador LIKE '%.jpg' OR foto_jugador LIKE '%.png' OR foto_jugador LIKE '%.jpeg' OR foto_jugador LIKE '%.gif')
 );
 
