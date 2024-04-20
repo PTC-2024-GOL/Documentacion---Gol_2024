@@ -49,18 +49,15 @@ CREATE TABLE tecnicos(
 
 #Se paso de escribir el año solamente, a escribirle un nombre para la temporada.
 #Con el fin de hacer este campo mas adaptable.
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE temporadas(
   id_temporada INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_temporada VARCHAR(25) NOT NULL,
-  CONSTRAINT uq_nombre_temporada_unico UNIQUE(nombre_temporada),
-  fecha_creacion DATETIME DEFAULT NOW()
+  CONSTRAINT uq_nombre_temporada_unico UNIQUE(nombre_temporada)
 );
 
 #Se añadira un nombre del horario, que se creara automaticamente con una función
 #que agarre el dia ejemplo "Lunes", además de un contador que aumente en 1, un texto quemado que diga
 #"Horario del" para que al final termine siendo algo por el estilo "Horario del lunes 1"
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE horarios(
   id_horario INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_horario VARCHAR(60) NOT NULL,
@@ -69,12 +66,10 @@ CREATE TABLE horarios(
   hora_inicial TIME NOT NULL, 
   hora_final TIME NOT NULL, 
   CONSTRAINT chk_validacion_de_horas CHECK(hora_inicial < hora_final), 
-  campo_de_entrenamiento VARCHAR(100) NOT NULL,
-  fecha_creacion DATETIME DEFAULT NOW()
+  campo_de_entrenamiento VARCHAR(100) NOT NULL
 );
 
 #Se quito de esta tabla el id del horario.
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE categorias(
   id_categoria INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_categoria VARCHAR(80) NOT NULL, 
@@ -83,42 +78,34 @@ CREATE TABLE categorias(
   edad_maxima_permitida DATE NOT NULL, 
   CONSTRAINT chk_validacion_de_edades CHECK(edad_minima_permitida < edad_maxima_permitida), 
   id_temporada INT NOT NULL, 
-  CONSTRAINT fk_temporada_de_la_categoria FOREIGN KEY (id_temporada) REFERENCES temporadas(id_temporada), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT fk_temporada_de_la_categoria FOREIGN KEY (id_temporada) REFERENCES temporadas(id_temporada)
 );
 
 #Se agrego esta tabla muchos a muchos, para darle el horario a las distintas categorias
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE horarios_categorias(
   id_horario_categoria INT AUTO_INCREMENT PRIMARY KEY,
   id_categoria INT NOT NULL, 
   CONSTRAINT fk_categoria_del_horario FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria),
   id_horario INT NOT NULL, 
-  CONSTRAINT fk_horarios_de_la_categoria FOREIGN KEY (id_horario) REFERENCES horarios(id_horario), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT fk_horarios_de_la_categoria FOREIGN KEY (id_horario) REFERENCES horarios(id_horario)
 );
 
 #Se agrego esta tabla de roles, para definir que tipo de tecnico puede ser, en caso que se agreguen mas cargos
 #al cuerpo tecnico
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE rol_tecnico(
   id_rol_tecnico INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_rol_tecnico VARCHAR(60),
-  CONSTRAINT uq_nombre_rol_tecnico_unico UNIQUE(nombre_rol_tecnico), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT uq_nombre_rol_tecnico_unico UNIQUE(nombre_rol_tecnico)
 );
 
 #Se eliminaron los campos que referenciaban datos y se dejo solamente el nombre del cuerpo tecnico para identificarlo
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE cuerpos_tecnicos(
   id_cuerpo_tecnico INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_cuerpo_tecnico VARCHAR(60),
-  CONSTRAINT uq_nombre_cuerpo_tecnico_unico UNIQUE(nombre_cuerpo_tecnico), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT uq_nombre_cuerpo_tecnico_unico UNIQUE(nombre_cuerpo_tecnico)
 );
 
 #Se agrego esta tabla, para asignarle al cuerpo tecnico el tecnico y el rol de este tecnico
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE detalles_cuerpos_tecnicos(
   id_detalle_cuerpo_tecnico INT AUTO_INCREMENT PRIMARY KEY, 
   id_cuerpo_tecnico INT NOT NULL, 
@@ -126,8 +113,7 @@ CREATE TABLE detalles_cuerpos_tecnicos(
   id_tecnico INT NOT NULL,
   CONSTRAINT fk_tecnico_del_equipo FOREIGN KEY (id_tecnico) REFERENCES tecnicos(id_tecnico), 
   id_rol_tecnico INT NOT NULL, 
-  CONSTRAINT fk_rol_tecnico_del_equipo FOREIGN KEY (id_rol_tecnico) REFERENCES rol_tecnico(id_rol_tecnico), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT fk_rol_tecnico_del_equipo FOREIGN KEY (id_rol_tecnico) REFERENCES rol_tecnico(id_rol_tecnico)
 );
 
 #Aclarar que la logica que se ocupa para el cuerpo tecnico y para la categoria, es que se llaman a las tablas padres, o sea 
@@ -150,8 +136,6 @@ CREATE TABLE equipos(
   fecha_creacion DATETIME NULL DEFAULT NOW()
 );
 
-#No hubo cambios
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE posiciones(
   id_posicion INT AUTO_INCREMENT PRIMARY KEY, 
   posicion VARCHAR(60) NOT NULL, 
@@ -160,7 +144,6 @@ CREATE TABLE posiciones(
 );
 
 #Se quitaron los campos del estado fisico del jugador.
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE jugadores(
   id_jugador INT AUTO_INCREMENT PRIMARY KEY, 
   dorsal_jugador INT UNSIGNED NULL,
@@ -183,15 +166,13 @@ CREATE TABLE jugadores(
 );
 
 #El estado fisico de cada jugador es variable, por ende se necesitaba otra tabla para este
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE estados_fisicos_jugadores(
   id_estado_fisico_jugador INT AUTO_INCREMENT PRIMARY KEY,
   id_jugador INT NOT NULL, 
   CONSTRAINT fk_estado_fisico_jugador FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador),
   altura_jugador DECIMAL(4, 2) UNSIGNED NOT NULL,
   peso_jugador DECIMAL(5, 2) UNSIGNED NOT NULL,
-  indice_masa_corporal DECIMAL(5, 2) UNSIGNED NULL, 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  indice_masa_corporal DECIMAL(5, 2) UNSIGNED NULL
 );
 
 #Se agrego esta tabla para aplicar la misma logica que se ocupa para el cuerpo técnico en la plantilla
@@ -200,20 +181,18 @@ CREATE TABLE estados_fisicos_jugadores(
 #pero en plantillas, las plantillas deberian tener un nombre para que además de identificarse mejor, se puedan aplicar como se hace en
 #cuerpo técnico, que se pone una tabla que sirve para identificar el nombre del cuerpo técnico y de ahí una nueva tabla
 #para poner los datos que le pertenecen a ese cuerpo técnico
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE plantillas(
   id_plantilla INT AUTO_INCREMENT PRIMARY KEY,
   nombre_plantilla VARCHAR(150) NOT NULL,
-  CONSTRAINT uq_nombre_plantilla_unico UNIQUE(nombre_plantilla), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT uq_nombre_plantilla_unico UNIQUE(nombre_plantilla)
 );
+
 #No hubo cambios, nada mas que se vuelve a aplicar la logica que se explico en el comentario de la tabla equipos
 #No se referencia la tabla estado fisico del jugador, porque de por si sabiendo el numero de identificación del jugador
 #ya se puede acceder a una consulta que traiga todos los datos del historial del estado fisico del jugador.
 #Recuerden que si se llama al id del estado fisico lo que pasaria es que solamente se le estaria dando un dato del estado fisico
 #y no el de todos los estados fisicos que se puedan insertar para cierto jugador.
 #Se le agrego la referencia a la plantilla, para identificar la plantilla a la cual le pertenecen todos estos datos.
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE plantillas_equipos(
   id_plantilla_equipo INT AUTO_INCREMENT PRIMARY KEY,
   id_plantilla INT NOT NULL, 
@@ -223,11 +202,9 @@ CREATE TABLE plantillas_equipos(
   id_temporada INT NOT NULL, 
   CONSTRAINT fk_temporada_plantilla FOREIGN KEY (id_temporada) REFERENCES temporadas(id_temporada), 
   id_equipo INT NOT NULL, 
-  CONSTRAINT fk_equipo_plantilla FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT fk_equipo_plantilla FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo)
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE caracteristicas_jugadores(
   id_caracteristica_jugador INT AUTO_INCREMENT PRIMARY KEY,
   nombre_caracteristica_jugador VARCHAR(50) NOT NULL,
@@ -235,8 +212,6 @@ CREATE TABLE caracteristicas_jugadores(
   clasificacion_caracteristica_jugador ENUM('Técnicos', 'Tácticos', 'Condicionales', 'Psicologicos', 'Personales') NOT NULL
 );
 
-
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción,
 #leer plantillas o equipos para ver la logica del porque se referencio la tabla padre Jugadores y no la tabla
 #hija Estados fisicos jugadores.
 CREATE TABLE caracteristicas_analisis(
@@ -248,7 +223,6 @@ CREATE TABLE caracteristicas_analisis(
   CONSTRAINT fk_sub_caracteristica_jugador_caracteristica_general FOREIGN KEY (id_caracteristica_jugador) REFERENCES caracteristicas_jugadores(id_caracteristica_jugador)
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 #leer plantillas o equipos para ver la logica del porque se referencio la tabla padre Jugadores y no la tabla
 #hija Estados fisicos jugadores y de igual forma para el horario, el porque se define el horario y no el horario de la categoria.
 CREATE TABLE asistencias(
@@ -262,14 +236,12 @@ CREATE TABLE asistencias(
   observacion_asistencia VARCHAR(2000) NULL
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE temas_contenidos(
   id_tema_contenido INT AUTO_INCREMENT PRIMARY KEY,
   nombre_tema_contenido VARCHAR(60) NOT NULL,
   CONSTRAINT uq_tema_contenido_unico UNIQUE(nombre_tema_contenido)
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE sub_temas_contenidos(
   id_sub_tema_contenido INT AUTO_INCREMENT PRIMARY KEY,
   sub_tema_contenido VARCHAR(60) NOT NULL,
@@ -277,13 +249,11 @@ CREATE TABLE sub_temas_contenidos(
   CONSTRAINT fk_tipo_contenido FOREIGN KEY (id_tema_contenido) REFERENCES temas_contenidos(id_tema_contenido)
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE tareas(
   id_tarea INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_tarea VARCHAR(60) NOT NULL
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE detalles_contenidos(
   id_detalle_contenido INT AUTO_INCREMENT PRIMARY KEY, 
   id_tarea INT NULL, 
@@ -293,11 +263,9 @@ CREATE TABLE detalles_contenidos(
   id_asistencia INT NOT NULL, 
   CONSTRAINT fk_asistencia_contenidos FOREIGN KEY (id_asistencia) REFERENCES asistencias(id_asistencia),
   minutos_contenido INT UNSIGNED NULL, 
-  minutos_tarea INT UNSIGNED NULL, 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  minutos_tarea INT UNSIGNED NULL
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción.
 #En jornada es necesario identificar la plantilla a la que se le asigna esa jornada en especifico
 #Cada temporada según lo que nos explico en un momento el encargado representa un torneo en el que la asociación de futbol participa,
 #sea por ejemplo la liga oficial juvenil en la que participa, un torneo amistoso o uno internacional, estos como tal tienen distintas 
@@ -310,11 +278,9 @@ CREATE TABLE jornadas(
   CONSTRAINT fk_plantilla_jornada FOREIGN KEY (id_plantilla) REFERENCES plantillas(id_plantilla), 
   fecha_inicio_jornada DATE NOT NULL,
   fecha_fin_jornada DATE NOT NULL,
-  CONSTRAINT chk_validacion_de_fechas_de_jornada CHECK(fecha_inicio_jornada < fecha_fin_jornada),
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT chk_validacion_de_fechas_de_jornada CHECK(fecha_inicio_jornada < fecha_fin_jornada)
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE entrenamientos(
   id_entrenamiento INT AUTO_INCREMENT PRIMARY KEY, 
   id_jornada INT NOT NULL, 
@@ -325,7 +291,6 @@ CREATE TABLE entrenamientos(
   CONSTRAINT fk_detalle_contenido_jornada FOREIGN KEY (id_detalle_contenido) REFERENCES detalles_contenidos(id_detalle_contenido)
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 #leer plantillas o equipos para ver la logica del porque se referencio la tabla padre Equipos y no la tabla
 #hija plantilla
 CREATE TABLE partidos(
@@ -344,14 +309,12 @@ CREATE TABLE partidos(
   tipo_resultado_partido ENUM('Victoria', 'Empate', 'Derrota') NULL
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE tipos_jugadas(
   id_tipo_jugada INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_tipo_juego VARCHAR(50) NOT NULL, 
   CONSTRAINT uq_nombre_tipo_juego_unico UNIQUE(nombre_tipo_juego)
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE tipos_goles(
   id_tipo_gol INT AUTO_INCREMENT PRIMARY KEY, 
   id_tipo_jugada INT NOT NULL, 
@@ -359,7 +322,6 @@ CREATE TABLE tipos_goles(
   nombre_tipo_gol VARCHAR(60) NOT NULL
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 #en este caso si es importante referenciar a la tabla hija plantillas equipos
 #y no a la padre de Jugadores, ya que es importante saber a que equipo pertenece el jugador al que se le hizo 
 #el detalle de la participación del partido.
@@ -380,7 +342,6 @@ CREATE TABLE participaciones_partidos(
   puntuacion INT UNSIGNED NULL DEFAULT 0
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE detalles_goles (
   id_detalle_gol INT AUTO_INCREMENT PRIMARY KEY,
   id_participacion INT NOT NULL,
@@ -390,7 +351,6 @@ CREATE TABLE detalles_goles (
   CONSTRAINT fk_tipo_gol_detalle_gol FOREIGN KEY (id_tipo_gol) REFERENCES tipos_goles(id_tipo_gol)
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE detalles_amonestaciones (
   id_detalle_amonestacion INT AUTO_INCREMENT PRIMARY KEY,
   id_participacion INT NOT NULL,
@@ -402,21 +362,18 @@ CREATE TABLE detalles_amonestaciones (
   numero_amonestacion INT UNSIGNED NULL
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE tipos_lesiones(
   id_tipo_lesion INT AUTO_INCREMENT PRIMARY KEY, 
   tipo_lesion VARCHAR(50) NOT NULL, 
   CONSTRAINT uq_tipo_lesion_unico UNIQUE(tipo_lesion)
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE tipologias(
   id_tipologia INT AUTO_INCREMENT PRIMARY KEY, 
   tipologia VARCHAR(60), 
   CONSTRAINT uq_tipologia_unico UNIQUE(tipologia)
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE sub_tipologias(
   id_sub_tipologia INT AUTO_INCREMENT PRIMARY KEY,
   nombre_sub_tipologia VARCHAR(60) NOT NULL,
@@ -425,7 +382,6 @@ CREATE TABLE sub_tipologias(
   CONSTRAINT fk_tipologias_de_la_subtipologia FOREIGN KEY (id_tipologia) REFERENCES tipologias(id_tipologia)
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE lesiones(
   id_lesion INT AUTO_INCREMENT PRIMARY KEY, 
   id_tipo_lesion INT NOT NULL, 
@@ -436,7 +392,6 @@ CREATE TABLE lesiones(
   promedio_lesiones INT UNSIGNED NULL DEFAULT 0
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE registros_medicos(
   id_registro_medico INT AUTO_INCREMENT PRIMARY KEY, 
   id_jugador INT NOT NULL, 
@@ -451,8 +406,6 @@ CREATE TABLE registros_medicos(
   CONSTRAINT fk_retorno_partido FOREIGN KEY (retorno_partido) REFERENCES partidos(id_partido)
 );
 
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
-#falta agregar mas campos
 CREATE TABLE pagos(
   id_pago INT AUTO_INCREMENT PRIMARY KEY, 
   fecha_pago DATE NOT NULL,
