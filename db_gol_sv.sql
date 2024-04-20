@@ -156,8 +156,7 @@ CREATE TABLE posiciones(
   id_posicion INT AUTO_INCREMENT PRIMARY KEY, 
   posicion VARCHAR(60) NOT NULL, 
   CONSTRAINT uq_posicion_unico UNIQUE(posicion), 
-  area_de_juego ENUM('Ofensiva', 'Defensiva', 'Ofensiva y defensiva') NOT NULL, 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  area_de_juego ENUM('Ofensiva', 'Defensiva', 'Ofensiva y defensiva') NOT NULL
 );
 
 #Se quitaron los campos del estado fisico del jugador.
@@ -180,8 +179,7 @@ CREATE TABLE jugadores(
   CONSTRAINT uq_alias_jugador_unico UNIQUE(alias_jugador), 
   clave_jugador VARCHAR(100) NOT NULL, 
   foto_jugador VARCHAR(36) NULL, 
-  CONSTRAINT chk_url_foto_jugador CHECK (foto_jugador LIKE '%.jpg' OR foto_jugador LIKE '%.png' OR foto_jugador LIKE '%.jpeg' OR foto_jugador LIKE '%.gif'), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT chk_url_foto_jugador CHECK (foto_jugador LIKE '%.jpg' OR foto_jugador LIKE '%.png' OR foto_jugador LIKE '%.jpeg' OR foto_jugador LIKE '%.gif')
 );
 
 #El estado fisico de cada jugador es variable, por ende se necesitaba otra tabla para este
@@ -234,8 +232,7 @@ CREATE TABLE caracteristicas_jugadores(
   id_caracteristica_jugador INT AUTO_INCREMENT PRIMARY KEY,
   nombre_caracteristica_jugador VARCHAR(50) NOT NULL,
   CONSTRAINT uq_nombre_sub_caracteristica_unico UNIQUE(nombre_caracteristica_jugador),
-  clasificacion_caracteristica_jugador ENUM('Técnicos', 'Tácticos', 'Condicionales', 'Psicologicos', 'Personales') NOT NULL, 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  clasificacion_caracteristica_jugador ENUM('Técnicos', 'Tácticos', 'Condicionales', 'Psicologicos', 'Personales') NOT NULL
 );
 
 
@@ -248,8 +245,7 @@ CREATE TABLE caracteristicas_analisis(
   id_jugador INT NOT NULL, 
   CONSTRAINT fk_jugador_caracteristica_general FOREIGN KEY (id_jugador) REFERENCES plantillas_equipos(id_plantilla_equipo), 
   id_caracteristica_jugador INT NOT NULL,
-  CONSTRAINT fk_sub_caracteristica_jugador_caracteristica_general FOREIGN KEY (id_caracteristica_jugador) REFERENCES caracteristicas_jugadores(id_caracteristica_jugador), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT fk_sub_caracteristica_jugador_caracteristica_general FOREIGN KEY (id_caracteristica_jugador) REFERENCES caracteristicas_jugadores(id_caracteristica_jugador)
 );
 
 #Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
@@ -263,16 +259,14 @@ CREATE TABLE asistencias(
   CONSTRAINT fk_horario_asistencia FOREIGN KEY (id_horario) REFERENCES horarios(id_horario), 
   fecha_asistencia DATE NULL DEFAULT NOW(),
   asistencia ENUM('Asistencia', 'Ausencia injustificada', 'Enfermedad', 'Estudio', 'Trabajo', 'Viaje', 'Permiso', 'Falta', 'Lesion', 'Otro') NOT NULL, 
-  observacion_asistencia VARCHAR(2000) NULL, 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  observacion_asistencia VARCHAR(2000) NULL
 );
 
 #Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE temas_contenidos(
   id_tema_contenido INT AUTO_INCREMENT PRIMARY KEY,
   nombre_tema_contenido VARCHAR(60) NOT NULL,
-  CONSTRAINT uq_tema_contenido_unico UNIQUE(nombre_tema_contenido), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT uq_tema_contenido_unico UNIQUE(nombre_tema_contenido)
 );
 
 #Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
@@ -280,15 +274,13 @@ CREATE TABLE sub_temas_contenidos(
   id_sub_tema_contenido INT AUTO_INCREMENT PRIMARY KEY,
   sub_tema_contenido VARCHAR(60) NOT NULL,
   id_tema_contenido INT NOT NULL,
-  CONSTRAINT fk_tipo_contenido FOREIGN KEY (id_tema_contenido) REFERENCES temas_contenidos(id_tema_contenido), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT fk_tipo_contenido FOREIGN KEY (id_tema_contenido) REFERENCES temas_contenidos(id_tema_contenido)
 );
 
 #Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE tareas(
   id_tarea INT AUTO_INCREMENT PRIMARY KEY, 
-  nombre_tarea VARCHAR(60) NOT NULL, 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  nombre_tarea VARCHAR(60) NOT NULL
 );
 
 #Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
@@ -318,7 +310,7 @@ CREATE TABLE jornadas(
   CONSTRAINT fk_plantilla_jornada FOREIGN KEY (id_plantilla) REFERENCES plantillas(id_plantilla), 
   fecha_inicio_jornada DATE NOT NULL,
   fecha_fin_jornada DATE NOT NULL,
-  CONSTRAINT chk_validacion_de_fechas_de_jornada CHECK(fecha_inicio_jornada < fecha_fin_jornada), 
+  CONSTRAINT chk_validacion_de_fechas_de_jornada CHECK(fecha_inicio_jornada < fecha_fin_jornada),
   fecha_creacion DATETIME NULL DEFAULT NOW()
 );
 
@@ -330,8 +322,7 @@ CREATE TABLE entrenamientos(
   id_caracteristica_analisis INT NOT NULL,
   CONSTRAINT fk_caracteristicas_analisis_jornada FOREIGN KEY (id_caracteristica_analisis) REFERENCES caracteristicas_analisis(id_caracteristica_analisis),
   id_detalle_contenido INT NOT NULL, 
-  CONSTRAINT fk_detalle_contenido_jornada FOREIGN KEY (id_detalle_contenido) REFERENCES detalles_contenidos(id_detalle_contenido), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT fk_detalle_contenido_jornada FOREIGN KEY (id_detalle_contenido) REFERENCES detalles_contenidos(id_detalle_contenido)
 );
 
 #Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
@@ -350,16 +341,14 @@ CREATE TABLE partidos(
   cancha_partido VARCHAR(100) NOT NULL,
   resultado_partido VARCHAR(10) NULL,
   localidad_partido ENUM('Local', 'Visitante') NOT NULL,
-  tipo_resultado_partido ENUM('Victoria', 'Empate', 'Derrota') NULL, 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  tipo_resultado_partido ENUM('Victoria', 'Empate', 'Derrota') NULL
 );
 
 #Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE tipos_jugadas(
   id_tipo_jugada INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_tipo_juego VARCHAR(50) NOT NULL, 
-  CONSTRAINT uq_nombre_tipo_juego_unico UNIQUE(nombre_tipo_juego), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT uq_nombre_tipo_juego_unico UNIQUE(nombre_tipo_juego)
 );
 
 #Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
@@ -367,8 +356,7 @@ CREATE TABLE tipos_goles(
   id_tipo_gol INT AUTO_INCREMENT PRIMARY KEY, 
   id_tipo_jugada INT NOT NULL, 
   CONSTRAINT fk_tipo_de_jugada FOREIGN KEY (id_tipo_jugada) REFERENCES tipos_jugadas(id_tipo_jugada), 
-  nombre_tipo_gol VARCHAR(60) NOT NULL, 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  nombre_tipo_gol VARCHAR(60) NOT NULL
 );
 
 #Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
@@ -389,8 +377,7 @@ CREATE TABLE participaciones_partidos(
   estado_animo ENUM (
     'Desanimado', 'Agotado', 'Normal', 'Satisfecho', 'Energetico'
   ) NULL DEFAULT 'Normal',
-  puntuacion INT UNSIGNED NULL DEFAULT 0, 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  puntuacion INT UNSIGNED NULL DEFAULT 0
 );
 
 #Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
@@ -400,36 +387,33 @@ CREATE TABLE detalles_goles (
   CONSTRAINT fk_participacion_detalle_gol FOREIGN KEY (id_participacion) REFERENCES participaciones_partidos(id_participacion),
   cantidad_tipo_gol INT UNSIGNED NULL,
   id_tipo_gol INT NOT NULL,
-  CONSTRAINT fk_tipo_gol_detalle_gol FOREIGN KEY (id_tipo_gol) REFERENCES tipos_goles(id_tipo_gol), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT fk_tipo_gol_detalle_gol FOREIGN KEY (id_tipo_gol) REFERENCES tipos_goles(id_tipo_gol)
 );
 
 #Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE detalles_amonestaciones (
   id_detalle_amonestacion INT AUTO_INCREMENT PRIMARY KEY,
   id_participacion INT NOT NULL,
+  CONSTRAINT fk_participacion_detalle_amonestacion FOREIGN KEY (id_participacion) REFERENCES participaciones_partidos(id_participacion),
   amonestacion ENUM(
     'Tarjeta amarilla', 'Tarjeta roja',
     'Ninguna'
   ) NULL DEFAULT 'Ninguna',
-  numero_amonestacion INT UNSIGNED NULL, 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  numero_amonestacion INT UNSIGNED NULL
 );
 
 #Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE tipos_lesiones(
   id_tipo_lesion INT AUTO_INCREMENT PRIMARY KEY, 
   tipo_lesion VARCHAR(50) NOT NULL, 
-  CONSTRAINT uq_tipo_lesion_unico UNIQUE(tipo_lesion), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT uq_tipo_lesion_unico UNIQUE(tipo_lesion)
 );
 
 #Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE tipologias(
   id_tipologia INT AUTO_INCREMENT PRIMARY KEY, 
   tipologia VARCHAR(60), 
-  CONSTRAINT uq_tipologia_unico UNIQUE(tipologia), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT uq_tipologia_unico UNIQUE(tipologia)
 );
 
 #Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
@@ -438,8 +422,7 @@ CREATE TABLE sub_tipologias(
   nombre_sub_tipologia VARCHAR(60) NOT NULL,
   CONSTRAINT uq_sub_tipologia_unico UNIQUE(nombre_sub_tipologia),
   id_tipologia INT NOT NULL, 
-  CONSTRAINT fk_tipologias_de_la_subtipologia FOREIGN KEY (id_tipologia) REFERENCES tipologias(id_tipologia), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT fk_tipologias_de_la_subtipologia FOREIGN KEY (id_tipologia) REFERENCES tipologias(id_tipologia)
 );
 
 #Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
@@ -450,8 +433,7 @@ CREATE TABLE lesiones(
   id_sub_tipologia INT NOT NULL,
   CONSTRAINT fk_id_subtipologia_lesiones FOREIGN KEY (id_sub_tipologia) REFERENCES sub_tipologias(id_sub_tipologia),
   numero_lesiones INT UNSIGNED NOT NULL, 
-  promedio_lesiones INT UNSIGNED NULL DEFAULT 0, 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  promedio_lesiones INT UNSIGNED NULL DEFAULT 0
 );
 
 #Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
@@ -466,8 +448,7 @@ CREATE TABLE registros_medicos(
   CONSTRAINT fk_lesion_jugador FOREIGN KEY (id_lesion) REFERENCES lesiones(id_lesion), 
   retorno_entreno DATE NOT NULL, 
   retorno_partido INT NOT NULL, 
-  CONSTRAINT fk_retorno_partido FOREIGN KEY (retorno_partido) REFERENCES partidos(id_partido), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT fk_retorno_partido FOREIGN KEY (retorno_partido) REFERENCES partidos(id_partido)
 );
 
 #Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
@@ -480,6 +461,5 @@ CREATE TABLE pagos(
   mora_pago DECIMAL(5, 2) UNSIGNED NULL DEFAULT 0,
   mes_pago ENUM('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre') NOT NULL,
   id_jugador INT NOT NULL, 
-  CONSTRAINT fk_jugador_pago FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
-  fecha_creacion DATETIME NULL DEFAULT NOW()
+  CONSTRAINT fk_jugador_pago FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador)
 );
