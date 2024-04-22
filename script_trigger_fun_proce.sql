@@ -107,3 +107,14 @@ FROM caracteristicas_analisis
 GROUP BY id_jugador;
 //
 DELIMITER ;
+
+-- VISTA para tabla de ingresos
+DELIMITER //
+CREATE VIEW vista_ingresos AS
+SELECT nombre_jugador, apellido_jugador, becado, cantidad_pago, pago_tardio, mes_pago, fecha_pago
+FROM jugadores
+INNER JOIN pagos ON jugadores.id_jugador = pagos.id_jugador;
+//
+DELIMITER  ;
+
+SELECT * FROM vista_ingresos;
