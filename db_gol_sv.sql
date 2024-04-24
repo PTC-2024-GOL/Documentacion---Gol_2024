@@ -73,8 +73,8 @@ CREATE TABLE categorias(
   id_categoria INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_categoria VARCHAR(80) NOT NULL, 
   CONSTRAINT uq_nombre_categoria_unico UNIQUE(nombre_categoria), 
-  edad_minima_permitida DATE NOT NULL, 
-  edad_maxima_permitida DATE NOT NULL, 
+  edad_minima_permitida INT NOT NULL, 
+  edad_maxima_permitida INT NOT NULL, 
   CONSTRAINT chk_validacion_de_edades CHECK(edad_minima_permitida < edad_maxima_permitida), 
   id_temporada INT NOT NULL, 
   CONSTRAINT fk_temporada_de_la_categoria FOREIGN KEY (id_temporada) REFERENCES temporadas(id_temporada)
