@@ -266,9 +266,16 @@ CREATE TABLE detalles_contenidos(
 );
 
 #En jornada es necesario identificar la plantilla a la que se le asigna esa jornada en especifico
-#Cada temporada según lo que nos explico en un momento el encargado representa un torneo en el que la asociación de futbol participa,
+#Cada temporada representa un torneo en el que la asociación de futbol participa,
 #sea por ejemplo la liga oficial juvenil en la que participa, un torneo amistoso o uno internacional, estos como tal tienen distintas 
-#jornadas al ser distintos torneos, se aprovechara que la plantilla como tal trae tanto el dato de la temporada, el equipo y los jugadores en especifico 
+#jornadas al ser distintos torneos, se aprovechara que la tabla plantilla equipo como tal trae tanto el dato de la temporada, el equipo y el jugador en especifico,
+#esto se utilizara para crear el nombre de la jornada en una función, este se hara de la siguiente forma, el nombre de la jornada sera, un texto que
+#diga "Jornada " luego el numero de jornada que se ingrese, un espacio " " y después con el id de plantilla se traera el nombre de temporada
+#haciendo una subconsulta utilizando inner join, para traer según el id de plantilla, en la tabla plantillas equipos, la temporada a la que pertenece
+#esa plantilla a la cual se hace referencia, para esto, se utilizara una función y un procedimiento almacenado, como tal la funcion
+#solo deberia tener los siguientes datos, el texto de jornada, el parametro de numero de jornada, el parametro que guarde el nombre
+#de temporada y quedaria algo así "Jornada 1 Torneo ADFA San Salvador 2024", la subconsulta y la forma con la que se traera el dato de temporada
+#se hara en el procedimiento almacenado de insercción del dato de jornada
 CREATE TABLE jornadas(
   id_jornada INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_jornada VARCHAR(60) NULL,
@@ -294,8 +301,8 @@ CREATE TABLE entrenamientos(
 #hija plantilla
 CREATE TABLE partidos(
   id_partido INT AUTO_INCREMENT PRIMARY KEY, 
-  id_entrenamiento INT NOT NULL, 
-  CONSTRAINT fk_jornada_partido FOREIGN KEY (id_entrenamiento) REFERENCES entrenamientos(id_entrenamiento), 
+  id_jornada INT NOT NULL, 
+  CONSTRAINT fk_jornada_partido FOREIGN KEY (id_jornada) REFERENCES jornadas(id_jornada), 
   id_equipo INT NOT NULL, 
   CONSTRAINT fk_equipo_partido FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
   logo_rival VARCHAR(50) NULL, 
