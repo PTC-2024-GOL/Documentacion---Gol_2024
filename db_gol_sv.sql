@@ -50,7 +50,7 @@ CREATE TABLE tecnicos(
 #Con el fin de hacer este campo mas adaptable.
 CREATE TABLE temporadas(
   id_temporada INT AUTO_INCREMENT PRIMARY KEY, 
-  nombre_temporada VARCHAR(25) NOT NULL,
+  nombre_temporada VARCHAR(50) NOT NULL,
   CONSTRAINT uq_nombre_temporada_unico UNIQUE(nombre_temporada)
 );
 
