@@ -328,24 +328,12 @@ CREATE PROCEDURE insertar_administrador_validado(
    IN p_foto_administrador VARCHAR(50)
 )
 BEGIN
-
     DECLARE p_alias_administrador VARCHAR(25);
-    
     IF p_correo_administrador REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
-        IF LENGTH(p_clave_administrador) >= 8
-           AND p_clave_administrador REGEXP '[A-Z]'
-           AND p_clave_administrador REGEXP '[a-z]'
-           AND p_clave_administrador REGEXP '[0-9]'
-           AND p_clave_administrador REGEXP '[^a-zA-Z0-9]' THEN
-           
             -- Generar el alias utilizando la función
             SET p_alias_administrador = generar_alias_administrador(p_nombre_administrador, p_apellido_administrador, NOW());
-            
             INSERT INTO administradores (nombre_administrador, apellido_administrador, clave_administrador, correo_administrador, telefono_administrador, dui_administrador, fecha_nacimiento_administrador, alias_administrador, foto_administrador)
             VALUES(p_nombre_administrador, p_apellido_administrador, p_clave_administrador, p_correo_administrador, p_telefono_administrador, p_dui_administrador, p_fecha_nacimiento_administrador, p_alias_administrador, p_foto_administrador);
-        ELSE
-            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La contraseña no cumple con los requisitos mínimos';
-        END IF;
     ELSE
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Formato de correo electrónico no válido';
     END IF;
@@ -370,7 +358,8 @@ BEGIN
             UPDATE administradores SET nombre_administrador = p_nombre_administrador, 
             apellido_administrador = p_apellido_administrador, 
             correo_administrador = p_correo_administrador,
-            telefono_administrador = p_telefono_administrador, dui_administrador = p_dui_administrador, 
+            telefono_administrador = p_telefono_administrador, 
+            dui_administrador = p_dui_administrador, 
             fecha_nacimiento_administrador = p_fecha_nacimiento_administrador,
             foto_administrador = p_foto_administrador
             WHERE id_administrador = p_id_administrador;
