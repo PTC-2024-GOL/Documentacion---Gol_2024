@@ -5,25 +5,27 @@ USE db_gol_sv;
 
 #No hubo cambios
 CREATE TABLE administradores(
-  id_administrador INT AUTO_INCREMENT PRIMARY KEY, 
-  nombre_administrador VARCHAR(50) NOT NULL, 
-  apellido_administrador VARCHAR(50) NOT NULL, 
-  alias_administrador VARCHAR(25) NOT NULL, 
-  CONSTRAINT uq_alias_administrador_unico UNIQUE(alias_administrador), 
-  clave_administrador VARCHAR(100) NOT NULL, 
-  correo_administrador VARCHAR(50) NOT NULL, 
-  CONSTRAINT uq_correo_administrador_unico UNIQUE(correo_administrador), 
-  CONSTRAINT chk_correo_administrador_formato CHECK (correo_administrador REGEXP '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$'), 
-  telefono_administrador VARCHAR(15) NOT NULL, 
-  dui_administrador VARCHAR(10) NOT NULL, 
-  CONSTRAINT uq_dui_administrador_unico UNIQUE(dui_administrador), 
-  fecha_nacimiento_administrador DATE NOT NULL, 
-  fecha_creacion DATETIME NULL DEFAULT NOW(), 
-  intentos_administrador INT DEFAULT 0, 
-  fecha_clave DATETIME NULL, 
-  fecha_bloqueo DATETIME NULL,
-  foto_administrador VARCHAR(50) NULL, 
-  CONSTRAINT chk_url_foto_administrador CHECK (foto_administrador LIKE '%.jpg' OR foto_administrador LIKE '%.png' OR foto_administrador LIKE '%.jpeg' OR foto_administrador LIKE '%.gif')
+id_administrador INT AUTO_INCREMENT PRIMARY KEY,
+nombre_administrador VARCHAR(50) NOT NULL,
+apellido_administrador VARCHAR(50) NOT NULL,
+clave_administrador VARCHAR(100) NOT NULL,
+correo_administrador VARCHAR(50) NOT NULL,
+CONSTRAINT uq_correo_administrador_unico UNIQUE(correo_administrador),
+CONSTRAINT chk_correo_administrador_formato CHECK (correo_administrador REGEXP '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$'),
+telefono_administrador VARCHAR(15) NOT NULL,
+dui_administrador VARCHAR(10) NOT NULL,
+CONSTRAINT uq_dui_administrador_unico UNIQUE(dui_administrador),
+fecha_nacimiento_administrador DATE NOT NULL,
+alias_administrador VARCHAR(25) NOT NULL,
+CONSTRAINT uq_alias_administrador_unico UNIQUE(alias_administrador),
+fecha_creacion DATETIME DEFAULT NOW(),
+intentos_administrador INT DEFAULT 0,
+estado_administrador BOOLEAN DEFAULT 1,
+tiempo_intento DATETIME NULL,
+fecha_clave DATETIME NULL DEFAULT NOW(),
+fecha_bloqueo DATETIME NULL,
+foto_administrador VARCHAR(50) NULL,
+CONSTRAINT chk_url_foto_administrador CHECK (foto_administrador LIKE '%.jpg' OR foto_administrador LIKE '%.png' OR foto_administrador LIKE '%.jpeg' OR foto_administrador LIKE '%.gif')
 );
 
 CREATE TABLE tecnicos(
