@@ -131,17 +131,18 @@ END //
 
 DELIMITER ;
 
--- PROCEDIMIENTO ALMACENADO INSERTAR JORNADAS
+-- PROCEDIMIENTO ALMACENADO JORNADAS
 DELIMITER //
 
-CREATE PROCEDURE insertar_jornada(
+CREATE PROCEDURE insertar_actualizar_jornada(
+    IN insertOrUpdate INT,
     IN numero_jornada INT,
     IN id_plantilla INT,
     IN fecha_inicio DATE,
     IN fecha_fin DATE
 )
 BEGIN
-    DECLARE nombre_temporada VARCHAR(25);
+    DECLARE nombre_temporada VARCHAR(50);
     DECLARE nombre_jornada VARCHAR(100);
 
     -- Verificar que las fechas no estén vacías y que la fecha de inicio sea anterior a la fecha de fin
@@ -165,26 +166,62 @@ BEGIN
     -- Generar el nombre de la jornada utilizando la función
     SET nombre_jornada = generar_nombre_jornada(numero_jornada, nombre_temporada);
 
-    -- Insertar los datos en la tabla jornadas
-    INSERT INTO jornadas (nombre_jornada, numero_jornada, id_plantilla, fecha_inicio_jornada, fecha_fin_jornada)
-    VALUES (nombre_jornada, numero_jornada, id_plantilla, fecha_inicio, fecha_fin);
+    -- Insertar o actualizar los datos en la tabla jornadas
+    IF insertOrUpdate = 0 THEN
+        INSERT INTO jornadas (nombre_jornada, numero_jornada, id_plantilla, fecha_inicio_jornada, fecha_fin_jornada)
+        VALUES (nombre_jornada, numero_jornada, id_plantilla, fecha_inicio, fecha_fin);
+    ELSE
+        UPDATE jornadas 
+        SET nombre_jornada = nombre_jornada, 
+            numero_jornada = numero_jornada, 
+            id_plantilla = id_plantilla, 
+            fecha_inicio_jornada = fecha_inicio, 
+            fecha_fin_jornada = fecha_fin
+        WHERE id_jornada = insertOrUpdate;
+    END IF;
 
-    -- Verificar que se insertó la jornada correctamente
+    -- Verificar que se insertó o actualizó la jornada correctamente
     IF ROW_COUNT() = 0 THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'No se pudo insertar la jornada';
+        SET MESSAGE_TEXT = 'No se pudo insertar o actualizar la jornada';
     END IF;
 END //
 
-DELIMITER ;
+DELIMITER $$
 
+CREATE PROCEDURE eliminar_jornada(
+    IN p_id_jornada INT
+)
+BEGIN
+    DECLARE contador_jornada_entrenamientos INT;
+    DECLARE contador_jornada_partidos INT;
+
+    SELECT COUNT(*)
+    INTO contador_jornada_entrenamientos
+    FROM entrenamientos
+    WHERE id_jornada = p_id_jornada;
+    
+    SELECT COUNT(*)
+    INTO contador_jornada_partidos
+    FROM partidos
+    WHERE id_jornada = p_id_jornada;
+
+    IF contador_jornada_entrenamientos > 0 OR contador_jornada_partidos > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No se puede eliminar la jornada, porque esta ya a sido asociada con otra tabla en la base de datos';
+    ELSE
+        DELETE FROM jornadas
+        WHERE id_jornada = p_id_jornada;
+    END IF;
+END;
+
+$$
 
 -- PROCEDIMIENTO ALMACENADO PARTIDOS
 DELIMITER //
 
 CREATE PROCEDURE insertar_o_actualizar_partido(
     IN insertorUpdate INT,
-    IN id_entrenamiento_param INT,
+    IN id_jornada_param INT,
     IN id_equipo_param INT,
     IN logo_rival_param VARCHAR(50),
     IN rival_partido_param VARCHAR(50),
@@ -195,9 +232,22 @@ CREATE PROCEDURE insertar_o_actualizar_partido(
     IN tipo_resultado_partido_param ENUM('Victoria', 'Empate', 'Derrota')
 )
 BEGIN
+    DECLARE fecha_inicio_jornada DATE;
+    DECLARE fecha_fin_jornada DATE;
+
+    -- Verificar que la fecha del partido esté dentro de las fechas de la jornada
+    SELECT fecha_inicio_jornada, fecha_fin_jornada INTO fecha_inicio_jornada, fecha_fin_jornada
+    FROM jornadas
+    WHERE id_jornada = id_jornada_param;
+
+    IF fecha_partido_param < fecha_inicio_jornada OR fecha_partido_param > fecha_fin_jornada THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La fecha del partido está fuera del rango de fechas de la jornada';
+    END IF;
+
     IF insertorUpdate = 0 THEN
         INSERT INTO partidos (
-            id_entrenamiento, 
+            id_jornada, 
             id_equipo, 
             logo_rival, 
             rival_partido, 
@@ -208,7 +258,7 @@ BEGIN
             tipo_resultado_partido
         ) 
         VALUES (
-            id_entrenamiento_param, 
+            id_jornada_param, 
             id_equipo_param, 
             logo_rival_param, 
             rival_partido_param, 
@@ -220,7 +270,7 @@ BEGIN
         );
     ELSE
         UPDATE partidos 
-        SET id_entrenamiento = id_entrenamiento_param, 
+        SET id_jornada = id_jornada_param, 
             id_equipo = id_equipo_param, 
             logo_rival = logo_rival_param, 
             rival_partido = rival_partido_param, 
@@ -233,7 +283,130 @@ BEGIN
     END IF;
 END //
 
-DELIMITER ;
+DELIMITER $$
+
+DELIMITER $$
+
+CREATE PROCEDURE eliminar_partido(
+    IN p_id_partido INT
+)
+BEGIN
+    DECLARE contador_partido_participaciones INT;
+    DECLARE contador_partido_registro_medico INT;
+
+    SELECT COUNT(*)
+    INTO contador_partido_participaciones
+    FROM participaciones_partidos
+    WHERE id_partido = p_id_partido;
+    
+    SELECT COUNT(*)
+    INTO contador_partido_registro_medico
+    FROM registros_medicos
+    WHERE retorno_partido = p_id_partido;
+
+    IF contador_partido_participaciones > 0 OR contador_partido_registro_medico > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No se puede eliminar el partido, porque esta ya a sido asociado con otra tabla en la base de datos';
+    ELSE
+        DELETE FROM partidos
+        WHERE id_partido = p_id_partido;
+    END IF;
+END;
+
+$$
+
+
+DROP PROCEDURE IF EXISTS insertar_administrador_validado;
+DELIMITER $$
+CREATE PROCEDURE insertar_administrador_validado(
+   IN p_nombre_administrador VARCHAR(50),
+   IN p_apellido_administrador VARCHAR(50),
+   IN p_clave_administrador VARCHAR(100),
+   IN p_correo_administrador VARCHAR(50),
+   IN p_telefono_administrador VARCHAR(15),
+   IN p_dui_administrador VARCHAR(10),
+   IN p_fecha_nacimiento_administrador DATE,
+   IN p_foto_administrador VARCHAR(50)
+)
+BEGIN
+
+    DECLARE p_alias_administrador VARCHAR(25);
+    
+    IF p_correo_administrador REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
+        IF LENGTH(p_clave_administrador) >= 8
+           AND p_clave_administrador REGEXP '[A-Z]'
+           AND p_clave_administrador REGEXP '[a-z]'
+           AND p_clave_administrador REGEXP '[0-9]'
+           AND p_clave_administrador REGEXP '[^a-zA-Z0-9]' THEN
+           
+            -- Generar el alias utilizando la función
+            SET p_alias_administrador = generar_alias_administrador(p_nombre_administrador, p_apellido_administrador, NOW());
+            
+            INSERT INTO administradores (nombre_administrador, apellido_administrador, clave_administrador, correo_administrador, telefono_administrador, dui_administrador, fecha_nacimiento_administrador, alias_administrador, foto_administrador)
+            VALUES(p_nombre_administrador, p_apellido_administrador, p_clave_administrador, p_correo_administrador, p_telefono_administrador, p_dui_administrador, p_fecha_nacimiento_administrador, p_alias_administrador, p_foto_administrador);
+        ELSE
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La contraseña no cumple con los requisitos mínimos';
+        END IF;
+    ELSE
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Formato de correo electrónico no válido';
+    END IF;
+END;
+$$
+
+
+DROP PROCEDURE IF EXISTS actualizar_administrador_validado;
+DELIMITER $$
+CREATE PROCEDURE actualizar_administrador_validado(
+   IN p_id_administrador INT,
+   IN p_nombre_administrador VARCHAR(50),
+   IN p_apellido_administrador VARCHAR(50),
+   IN p_correo_administrador VARCHAR(50),
+   IN p_telefono_administrador VARCHAR(15),
+   IN p_dui_administrador VARCHAR(10),
+   IN p_fecha_nacimiento_administrador DATE,
+   IN p_foto_administrador VARCHAR(50)
+)
+BEGIN
+    IF p_correo_administrador REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
+            UPDATE administradores SET nombre_administrador = p_nombre_administrador, 
+            apellido_administrador = p_apellido_administrador, 
+            correo_administrador = p_correo_administrador,
+            telefono_administrador = p_telefono_administrador, dui_administrador = p_dui_administrador, 
+            fecha_nacimiento_administrador = p_fecha_nacimiento_administrador,
+            foto_administrador = p_foto_administrador
+            WHERE id_administrador = p_id_administrador;
+    ELSE
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Formato de correo electrónico no válido';
+    END IF;
+END;
+$$
+
+DROP PROCEDURE IF EXISTS eliminar_administrador;
+DELIMITER $$
+CREATE PROCEDURE eliminar_administrador(
+    IN p_id_administrador INT
+)
+BEGIN
+	DELETE FROM administradores
+	WHERE id_administrador = p_id_administrador;
+END;
+$$
+
+DROP VIEW IF EXISTS vista_tabla_administradores;
+DELIMITER $$
+CREATE VIEW vista_tabla_administradores AS
+SELECT id_administrador AS 'ID',
+foto_administrador AS 'IMAGEN', 
+CONCAT(nombre_administrador, ' ', apellido_administrador) AS 'NOMBRE',
+correo_administrador AS 'CORREO', 
+telefono_administrador AS 'TELÉFONO',
+dui_administrador AS 'DUI',
+fecha_nacimiento_administrador AS 'NACIMIENTO',
+    CASE 
+        WHEN estado_administrador = 1 THEN 'Activo'
+        WHEN estado_administrador = 0 THEN 'Bloqueado'
+    END AS 'ESTADO'
+FROM administradores;
+$$
 
 -- VISTA
 -- Vista que calcula el promedio de las notas de las subcaracteristicas de los jugadores.
@@ -254,4 +427,10 @@ INNER JOIN pagos ON jugadores.id_jugador = pagos.id_jugador;
 //
 DELIMITER  ;
 
-SELECT * FROM vista_ingresos;
+SELECT ROUTINE_NAME
+FROM information_schema.ROUTINES
+WHERE ROUTINE_TYPE = 'PROCEDURE' AND ROUTINE_SCHEMA = 'db_gol_sv';
+
+SELECT TABLE_NAME
+FROM information_schema.TABLES
+WHERE TABLE_SCHEMA = 'db_gol_sv';
