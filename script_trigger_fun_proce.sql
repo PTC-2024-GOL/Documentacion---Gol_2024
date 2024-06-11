@@ -397,6 +397,93 @@ fecha_nacimiento_administrador AS 'NACIMIENTO',
 FROM administradores;
 $$
 
+DROP PROCEDURE IF EXISTS insertar_tecnico_validado;
+DELIMITER $$
+CREATE PROCEDURE insertar_tecnico_validado(
+   IN p_nombre_tecnico VARCHAR(50),
+   IN p_apellido_tecnico VARCHAR(50),
+   IN p_clave_tecnico VARCHAR(100),
+   IN p_correo_tecnico VARCHAR(50),
+   IN p_telefono_tecnico VARCHAR(15),
+   IN p_dui_tecnico VARCHAR(10),
+   IN p_fecha_nacimiento_tecnico DATE,
+   IN p_foto_tecnico VARCHAR(50)
+)
+BEGIN
+    DECLARE p_alias_tecnico VARCHAR(25);
+    IF p_correo_tecnico REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
+        -- Generar el alias utilizando la función, suponiendo que la función generar_alias_tecnico existe
+        SET p_alias_tecnico = generar_alias_tecnico(p_nombre_tecnico, p_apellido_tecnico, NOW());
+        INSERT INTO tecnicos (nombre_tecnico, apellido_tecnico, clave_tecnico, correo_tecnico, telefono_tecnico, dui_tecnico, fecha_nacimiento_tecnico, alias_tecnico, foto_tecnico)
+        VALUES(p_nombre_tecnico, p_apellido_tecnico, p_clave_tecnico, p_correo_tecnico, p_telefono_tecnico, p_dui_tecnico, p_fecha_nacimiento_tecnico, p_alias_tecnico, p_foto_tecnico);
+    ELSE
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Formato de correo electrónico no válido';
+    END IF;
+END;
+$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS actualizar_tecnico_validado;
+DELIMITER $$
+CREATE PROCEDURE actualizar_tecnico_validado(
+   IN p_id_tecnico INT,
+   IN p_nombre_tecnico VARCHAR(50),
+   IN p_apellido_tecnico VARCHAR(50),
+   IN p_correo_tecnico VARCHAR(50),
+   IN p_telefono_tecnico VARCHAR(15),
+   IN p_dui_tecnico VARCHAR(10),
+   IN p_fecha_nacimiento_tecnico DATE,
+   IN p_foto_tecnico VARCHAR(50)
+)
+BEGIN
+    IF p_correo_tecnico REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
+        UPDATE tecnicos SET 
+            nombre_tecnico = p_nombre_tecnico, 
+            apellido_tecnico = p_apellido_tecnico, 
+            correo_tecnico = p_correo_tecnico,
+            telefono_tecnico = p_telefono_tecnico, 
+            dui_tecnico = p_dui_tecnico, 
+            fecha_nacimiento_tecnico = p_fecha_nacimiento_tecnico,
+            foto_tecnico = p_foto_tecnico
+        WHERE id_tecnico = p_id_tecnico;
+    ELSE
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Formato de correo electrónico no válido';
+    END IF;
+END;
+$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS eliminar_tecnico;
+DELIMITER $$
+CREATE PROCEDURE eliminar_tecnico(
+    IN p_id_tecnico INT
+)
+BEGIN
+    DELETE FROM tecnicos
+    WHERE id_tecnico = p_id_tecnico;
+END;
+$$
+DELIMITER ;
+
+DROP VIEW IF EXISTS vista_tabla_tecnicos;
+DELIMITER $$
+CREATE VIEW vista_tabla_tecnicos AS
+SELECT id_tecnico AS 'ID',
+foto_tecnico AS 'IMAGEN', 
+CONCAT(nombre_tecnico, ' ', apellido_tecnico) AS 'NOMBRE',
+correo_tecnico AS 'CORREO', 
+telefono_tecnico AS 'TELÉFONO',
+dui_tecnico AS 'DUI',
+fecha_nacimiento_tecnico AS 'NACIMIENTO',
+    CASE 
+        WHEN estado_tecnico = 1 THEN 'Activo'
+        WHEN estado_tecnico = 0 THEN 'Bloqueado'
+    END AS 'ESTADO'
+FROM tecnicos;
+$$
+DELIMITER ;
+
+
 -- VISTA
 -- Vista que calcula el promedio de las notas de las subcaracteristicas de los jugadores.
 DELIMITER //
@@ -415,6 +502,7 @@ FROM jugadores
 INNER JOIN pagos ON jugadores.id_jugador = pagos.id_jugador;
 //
 DELIMITER  ;
+
 
 SELECT ROUTINE_NAME
 FROM information_schema.ROUTINES
