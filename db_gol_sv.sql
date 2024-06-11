@@ -28,6 +28,8 @@ foto_administrador VARCHAR(50) NULL,
 CONSTRAINT chk_url_foto_administrador CHECK (foto_administrador LIKE '%.jpg' OR foto_administrador LIKE '%.png' OR foto_administrador LIKE '%.jpeg' OR foto_administrador LIKE '%.gif')
 );
 
+SELECT * FROM administradores;
+
 CREATE TABLE tecnicos(
   id_tecnico INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_tecnico VARCHAR(50) NOT NULL, 
@@ -41,7 +43,7 @@ CREATE TABLE tecnicos(
   telefono_tecnico VARCHAR(15) NOT NULL, 
   dui_tecnico VARCHAR(10) NOT NULL, 
   CONSTRAINT uq_dui_tecnico_unico UNIQUE(dui_tecnico),
-  estado_tecnico BOOLEAN NOT NULL DEFAULT 0,
+  estado_tecnico BOOLEAN NOT NULL DEFAULT 1,
   fecha_nacimiento_tecnico DATE NOT NULL,
   fecha_creacion DATETIME NULL DEFAULT NOW(),
   foto_tecnico VARCHAR(50) NULL, 
