@@ -465,6 +465,217 @@ END;
 $$
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS insertar_caracteristica_jugador;
+DELIMITER $$
+CREATE PROCEDURE insertar_caracteristica_jugador(
+    IN p_nombre_caracteristica VARCHAR(50),
+    IN p_clasificacion ENUM('Técnicos', 'Tácticos', 'Condicionales', 'Psicologicos', 'Personales')
+)
+BEGIN
+    INSERT INTO caracteristicas_jugadores (nombre_caracteristica_jugador, clasificacion_caracteristica_jugador)
+    VALUES (p_nombre_caracteristica, p_clasificacion);
+END;
+$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS actualizar_caracteristica_jugador;
+DELIMITER $$
+CREATE PROCEDURE actualizar_caracteristica_jugador(
+    IN p_id_caracteristica INT,
+    IN p_nuevo_nombre VARCHAR(50),
+    IN p_nueva_clasificacion ENUM('Técnicos', 'Tácticos', 'Condicionales', 'Psicologicos', 'Personales')
+)
+BEGIN
+    UPDATE caracteristicas_jugadores
+    SET nombre_caracteristica_jugador = p_nuevo_nombre,
+        clasificacion_caracteristica_jugador = p_nueva_clasificacion
+    WHERE id_caracteristica_jugador = p_id_caracteristica;
+END;
+$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS eliminar_caracteristica_jugador;
+DELIMITER $$
+CREATE PROCEDURE eliminar_caracteristica_jugador(
+    IN p_id_caracteristica INT
+)
+BEGIN
+    DELETE FROM caracteristicas_jugadores
+    WHERE id_caracteristica_jugador = p_id_caracteristica;
+END;
+$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS insertar_cuerpo_tecnico;
+DELIMITER $$
+CREATE PROCEDURE insertar_cuerpo_tecnico(
+    IN p_nombre_cuerpo_tecnico VARCHAR(60)
+)
+BEGIN
+    INSERT INTO cuerpos_tecnicos (nombre_cuerpo_tecnico)
+    VALUES (p_nombre_cuerpo_tecnico);
+END;
+$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS actualizar_cuerpo_tecnico;
+DELIMITER $$
+CREATE PROCEDURE actualizar_cuerpo_tecnico(
+    IN p_id_cuerpo_tecnico INT,
+    IN p_nuevo_nombre VARCHAR(60)
+)
+BEGIN
+    UPDATE cuerpos_tecnicos
+    SET nombre_cuerpo_tecnico = p_nuevo_nombre
+    WHERE id_cuerpo_tecnico = p_id_cuerpo_tecnico;
+END;
+$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS eliminar_cuerpo_tecnico;
+DELIMITER $$
+CREATE PROCEDURE eliminar_cuerpo_tecnico(
+    IN p_id_cuerpo_tecnico INT
+)
+BEGIN
+    DELETE FROM cuerpos_tecnicos
+    WHERE id_cuerpo_tecnico = p_id_cuerpo_tecnico;
+END;
+$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS insertar_pago;
+DELIMITER $$
+CREATE PROCEDURE insertar_pago(
+    IN p_fecha_pago DATE,
+    IN p_cantidad_pago DECIMAL(5, 2),
+    IN p_pago_tardio BOOLEAN,
+    IN p_mora_pago DECIMAL(5, 2),
+    IN p_mes_pago ENUM('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'),
+    IN p_id_jugador INT
+)
+BEGIN
+    INSERT INTO pagos (fecha_pago, cantidad_pago, pago_tardio, mora_pago, mes_pago, id_jugador)
+    VALUES (p_fecha_pago, p_cantidad_pago, p_pago_tardio, p_mora_pago, p_mes_pago, p_id_jugador);
+END;
+$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS actualizar_pago;
+DELIMITER $$
+CREATE PROCEDURE actualizar_pago(
+    IN p_id_pago INT,
+    IN p_fecha_pago DATE,
+    IN p_cantidad_pago DECIMAL(5, 2),
+    IN p_pago_tardio BOOLEAN,
+    IN p_mora_pago DECIMAL(5, 2),
+    IN p_mes_pago ENUM('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'),
+    IN p_id_jugador INT
+)
+BEGIN
+    UPDATE pagos
+    SET fecha_pago = p_fecha_pago,
+        cantidad_pago = p_cantidad_pago,
+        pago_tardio = p_pago_tardio,
+        mora_pago = p_mora_pago,
+        mes_pago = p_mes_pago,
+        id_jugador = p_id_jugador
+    WHERE id_pago = p_id_pago;
+END;
+$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS eliminar_pago;
+DELIMITER $$
+CREATE PROCEDURE eliminar_pago(
+    IN p_id_pago INT
+)
+BEGIN
+    DELETE FROM pagos
+    WHERE id_pago = p_id_pago;
+END;
+$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS insertar_sub_tipologia;
+DELIMITER $$
+CREATE PROCEDURE insertar_sub_tipologia(
+    IN p_nombre_sub_tipologia VARCHAR(60),
+    IN p_id_tipologia INT
+)
+BEGIN
+    INSERT INTO sub_tipologias (nombre_sub_tipologia, id_tipologia)
+    VALUES (p_nombre_sub_tipologia, p_id_tipologia);
+END;
+$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS actualizar_sub_tipologia;
+DELIMITER $$
+CREATE PROCEDURE actualizar_sub_tipologia(
+    IN p_id_sub_tipologia INT,
+    IN p_nombre_sub_tipologia VARCHAR(60),
+    IN p_id_tipologia INT
+)
+BEGIN
+    UPDATE sub_tipologias
+    SET nombre_sub_tipologia = p_nombre_sub_tipologia,
+        id_tipologia = p_id_tipologia
+    WHERE id_sub_tipologia = p_id_sub_tipologia;
+END;
+$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS eliminar_sub_tipologia;
+DELIMITER $$
+CREATE PROCEDURE eliminar_sub_tipologia(
+    IN p_id_sub_tipologia INT
+)
+BEGIN
+    DELETE FROM sub_tipologias
+    WHERE id_sub_tipologia = p_id_sub_tipologia;
+END;
+$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS insertar_tipologia;
+DELIMITER $$
+CREATE PROCEDURE insertar_tipologia(
+    IN p_tipologia VARCHAR(60)
+)
+BEGIN
+    INSERT INTO tipologias (tipologia)
+    VALUES (p_tipologia);
+END;
+$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS actualizar_tipologia;
+DELIMITER $$
+CREATE PROCEDURE actualizar_tipologia(
+    IN p_id_tipologia INT,
+    IN p_nueva_tipologia VARCHAR(60)
+)
+BEGIN
+    UPDATE tipologias
+    SET tipologia = p_nueva_tipologia
+    WHERE id_tipologia = p_id_tipologia;
+END;
+$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS eliminar_tipologia;
+DELIMITER $$
+CREATE PROCEDURE eliminar_tipologia(
+    IN p_id_tipologia INT
+)
+BEGIN
+    DELETE FROM tipologias
+    WHERE id_tipologia = p_id_tipologia;
+END;
+$$
+DELIMITER ;
+
 DROP VIEW IF EXISTS vista_tabla_tecnicos;
 DELIMITER $$
 CREATE VIEW vista_tabla_tecnicos AS
@@ -493,6 +704,61 @@ FROM caracteristicas_analisis
 GROUP BY id_jugador;
 //
 DELIMITER ;
+
+- VISTA para tabla caracteristica jugadores
+DELIMITER $$
+CREATE VIEW vista_caracteristicas_jugadores AS
+SELECT id_caracteristica_jugador AS 'ID',
+	   nombre_caracteristica_jugador AS 'NOMBRE',
+       clasificacion_caracteristica_jugador AS 'CLASIFICACION'
+FROM caracteristicas_jugadores
+GROUP BY 'NOMBRE';
+$$
+
+-- VISTA para tabla cuerpo cuerpo técnico
+DELIMITER $$
+CREATE VIEW vista_cuerpos_tecnicos AS
+SELECT id_cuerpo_tecnico AS 'ID',
+       nombre_cuerpo_tecnico AS 'NOMBRE'
+FROM cuerpos_tecnicos
+GROUP BY 'NOMBRE';
+$$
+DELIMITER ;
+
+-- VISTA para tabla pagos
+DELIMITER $$
+CREATE VIEW vista_pagos AS
+SELECT id_pago AS 'ID',
+       fecha_pago AS 'FECHA',
+       cantidad_pago AS 'CANTIDAD',
+       pago_tardio AS 'PAGO_TARDIO',
+       mora_pago AS 'MORA',
+       mes_pago AS 'MES',
+       id_jugador AS 'ID_JUGADOR'
+FROM pagos;
+$$
+DELIMITER ;
+
+-- VISTA para tabla sub tipología
+DELIMITER $$
+CREATE VIEW vista_sub_tipologias AS
+SELECT id_sub_tipologia AS 'ID',
+       nombre_sub_tipologia AS 'NOMBRE',
+       id_tipologia AS 'ID_TIPOLOGIA'
+FROM sub_tipologias;
+$$
+DELIMITER ;
+
+-- VISTA para tabla tipología
+DELIMITER $$
+CREATE VIEW vista_tipologias AS
+SELECT id_tipologia AS 'ID',
+       tipologia AS 'NOMBRE'
+FROM tipologias
+GROUP BY 'NOMBRE';
+$$
+DELIMITER ;
+
 
 -- VISTA para tabla de ingresos
 DELIMITER //
