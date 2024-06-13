@@ -705,14 +705,14 @@ GROUP BY id_jugador;
 //
 DELIMITER ;
 
-- VISTA para tabla caracteristica jugadores
+-- VISTA para tabla caracteristica jugadores
+DROP VIEW IF EXISTS vista_caracteristicas_jugadores;
 DELIMITER $$
 CREATE VIEW vista_caracteristicas_jugadores AS
 SELECT id_caracteristica_jugador AS 'ID',
 	   nombre_caracteristica_jugador AS 'NOMBRE',
        clasificacion_caracteristica_jugador AS 'CLASIFICACION'
-FROM caracteristicas_jugadores
-GROUP BY 'NOMBRE';
+FROM caracteristicas_jugadores;
 $$
 
 -- VISTA para tabla cuerpo cuerpo técnico
@@ -726,6 +726,7 @@ $$
 DELIMITER ;
 
 -- VISTA para tabla pagos
+DROP VIEW IF EXISTS vista_pagos;
 DELIMITER $$
 CREATE VIEW vista_pagos AS
 SELECT id_pago AS 'ID',
@@ -740,6 +741,7 @@ $$
 DELIMITER ;
 
 -- VISTA para tabla sub tipología
+DROP VIEW IF EXISTS vista_sub_tipologias;
 DELIMITER $$
 CREATE VIEW vista_sub_tipologias AS
 SELECT id_sub_tipologia AS 'ID',
@@ -750,12 +752,12 @@ $$
 DELIMITER ;
 
 -- VISTA para tabla tipología
+DROP VIEW IF EXISTS vista_tipologias;
 DELIMITER $$
 CREATE VIEW vista_tipologias AS
 SELECT id_tipologia AS 'ID',
        tipologia AS 'NOMBRE'
-FROM tipologias
-GROUP BY 'NOMBRE';
+FROM tipologias;
 $$
 DELIMITER ;
 
