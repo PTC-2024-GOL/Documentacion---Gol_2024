@@ -705,6 +705,7 @@ GROUP BY id_jugador;
 //
 DELIMITER ;
 
+
 -- VISTA para tabla caracteristica jugadores
 DROP VIEW IF EXISTS vista_caracteristicas_jugadores;
 DELIMITER $$
@@ -714,14 +715,15 @@ SELECT id_caracteristica_jugador AS 'ID',
        clasificacion_caracteristica_jugador AS 'CLASIFICACION'
 FROM caracteristicas_jugadores;
 $$
+DELIMITER ;
 
 -- VISTA para tabla cuerpo cuerpo técnico
+DROP VIEW IF EXISTS vista_cuerpos_tecnicos;
 DELIMITER $$
 CREATE VIEW vista_cuerpos_tecnicos AS
 SELECT id_cuerpo_tecnico AS 'ID',
        nombre_cuerpo_tecnico AS 'NOMBRE'
-FROM cuerpos_tecnicos
-GROUP BY 'NOMBRE';
+FROM cuerpos_tecnicos;
 $$
 DELIMITER ;
 
@@ -729,27 +731,31 @@ DELIMITER ;
 DROP VIEW IF EXISTS vista_pagos;
 DELIMITER $$
 CREATE VIEW vista_pagos AS
-SELECT id_pago AS 'ID',
-       fecha_pago AS 'FECHA',
-       cantidad_pago AS 'CANTIDAD',
-       pago_tardio AS 'PAGO_TARDIO',
-       mora_pago AS 'MORA',
-       mes_pago AS 'MES',
-       id_jugador AS 'ID_JUGADOR'
-FROM pagos;
+SELECT p.id_pago AS 'ID',
+       p.fecha_pago AS 'FECHA',
+       p.cantidad_pago AS 'CANTIDAD',
+       p.pago_tardio AS 'TARDIO',
+       p.mora_pago AS 'MORA',
+       p.mes_pago AS 'MES',
+       CONCAT(j.nombre_jugador,' ',j.apellido_jugador) AS 'NOMBRE'
+FROM pagos p
+INNER JOIN jugadores j ON p.id_jugador = j.id_jugador;
 $$
 DELIMITER ;
+
 
 -- VISTA para tabla sub tipología
 DROP VIEW IF EXISTS vista_sub_tipologias;
 DELIMITER $$
 CREATE VIEW vista_sub_tipologias AS
-SELECT id_sub_tipologia AS 'ID',
-       nombre_sub_tipologia AS 'NOMBRE',
-       id_tipologia AS 'ID_TIPOLOGIA'
-FROM sub_tipologias;
+SELECT st.id_sub_tipologia AS 'ID',
+       st.nombre_sub_tipologia AS 'NOMBRE',
+       t.tipologia AS 'TIPOLOGIA'
+FROM sub_tipologias st
+INNER JOIN tipologias t ON st.id_tipologia = t.id_tipologia;
 $$
 DELIMITER ;
+
 
 -- VISTA para tabla tipología
 DROP VIEW IF EXISTS vista_tipologias;
