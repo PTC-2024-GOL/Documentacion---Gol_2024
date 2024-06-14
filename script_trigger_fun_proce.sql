@@ -380,23 +380,6 @@ BEGIN
 END;
 $$
 
-DROP VIEW IF EXISTS vista_tabla_administradores;
-DELIMITER $$
-CREATE VIEW vista_tabla_administradores AS
-SELECT id_administrador AS 'ID',
-foto_administrador AS 'IMAGEN', 
-CONCAT(nombre_administrador, ' ', apellido_administrador) AS 'NOMBRE',
-correo_administrador AS 'CORREO', 
-telefono_administrador AS 'TELÉFONO',
-dui_administrador AS 'DUI',
-fecha_nacimiento_administrador AS 'NACIMIENTO',
-    CASE 
-        WHEN estado_administrador = 1 THEN 'Activo'
-        WHEN estado_administrador = 0 THEN 'Bloqueado'
-    END AS 'ESTADO'
-FROM administradores;
-$$
-
 DROP PROCEDURE IF EXISTS insertar_tecnico_validado;
 DELIMITER $$
 CREATE PROCEDURE insertar_tecnico_validado(
@@ -464,6 +447,7 @@ BEGIN
 END;
 $$
 DELIMITER ;
+
 
 DROP PROCEDURE IF EXISTS insertar_caracteristica_jugador;
 DELIMITER $$
@@ -676,6 +660,164 @@ END;
 $$
 DELIMITER ;
 
+
+DROP PROCEDURE IF EXISTS insertar_temporada;
+DELIMITER //
+CREATE PROCEDURE insertar_temporada(IN p_nombre_temporada VARCHAR(50))
+BEGIN
+    INSERT INTO temporadas (nombre_temporada)
+    VALUES (p_nombre_temporada);
+END //
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS actualizar_temporada;
+DELIMITER //
+CREATE PROCEDURE actualizar_temporada(IN p_id_temporada INT, IN p_nombre_temporada VARCHAR(50))
+BEGIN
+    UPDATE temporadas
+    SET nombre_temporada = p_nombre_temporada
+    WHERE id_temporada = p_id_temporada;
+END //
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS eliminar_temporada;
+DELIMITER //
+CREATE PROCEDURE eliminar_temporada(IN p_id_temporada INT)
+BEGIN
+    DELETE FROM temporadas
+    WHERE id_temporada = p_id_temporada;
+END //
+
+DELIMITER ;
+
+
+DROP PROCEDURE IF EXISTS insertar_tarea;
+DELIMITER //
+CREATE PROCEDURE insertar_tarea(IN p_nombre_tarea VARCHAR(60))
+BEGIN
+    INSERT INTO tareas (nombre_tarea)
+    VALUES (p_nombre_tarea);
+END //
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS actualizar_tarea;
+DELIMITER //
+CREATE PROCEDURE actualizar_tarea(IN p_id_tarea INT, IN p_nombre_tarea VARCHAR(60))
+BEGIN
+    UPDATE tareas
+    SET nombre_tarea = p_nombre_tarea
+    WHERE id_tarea = p_id_tarea;
+END //
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS eliminar_tarea;
+DELIMITER //
+CREATE PROCEDURE eliminar_tarea(IN p_id_tarea INT)
+BEGIN
+    DELETE FROM tareas
+    WHERE id_tarea = p_id_tarea;
+END //
+
+DELIMITER ;
+
+-- Tabla plantillas
+
+DELIMITER //
+
+CREATE PROCEDURE insertar_plantilla(IN p_nombre_plantilla VARCHAR(150))
+BEGIN
+    INSERT INTO plantillas (nombre_plantilla)
+    VALUES (p_nombre_plantilla);
+END //
+
+CREATE PROCEDURE actualizar_plantilla(IN p_id_plantilla INT, IN p_nombre_plantilla VARCHAR(150))
+BEGIN
+    UPDATE plantillas
+    SET nombre_plantilla = p_nombre_plantilla
+    WHERE id_plantilla = p_id_plantilla;
+END //
+
+CREATE PROCEDURE eliminar_plantilla(IN p_id_plantilla INT)
+BEGIN
+    DELETE FROM plantillas
+    WHERE id_plantilla = p_id_plantilla;
+END //
+
+-- Tabla tipos_lesiones
+
+DELIMITER //
+
+CREATE PROCEDURE insertar_tipo_lesion(IN p_tipo_lesion VARCHAR(50))
+BEGIN
+    INSERT INTO tipos_lesiones (tipo_lesion)
+    VALUES (p_tipo_lesion);
+END //
+
+CREATE PROCEDURE actualizar_tipo_lesion(IN p_id_tipo_lesion INT, IN p_tipo_lesion VARCHAR(50))
+BEGIN
+    UPDATE tipos_lesiones
+    SET tipo_lesion = p_tipo_lesion
+    WHERE id_tipo_lesion = p_id_tipo_lesion;
+END //
+
+CREATE PROCEDURE eliminar_tipo_lesion(IN p_id_tipo_lesion INT)
+BEGIN
+    DELETE FROM tipos_lesiones
+    WHERE id_tipo_lesion = p_id_tipo_lesion;
+END //
+
+DELIMITER ;
+
+-- Tabla rol_tecnico
+
+DELIMITER //
+
+CREATE PROCEDURE insertar_rol_tecnico(IN p_nombre_rol_tecnico VARCHAR(60))
+BEGIN
+    INSERT INTO rol_tecnico (nombre_rol_tecnico)
+    VALUES (p_nombre_rol_tecnico);
+END //
+
+CREATE PROCEDURE actualizar_rol_tecnico(IN p_id_rol_tecnico INT, IN p_nombre_rol_tecnico VARCHAR(60))
+BEGIN
+    UPDATE rol_tecnico
+    SET nombre_rol_tecnico = p_nombre_rol_tecnico
+    WHERE id_rol_tecnico = p_id_rol_tecnico;
+END //
+
+CREATE PROCEDURE eliminar_rol_tecnico(IN p_id_rol_tecnico INT)
+BEGIN
+    DELETE FROM rol_tecnico
+    WHERE id_rol_tecnico = p_id_rol_tecnico;
+END //
+
+DELIMITER ;
+
+-- VISTA
+
+-- VISTA para tabla administradores
+DROP VIEW IF EXISTS vista_tabla_administradores;
+DELIMITER $$
+CREATE VIEW vista_tabla_administradores AS
+SELECT id_administrador AS 'ID',
+foto_administrador AS 'IMAGEN', 
+CONCAT(nombre_administrador, ' ', apellido_administrador) AS 'NOMBRE',
+correo_administrador AS 'CORREO', 
+telefono_administrador AS 'TELÉFONO',
+dui_administrador AS 'DUI',
+fecha_nacimiento_administrador AS 'NACIMIENTO',
+    CASE 
+        WHEN estado_administrador = 1 THEN 'Activo'
+        WHEN estado_administrador = 0 THEN 'Bloqueado'
+    END AS 'ESTADO'
+FROM administradores;
+$$
+
+-- VISTA para tabla tecnicos
 DROP VIEW IF EXISTS vista_tabla_tecnicos;
 DELIMITER $$
 CREATE VIEW vista_tabla_tecnicos AS
@@ -694,18 +836,6 @@ FROM tecnicos;
 $$
 DELIMITER ;
 
-
--- VISTA
--- Vista que calcula el promedio de las notas de las subcaracteristicas de los jugadores.
-DELIMITER //
-CREATE VIEW vista_promedio_subcaracteristicas_por_jugador AS
-SELECT id_jugador, AVG(nota_caracteristica_analisis) AS promedio_subcaracteristicas
-FROM caracteristicas_analisis
-GROUP BY id_jugador;
-//
-DELIMITER ;
-
-
 -- VISTA para tabla caracteristica jugadores
 DROP VIEW IF EXISTS vista_caracteristicas_jugadores;
 DELIMITER $$
@@ -715,7 +845,6 @@ SELECT id_caracteristica_jugador AS 'ID',
        clasificacion_caracteristica_jugador AS 'CLASIFICACION'
 FROM caracteristicas_jugadores;
 $$
-DELIMITER ;
 
 -- VISTA para tabla cuerpo cuerpo técnico
 DROP VIEW IF EXISTS vista_cuerpos_tecnicos;
@@ -756,7 +885,6 @@ INNER JOIN tipologias t ON st.id_tipologia = t.id_tipologia;
 $$
 DELIMITER ;
 
-
 -- VISTA para tabla tipología
 DROP VIEW IF EXISTS vista_tipologias;
 DELIMITER $$
@@ -767,6 +895,14 @@ FROM tipologias;
 $$
 DELIMITER ;
 
+-- Vista que calcula el promedio de las notas de las subcaracteristicas de los jugadores.
+DELIMITER //
+CREATE VIEW vista_promedio_subcaracteristicas_por_jugador AS
+SELECT id_jugador, AVG(nota_caracteristica_analisis) AS promedio_subcaracteristicas
+FROM caracteristicas_analisis
+GROUP BY id_jugador;
+//
+DELIMITER ;
 
 -- VISTA para tabla de ingresos
 DELIMITER //
@@ -776,6 +912,47 @@ FROM jugadores
 INNER JOIN pagos ON jugadores.id_jugador = pagos.id_jugador;
 //
 DELIMITER  ;
+
+-- VISTA para la tabla temporadas
+CREATE VIEW vista_temporadas AS
+SELECT 
+  id_temporada AS ID,
+  nombre_temporada AS NOMBRE
+FROM 
+  temporadas;
+
+-- VISTA para la tabla tareas
+CREATE VIEW vista_tareas AS
+SELECT 
+  id_tarea AS ID,
+  nombre_tarea AS NOMBRE
+FROM 
+  tareas;
+
+-- VISTA para la tabla plantillas
+CREATE VIEW vista_plantillas AS
+SELECT 
+  id_plantilla AS ID,
+  nombre_plantilla AS NOMBRE
+FROM 
+  plantillas;
+
+-- VISTA para la tabla tipos lesiones
+CREATE VIEW vista_tipos_lesiones AS
+SELECT 
+  id_tipo_lesion AS ID,
+  tipo_lesion AS NOMBRE
+FROM 
+  tipos_lesiones;
+
+
+-- VISTA para la tabla rol tecnico
+CREATE VIEW vista_rol_tecnico AS
+SELECT 
+  id_rol_tecnico AS ID,
+  nombre_rol_tecnico AS NOMBRE
+FROM 
+  rol_tecnico;
 
 
 SELECT ROUTINE_NAME
