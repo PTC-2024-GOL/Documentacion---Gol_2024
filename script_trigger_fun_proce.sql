@@ -920,8 +920,8 @@ DROP VIEW IF EXISTS vista_tabla_tecnicos;
 DELIMITER $$
 CREATE VIEW vista_tabla_tecnicos AS
 SELECT id_tecnico AS 'ID',
-foto_tecnico AS 'IMAGEN', 
 CONCAT(nombre_tecnico, ' ', apellido_tecnico) AS 'NOMBRE',
+foto_tecnico AS 'IMAGEN', 
 correo_tecnico AS 'CORREO', 
 telefono_tecnico AS 'TELÉFONO',
 dui_tecnico AS 'DUI',
@@ -949,9 +949,15 @@ DROP VIEW IF EXISTS vista_cuerpos_tecnicos;
 DELIMITER $$
 CREATE VIEW vista_cuerpos_tecnicos AS
 SELECT id_cuerpo_tecnico AS 'ID',
-       nombre_cuerpo_tecnico AS 'NOMBRE'
+nombre_cuerpo_tecnico AS 'NOMBRE'
 FROM cuerpos_tecnicos;
 $$
+
+
+SELECT id_cuerpo_tecnico AS 'ID',
+nombre_cuerpo_tecnico AS 'NOMBRE'
+FROM cuerpos_tecnicos;
+SELECT * FROM vista_cuerpos_tecnicos;
 DELIMITER ;
 
 -- VISTA para tabla pagos
@@ -1113,6 +1119,7 @@ INNER JOIN
 INNER JOIN 
     rol_tecnico rt ON dct.id_rol_tecnico = rt.id_rol_tecnico;
 
+SELECT * FROM vw_detalles_cuerpos_tecnicos;
 
 SELECT ROUTINE_NAME
 FROM information_schema.ROUTINES
