@@ -797,6 +797,104 @@ END //
 
 DELIMITER ;
 
+-- Procedimientos para la tabla jornadas
+
+DELIMITER //
+
+CREATE PROCEDURE sp_insertar_jornada (
+    IN nombre_jornada VARCHAR(60), 
+    IN numero_jornada INT, 
+    IN id_plantilla INT, 
+    IN fecha_inicio DATE, 
+    IN fecha_fin DATE
+)
+BEGIN
+    INSERT INTO jornadas(nombre_jornada, numero_jornada, id_plantilla, fecha_inicio_jornada, fecha_fin_jornada)
+    VALUES (nombre_jornada, numero_jornada, id_plantilla, fecha_inicio, fecha_fin);
+END //
+
+CREATE PROCEDURE sp_actualizar_jornada (
+    IN id_jornada INT, 
+    IN nombre_jornada VARCHAR(60), 
+    IN numero_jornada INT, 
+    IN id_plantilla INT, 
+    IN fecha_inicio DATE, 
+    IN fecha_fin DATE
+)
+BEGIN
+    UPDATE jornadas 
+    SET nombre_jornada = nombre_jornada, numero_jornada = numero_jornada, id_plantilla = id_plantilla, fecha_inicio_jornada = fecha_inicio, fecha_fin_jornada = fecha_fin
+    WHERE id_jornada = id_jornada;
+END //
+
+CREATE PROCEDURE sp_eliminar_jornada (IN id_jornada INT)
+BEGIN
+    DELETE FROM jornadas WHERE id_jornada = id_jornada;
+END //
+
+-- Procedimientos para la tabla plantillas_equipos
+
+CREATE PROCEDURE sp_insertar_plantilla_equipo (
+    IN id_plantilla INT, 
+    IN id_jugador INT, 
+    IN id_temporada INT, 
+    IN id_equipo INT
+)
+BEGIN
+    INSERT INTO plantillas_equipos(id_plantilla, id_jugador, id_temporada, id_equipo)
+    VALUES (id_plantilla, id_jugador, id_temporada, id_equipo);
+END //
+
+CREATE PROCEDURE sp_actualizar_plantilla_equipo (
+    IN id_plantilla_equipo INT, 
+    IN id_plantilla INT, 
+    IN id_jugador INT, 
+    IN id_temporada INT, 
+    IN id_equipo INT
+)
+BEGIN
+    UPDATE plantillas_equipos 
+    SET id_plantilla = id_plantilla, id_jugador = id_jugador, id_temporada = id_temporada, id_equipo = id_equipo
+    WHERE id_plantilla_equipo = id_plantilla_equipo;
+END //
+
+CREATE PROCEDURE sp_eliminar_plantilla_equipo (IN id_plantilla_equipo INT)
+BEGIN
+    DELETE FROM plantillas_equipos WHERE id_plantilla_equipo = id_plantilla_equipo;
+END //
+
+-- Procedimientos para la tabla detalles_cuerpos_tecnicos
+
+CREATE PROCEDURE sp_insertar_detalle_cuerpo_tecnico (
+    IN id_cuerpo_tecnico INT, 
+    IN id_tecnico INT, 
+    IN id_rol_tecnico INT
+)
+BEGIN
+    INSERT INTO detalles_cuerpos_tecnicos(id_cuerpo_tecnico, id_tecnico, id_rol_tecnico)
+    VALUES (id_cuerpo_tecnico, id_tecnico, id_rol_tecnico);
+END //
+
+CREATE PROCEDURE sp_actualizar_detalle_cuerpo_tecnico (
+    IN id_detalle_cuerpo_tecnico INT, 
+    IN id_cuerpo_tecnico INT, 
+    IN id_tecnico INT, 
+    IN id_rol_tecnico INT
+)
+BEGIN
+    UPDATE detalles_cuerpos_tecnicos 
+    SET id_cuerpo_tecnico = id_cuerpo_tecnico, id_tecnico = id_tecnico, id_rol_tecnico = id_rol_tecnico
+    WHERE id_detalle_cuerpo_tecnico = id_detalle_cuerpo_tecnico;
+END //
+
+CREATE PROCEDURE sp_eliminar_detalle_cuerpo_tecnico (IN id_detalle_cuerpo_tecnico INT)
+BEGIN
+    DELETE FROM detalles_cuerpos_tecnicos WHERE id_detalle_cuerpo_tecnico = id_detalle_cuerpo_tecnico;
+END //
+
+DELIMITER ;
+
+
 -- VISTA
 
 -- VISTA para tabla administradores
@@ -953,6 +1051,67 @@ SELECT
   nombre_rol_tecnico AS NOMBRE
 FROM 
   rol_tecnico;
+
+
+-- Vista para jornadas
+DROP VIEW IF EXISTS vw_jornadas;
+CREATE VIEW vw_jornadas AS
+SELECT 
+    j.id_jornada AS ID,
+    j.nombre_jornada AS NOMBRE,
+    j.numero_jornada AS NUMERO,
+    p.nombre_plantilla AS PLANTILLA,
+    j.id_plantilla AS ID_PLANTILLA,
+    j.fecha_inicio_jornada AS FECHA_INICIO,
+    j.fecha_fin_jornada AS FECHA_FIN
+FROM 
+    jornadas j
+INNER JOIN 
+    plantillas p ON j.id_plantilla = p.id_plantilla;
+
+-- Vista para plantillas_equipos
+DROP VIEW IF EXISTS vw_plantillas_equipos;
+CREATE VIEW vw_plantillas_equipos AS
+SELECT 
+    pe.id_plantilla_equipo AS ID,
+    pe.id_plantilla AS ID_PLANTILLA,
+    pe.id_jugador AS ID_JUGADOR,
+    pe.id_temporada AS ID_TEMPORADA,
+    pe.id_equipo AS ID_EQUIPO,
+    p.nombre_plantilla AS PLANTILLA,
+    CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS JUGADOR,
+    t.nombre_temporada AS TEMPORADA,
+    e.nombre_equipo AS EQUIPO
+FROM 
+    plantillas_equipos pe
+INNER JOIN 
+    plantillas p ON pe.id_plantilla = p.id_plantilla
+INNER JOIN 
+    jugadores j ON pe.id_jugador = j.id_jugador
+INNER JOIN 
+    temporadas t ON pe.id_temporada = t.id_temporada
+INNER JOIN 
+    equipos e ON pe.id_equipo = e.id_equipo;
+
+-- Vista para detalles_cuerpos_tecnicos
+DROP VIEW IF EXISTS vw_detalles_cuerpos_tecnicos;
+CREATE VIEW vw_detalles_cuerpos_tecnicos AS
+SELECT 
+    dct.id_detalle_cuerpo_tecnico AS ID,
+    dct.id_cuerpo_tecnico AS ID_CUERPO_TECNICO,
+    dct.id_tecnico AS ID_TECNICO,
+    dct.id_rol_tecnico AS ID_ROL,
+    ct.nombre_cuerpo_tecnico AS CUERPO_TECNICO,
+    CONCAT(t.nombre_tecnico, ' ', t.apellido_tecnico) AS TECNICO,
+    rt.nombre_rol_tecnico AS ROL_TECNICO
+FROM 
+    detalles_cuerpos_tecnicos dct
+INNER JOIN 
+    cuerpos_tecnicos ct ON dct.id_cuerpo_tecnico = ct.id_cuerpo_tecnico
+INNER JOIN 
+    tecnicos t ON dct.id_tecnico = t.id_tecnico
+INNER JOIN 
+    rol_tecnico rt ON dct.id_rol_tecnico = rt.id_rol_tecnico;
 
 
 SELECT ROUTINE_NAME
