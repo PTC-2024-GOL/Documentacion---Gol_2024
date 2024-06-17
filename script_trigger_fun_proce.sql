@@ -798,35 +798,59 @@ END //
 DELIMITER ;
 
 -- Procedimientos para la tabla jornadas
+ 
+DROP PROCEDURE IF EXISTS insertar_jornada;
+DELIMITER //
+CREATE PROCEDURE insertar_jornada(
+    IN p_nombre_jornada VARCHAR(60),
+    IN p_numero_jornada INT,
+    IN p_id_plantilla INT,
+    IN p_fecha_inicio DATE,
+    IN p_fecha_fin DATE
+)
+BEGIN
+    -- Validar las fechas
+    IF p_fecha_inicio >= p_fecha_fin THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La fecha de inicio debe ser anterior a la fecha de fin';
+    END IF;
+
+    -- Insertar una nueva jornada
+    INSERT INTO jornadas (nombre_jornada, numero_jornada, id_plantilla, fecha_inicio_jornada, fecha_fin_jornada)
+    VALUES (p_nombre_jornada, p_numero_jornada, p_id_plantilla, p_fecha_inicio, p_fecha_fin);
+END //
+DELIMITER ;
+
+
+DROP PROCEDURE IF EXISTS actualizar_jornada;
+DELIMITER //
+CREATE PROCEDURE actualizar_jornada(
+    IN p_id_jornada INT,
+    IN p_nombre_jornada VARCHAR(60),
+    IN p_numero_jornada INT,
+    IN p_id_plantilla INT,
+    IN p_fecha_inicio DATE,
+    IN p_fecha_fin DATE
+)
+BEGIN
+
+    -- Validar las fechas
+    IF p_fecha_inicio >= p_fecha_fin THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La fecha de inicio debe ser anterior a la fecha de fin';
+    END IF;
+
+    -- Actualizar la jornada existente
+    UPDATE jornadas
+    SET nombre_jornada = p_nombre_jornada,
+        numero_jornada = p_numero_jornada,
+        id_plantilla = p_id_plantilla,
+        fecha_inicio_jornada = p_fecha_inicio,
+        fecha_fin_jornada = p_fecha_fin
+    WHERE id_jornada = p_id_jornada;
+END //
+DELIMITER ;
+
 
 DELIMITER //
-
-CREATE PROCEDURE sp_insertar_jornada (
-    IN nombre_jornada VARCHAR(60), 
-    IN numero_jornada INT, 
-    IN id_plantilla INT, 
-    IN fecha_inicio DATE, 
-    IN fecha_fin DATE
-)
-BEGIN
-    INSERT INTO jornadas(nombre_jornada, numero_jornada, id_plantilla, fecha_inicio_jornada, fecha_fin_jornada)
-    VALUES (nombre_jornada, numero_jornada, id_plantilla, fecha_inicio, fecha_fin);
-END //
-
-CREATE PROCEDURE sp_actualizar_jornada (
-    IN id_jornada INT, 
-    IN nombre_jornada VARCHAR(60), 
-    IN numero_jornada INT, 
-    IN id_plantilla INT, 
-    IN fecha_inicio DATE, 
-    IN fecha_fin DATE
-)
-BEGIN
-    UPDATE jornadas 
-    SET nombre_jornada = nombre_jornada, numero_jornada = numero_jornada, id_plantilla = id_plantilla, fecha_inicio_jornada = fecha_inicio, fecha_fin_jornada = fecha_fin
-    WHERE id_jornada = id_jornada;
-END //
-
 CREATE PROCEDURE sp_eliminar_jornada (IN id_jornada INT)
 BEGIN
     DELETE FROM jornadas WHERE id_jornada = id_jornada;
@@ -858,13 +882,19 @@ BEGIN
     WHERE id_plantilla_equipo = id_plantilla_equipo;
 END //
 
-CREATE PROCEDURE sp_eliminar_plantilla_equipo (IN id_plantilla_equipo INT)
+DROP PROCEDURE IF EXISTS sp_eliminar_plantilla_equipo;
+DELIMITER //
+CREATE PROCEDURE sp_eliminar_plantilla_equipo (IN id_plantilla INT, IN id_equipo INT, IN id_temporada INT)
 BEGIN
-    DELETE FROM plantillas_equipos WHERE id_plantilla_equipo = id_plantilla_equipo;
+    DELETE FROM plantillas_equipos WHERE id_plantilla IN 
+        (SELECT id_plantilla FROM plantillas_equipos 
+         WHERE id_plantilla = id_plantilla AND id_equipo = id_equipo AND id_temporada = id_temporada) LIMIT 1;
 END //
+DELIMITER ;
 
 -- Procedimientos para la tabla detalles_cuerpos_tecnicos
 
+DELIMITER //
 CREATE PROCEDURE sp_insertar_detalle_cuerpo_tecnico (
     IN id_cuerpo_tecnico INT, 
     IN id_tecnico INT, 
@@ -1076,28 +1106,34 @@ INNER JOIN
     plantillas p ON j.id_plantilla = p.id_plantilla;
 
 -- Vista para plantillas_equipos
-DROP VIEW IF EXISTS vw_plantillas_equipos;
-CREATE VIEW vw_plantillas_equipos AS
+DROP VIEW IF EXISTS vw_plantillas_equipos_agrupadas;
+CREATE VIEW vw_plantillas_equipos_agrupadas AS
 SELECT 
     pe.id_plantilla_equipo AS ID,
     pe.id_plantilla AS ID_PLANTILLA,
-    pe.id_jugador AS ID_JUGADOR,
+    p.nombre_plantilla AS NOMBRE_PLANTILLA,
+    COUNT(pe.id_jugador) AS TOTAL_JUGADORES,
     pe.id_temporada AS ID_TEMPORADA,
+    t.nombre_temporada AS NOMBRE_TEMPORADA,
     pe.id_equipo AS ID_EQUIPO,
-    p.nombre_plantilla AS PLANTILLA,
-    CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS JUGADOR,
-    t.nombre_temporada AS TEMPORADA,
-    e.nombre_equipo AS EQUIPO
+    e.nombre_equipo AS NOMBRE_EQUIPO
 FROM 
     plantillas_equipos pe
 INNER JOIN 
     plantillas p ON pe.id_plantilla = p.id_plantilla
 INNER JOIN 
-    jugadores j ON pe.id_jugador = j.id_jugador
-INNER JOIN 
     temporadas t ON pe.id_temporada = t.id_temporada
 INNER JOIN 
-    equipos e ON pe.id_equipo = e.id_equipo;
+    equipos e ON pe.id_equipo = e.id_equipo
+GROUP BY 
+    pe.id_plantilla,
+    p.nombre_plantilla,
+    pe.id_temporada,
+    t.nombre_temporada,
+    pe.id_equipo,
+    e.nombre_equipo;
+
+SELECT * FROM vw_plantillas_equipos_agrupadas;
 
 -- Vista para detalles_cuerpos_tecnicos
 DROP VIEW IF EXISTS vw_detalles_cuerpos_tecnicos;
