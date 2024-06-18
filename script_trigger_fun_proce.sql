@@ -1164,3 +1164,14 @@ WHERE ROUTINE_TYPE = 'PROCEDURE' AND ROUTINE_SCHEMA = 'db_gol_sv';
 SELECT TABLE_NAME
 FROM information_schema.TABLES
 WHERE TABLE_SCHEMA = 'db_gol_sv';
+
+CREATE VIEW vista_tipos_goles AS
+    SELECT
+        tg.id_tipo_gol,
+        tg.id_tipo_jugada,
+        tg.nombre_tipo_gol AS gol,
+        tj.nombre_tipo_juego AS jugada
+FROM
+    tipos_goles tg
+INNER JOIN
+    tipos_jugadas tj on tg.id_tipo_jugada =   tj.id_tipo_jugada;
