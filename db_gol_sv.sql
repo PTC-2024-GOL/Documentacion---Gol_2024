@@ -3,7 +3,6 @@ DROP DATABASE if EXISTS db_gol_sv;
 CREATE DATABASE db_gol_sv;
 USE db_gol_sv;
 
-#No hubo cambios
 CREATE TABLE administradores(
 id_administrador INT AUTO_INCREMENT PRIMARY KEY,
 nombre_administrador VARCHAR(50) NOT NULL,
@@ -28,8 +27,6 @@ foto_administrador VARCHAR(50) NULL,
 CONSTRAINT chk_url_foto_administrador CHECK (foto_administrador LIKE '%.jpg' OR foto_administrador LIKE '%.png' OR foto_administrador LIKE '%.jpeg' OR foto_administrador LIKE '%.gif')
 );
 
-SELECT * FROM administradores;
-
 CREATE TABLE tecnicos(
   id_tecnico INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_tecnico VARCHAR(50) NOT NULL, 
@@ -50,17 +47,12 @@ CREATE TABLE tecnicos(
   CONSTRAINT chk_url_foto_administrador CHECK (foto_tecnico LIKE '%.jpg' OR foto_tecnico LIKE '%.png' OR foto_tecnico LIKE '%.jpeg' OR foto_tecnico LIKE '%.gif')
 );
 
-#Se paso de escribir el año solamente, a escribirle un nombre para la temporada.
-#Con el fin de hacer este campo mas adaptable.
 CREATE TABLE temporadas(
   id_temporada INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_temporada VARCHAR(50) NOT NULL,
   CONSTRAINT uq_nombre_temporada_unico UNIQUE(nombre_temporada)
 );
 
-#Se añadira un nombre del horario, que se creara automaticamente con una función
-#que agarre el dia ejemplo "Lunes", además de un contador que aumente en 1, un texto quemado que diga
-#"Horario del" para que al final termine siendo algo por el estilo "Horario del lunes 1"
 CREATE TABLE horarios(
   id_horario INT AUTO_INCREMENT PRIMARY KEY,
   nombre_horario VARCHAR(60) NOT NULL,
@@ -72,7 +64,6 @@ CREATE TABLE horarios(
   campo_de_entrenamiento VARCHAR(100) NOT NULL
 );
 
-#Se quito de esta tabla el id del horario.
 CREATE TABLE categorias(
   id_categoria INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_categoria VARCHAR(80) NOT NULL, 
@@ -84,7 +75,6 @@ CREATE TABLE categorias(
   CONSTRAINT fk_temporada_de_la_categoria FOREIGN KEY (id_temporada) REFERENCES temporadas(id_temporada)
 );
 
-#Se agrego esta tabla muchos a muchos, para darle el horario a las distintas categorias
 CREATE TABLE horarios_categorias(
   id_horario_categoria INT AUTO_INCREMENT PRIMARY KEY,
   id_categoria INT NOT NULL, 
@@ -93,22 +83,18 @@ CREATE TABLE horarios_categorias(
   CONSTRAINT fk_horarios_de_la_categoria FOREIGN KEY (id_horario) REFERENCES horarios(id_horario)
 );
 
-#Se agrego esta tabla de roles, para definir que tipo de tecnico puede ser, en caso que se agreguen mas cargos
-#al cuerpo tecnico
 CREATE TABLE rol_tecnico(
   id_rol_tecnico INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_rol_tecnico VARCHAR(60),
   CONSTRAINT uq_nombre_rol_tecnico_unico UNIQUE(nombre_rol_tecnico)
 );
 
-#Se eliminaron los campos que referenciaban datos y se dejo solamente el nombre del cuerpo tecnico para identificarlo
 CREATE TABLE cuerpos_tecnicos(
   id_cuerpo_tecnico INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_cuerpo_tecnico VARCHAR(60),
   CONSTRAINT uq_nombre_cuerpo_tecnico_unico UNIQUE(nombre_cuerpo_tecnico)
 );
 
-#Se agrego esta tabla, para asignarle al cuerpo tecnico el tecnico y el rol de este tecnico
 CREATE TABLE detalles_cuerpos_tecnicos(
   id_detalle_cuerpo_tecnico INT AUTO_INCREMENT PRIMARY KEY, 
   id_cuerpo_tecnico INT NOT NULL, 
@@ -119,11 +105,6 @@ CREATE TABLE detalles_cuerpos_tecnicos(
   CONSTRAINT fk_rol_tecnico_del_equipo FOREIGN KEY (id_rol_tecnico) REFERENCES rol_tecnico(id_rol_tecnico)
 );
 
-#Aclarar que la logica que se ocupa para el cuerpo tecnico y para la categoria, es que se llaman a las tablas padres, o sea 
-#Categorias y Cuerpos Tecnicos, con el fin de traer los datos de sabiendo el identificador de la tabla padre
-#llamar a la tabla hija que contiene tanto el horario de las categorias, como a la tabla que contiene el detalle del cuerpo
-#tecnico.
-#Se agrego fecha de creación por seguridad de datos, en el sentido de que el admin tenga registro de cuando se hizo una inserrción
 CREATE TABLE equipos(
   id_equipo INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_equipo VARCHAR(50) NOT NULL, 
@@ -145,7 +126,6 @@ CREATE TABLE posiciones(
   area_de_juego ENUM('Ofensiva', 'Defensiva', 'Ofensiva y defensiva') NOT NULL
 );
 
-#Se quitaron los campos del estado fisico del jugador.
 CREATE TABLE jugadores(
   id_jugador INT AUTO_INCREMENT PRIMARY KEY, 
   dorsal_jugador INT UNSIGNED NULL,
@@ -168,8 +148,6 @@ CREATE TABLE jugadores(
   CONSTRAINT chk_url_foto_jugador CHECK (foto_jugador LIKE '%.jpg' OR foto_jugador LIKE '%.png' OR foto_jugador LIKE '%.jpeg' OR foto_jugador LIKE '%.gif')
 );
 
-#El estado fisico de cada jugador es variable, por ende se necesitaba otra tabla para este
-#Se agrega un campo mas llamado FECHA ESTADO FISICO, para registrar cuando se cree un nuevo estado fisico
 CREATE TABLE estados_fisicos_jugadores(
   id_estado_fisico_jugador INT AUTO_INCREMENT PRIMARY KEY,
   id_jugador INT NOT NULL, 
@@ -184,24 +162,12 @@ CREATE TABLE estados_fisicos_jugadores(
 #ALTER TABLE estados_fisicos_jugadores MODIFY COLUMN altura_jugador DECIMAL(5, 2) UNSIGNED NOT NULL;
 #ALTER TABLE estados_fisicos_jugadores ADD COLUMN fecha_creacion DATETIME NULL DEFAULT NOW();
 
-#Se agrego esta tabla para aplicar la misma logica que se ocupa para el cuerpo técnico en la plantilla
-#recuerdo que en la reunión el señor pidio que en temporada se pusiese el nombre de la temporada y de que torneo es,
-#por ejemplo liga adfa 2024, torneo internacional promesas 2024 etc, tonces en temporada ya se aplica esto,
-#pero en plantillas, las plantillas deberian tener un nombre para que además de identificarse mejor, se puedan aplicar como se hace en
-#cuerpo técnico, que se pone una tabla que sirve para identificar el nombre del cuerpo técnico y de ahí una nueva tabla
-#para poner los datos que le pertenecen a ese cuerpo técnico
 CREATE TABLE plantillas(
   id_plantilla INT AUTO_INCREMENT PRIMARY KEY,
   nombre_plantilla VARCHAR(150) NOT NULL,
   CONSTRAINT uq_nombre_plantilla_unico UNIQUE(nombre_plantilla)
 );
 
-#No hubo cambios, nada mas que se vuelve a aplicar la logica que se explico en el comentario de la tabla equipos
-#No se referencia la tabla estado fisico del jugador, porque de por si sabiendo el numero de identificación del jugador
-#ya se puede acceder a una consulta que traiga todos los datos del historial del estado fisico del jugador.
-#Recuerden que si se llama al id del estado fisico lo que pasaria es que solamente se le estaria dando un dato del estado fisico
-#y no el de todos los estados fisicos que se puedan insertar para cierto jugador.
-#Se le agrego la referencia a la plantilla, para identificar la plantilla a la cual le pertenecen todos estos datos.
 CREATE TABLE plantillas_equipos(
   id_plantilla_equipo INT AUTO_INCREMENT PRIMARY KEY,
   id_plantilla INT NOT NULL, 
@@ -221,8 +187,6 @@ CREATE TABLE caracteristicas_jugadores(
   clasificacion_caracteristica_jugador ENUM('Técnicos', 'Tácticos', 'Condicionales', 'Psicologicos', 'Personales') NOT NULL
 );
 
-#leer plantillas o equipos para ver la logica del porque se referencio la tabla padre Jugadores y no la tabla
-#hija Estados fisicos jugadores.
 CREATE TABLE caracteristicas_analisis(
   id_caracteristica_analisis INT AUTO_INCREMENT PRIMARY KEY,
   nota_caracteristica_analisis DECIMAL(5,3) UNSIGNED NOT NULL,
@@ -232,8 +196,6 @@ CREATE TABLE caracteristicas_analisis(
   CONSTRAINT fk_sub_caracteristica_jugador_caracteristica_general FOREIGN KEY (id_caracteristica_jugador) REFERENCES caracteristicas_jugadores(id_caracteristica_jugador)
 );
 
-#leer plantillas o equipos para ver la logica del porque se referencio la tabla padre Jugadores y no la tabla
-#hija Estados fisicos jugadores y de igual forma para el horario, el porque se define el horario y no el horario de la categoria.
 CREATE TABLE asistencias(
   id_asistencia INT AUTO_INCREMENT PRIMARY KEY, 
   id_jugador INT NOT NULL, 
@@ -269,23 +231,10 @@ CREATE TABLE detalles_contenidos(
   CONSTRAINT fk_tarea FOREIGN KEY (id_tarea) REFERENCES tareas(id_tarea), 
   id_sub_tema_contenido INT NOT NULL,
   CONSTRAINT fk_contenido FOREIGN KEY (id_sub_tema_contenido) REFERENCES sub_temas_contenidos(id_sub_tema_contenido),
-  id_asistencia INT NOT NULL, 
-  CONSTRAINT fk_asistencia_contenidos FOREIGN KEY (id_asistencia) REFERENCES asistencias(id_asistencia),
   minutos_contenido INT UNSIGNED NULL, 
   minutos_tarea INT UNSIGNED NULL
 );
 
-#En jornada es necesario identificar la plantilla a la que se le asigna esa jornada en especifico
-#Cada temporada representa un torneo en el que la asociación de futbol participa,
-#sea por ejemplo la liga oficial juvenil en la que participa, un torneo amistoso o uno internacional, estos como tal tienen distintas 
-#jornadas al ser distintos torneos, se aprovechara que la tabla plantilla equipo como tal trae tanto el dato de la temporada, el equipo y el jugador en especifico,
-#esto se utilizara para crear el nombre de la jornada en una función, este se hara de la siguiente forma, el nombre de la jornada sera, un texto que
-#diga "Jornada " luego el numero de jornada que se ingrese, un espacio " " y después con el id de plantilla se traera el nombre de temporada
-#haciendo una subconsulta utilizando inner join, para traer según el id de plantilla, en la tabla plantillas equipos, la temporada a la que pertenece
-#esa plantilla a la cual se hace referencia, para esto, se utilizara una función y un procedimiento almacenado, como tal la funcion
-#solo deberia tener los siguientes datos, el texto de jornada, el parametro de numero de jornada, el parametro que guarde el nombre
-#de temporada y quedaria algo así "Jornada 1 Torneo ADFA San Salvador 2024", la subconsulta y la forma con la que se traera el dato de temporada
-#se hara en el procedimiento almacenado de insercción del dato de jornada
 CREATE TABLE jornadas(
   id_jornada INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_jornada VARCHAR(60) NULL,
@@ -299,16 +248,24 @@ CREATE TABLE jornadas(
 
 CREATE TABLE entrenamientos(
   id_entrenamiento INT AUTO_INCREMENT PRIMARY KEY, 
+  fecha_entrenamiento DATE,
+  sesion ENUM('Sesion 1', 'Sesion 2', 'Sesion 3'),
   id_jornada INT NOT NULL, 
-  CONSTRAINT fk_identificador_de_jornada FOREIGN KEY (id_jornada) REFERENCES jornadas(id_jornada),
+  CONSTRAINT fk_identificador_de_jornada_entrenamiento FOREIGN KEY (id_jornada) REFERENCES jornadas(id_jornada)
+);
+
+CREATE TABLE detalle_entrenamients(
+  id_detalle INT AUTO_INCREMENT PRIMARY KEY,
+  id_entrenamiento INT NOT NULL,
+  CONSTRAINT fk_entrenamientos FOREIGN KEY (id_entrenamiento) REFERENCES entrenamientos(id_entrenamiento),
+  id_asistencia INT NOT NULL, 
+  CONSTRAINT fk_asistencia_contenidos FOREIGN KEY (id_asistencia) REFERENCES asistencias(id_asistencia),
   id_caracteristica_analisis INT NOT NULL,
   CONSTRAINT fk_caracteristicas_analisis_jornada FOREIGN KEY (id_caracteristica_analisis) REFERENCES caracteristicas_analisis(id_caracteristica_analisis),
   id_detalle_contenido INT NOT NULL, 
   CONSTRAINT fk_detalle_contenido_jornada FOREIGN KEY (id_detalle_contenido) REFERENCES detalles_contenidos(id_detalle_contenido)
-);	
+);
 
-#leer plantillas o equipos para ver la logica del porque se referencio la tabla padre Equipos y no la tabla
-#hija plantilla
 CREATE TABLE partidos(
   id_partido INT AUTO_INCREMENT PRIMARY KEY, 
   id_jornada INT NOT NULL, 
@@ -338,9 +295,6 @@ CREATE TABLE tipos_goles(
   nombre_tipo_gol VARCHAR(60) NOT NULL
 );
 
-#en este caso si es importante referenciar a la tabla hija plantillas equipos
-#y no a la padre de Jugadores, ya que es importante saber a que equipo pertenece el jugador al que se le hizo 
-#el detalle de la participación del partido.
 CREATE TABLE participaciones_partidos(
   id_participacion INT AUTO_INCREMENT PRIMARY KEY, 
   id_partido INT NOT NULL, 
