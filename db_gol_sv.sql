@@ -169,14 +169,20 @@ CREATE TABLE jugadores(
 );
 
 #El estado fisico de cada jugador es variable, por ende se necesitaba otra tabla para este
+#Se agrega un campo mas llamado FECHA ESTADO FISICO, para registrar cuando se cree un nuevo estado fisico
 CREATE TABLE estados_fisicos_jugadores(
   id_estado_fisico_jugador INT AUTO_INCREMENT PRIMARY KEY,
   id_jugador INT NOT NULL, 
   CONSTRAINT fk_estado_fisico_jugador FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador),
-  altura_jugador DECIMAL(4, 2) UNSIGNED NOT NULL,
+  altura_jugador DECIMAL(5, 2) UNSIGNED NOT NULL,
   peso_jugador DECIMAL(5, 2) UNSIGNED NOT NULL,
-  indice_masa_corporal DECIMAL(5, 2) UNSIGNED NULL
+  indice_masa_corporal DECIMAL(5, 2) UNSIGNED NULL,
+  fecha_creacion DATETIME NULL DEFAULT NOW()
 );
+
+# Ejecutar en caso de que se haya creado la base antes del día martes 18 de junio del 2024 
+#ALTER TABLE estados_fisicos_jugadores MODIFY COLUMN altura_jugador DECIMAL(5, 2) UNSIGNED NOT NULL;
+#ALTER TABLE estados_fisicos_jugadores ADD COLUMN fecha_creacion DATETIME NULL DEFAULT NOW();
 
 #Se agrego esta tabla para aplicar la misma logica que se ocupa para el cuerpo técnico en la plantilla
 #recuerdo que en la reunión el señor pidio que en temporada se pusiese el nombre de la temporada y de que torneo es,
@@ -299,7 +305,7 @@ CREATE TABLE entrenamientos(
   CONSTRAINT fk_caracteristicas_analisis_jornada FOREIGN KEY (id_caracteristica_analisis) REFERENCES caracteristicas_analisis(id_caracteristica_analisis),
   id_detalle_contenido INT NOT NULL, 
   CONSTRAINT fk_detalle_contenido_jornada FOREIGN KEY (id_detalle_contenido) REFERENCES detalles_contenidos(id_detalle_contenido)
-);
+);	
 
 #leer plantillas o equipos para ver la logica del porque se referencio la tabla padre Equipos y no la tabla
 #hija plantilla
