@@ -23,58 +23,59 @@ INSERT INTO tecnicos (nombre_tecnico, apellido_tecnico, alias_tecnico, clave_tec
 ('Carmen', 'Vargas', 'carmen_v', 'clave789', 'carmen@gmail.com', '7774-7321', '11111111-1', '1981-01-12');
 
 -- 3. temporadas
-INSERT INTO temporadas(anio_temporada) VALUES(2020);
-INSERT INTO temporadas(anio_temporada) VALUES(2021);
-INSERT INTO temporadas(anio_temporada) VALUES(2022);
-INSERT INTO temporadas(anio_temporada) VALUES(2023);
-INSERT INTO temporadas(anio_temporada) VALUES(2024);
+INSERT INTO temporadas(nombre_temporada) VALUES('2020');
+INSERT INTO temporadas(nombre_temporada) VALUES('2021');
+INSERT INTO temporadas(nombre_temporada) VALUES('2022');
+INSERT INTO temporadas(nombre_temporada) VALUES('2023');
+INSERT INTO temporadas(nombre_temporada) VALUES('2024');
 
 -- 4. horarios
-INSERT INTO horarios (dia, hora_inicial, hora_final, campo_de_entrenamiento) VALUES
-('Miércoles', '16:00:00', '18:00:00', 'Cancha Bayer'),
-('Jueves', '16:00:00', '18:00:00', 'Cancha Bayer'),
-('Viernes', '16:00:00', '18:00:00', 'Cancha Bayer'),
-('Sábado', '16:00:00', '18:00:00', 'Cancha Bayer'),
-('Domingo', '16:00:00', '18:00:00', 'Cancha Bayer'),
-('Lunes', '16:00:00', '18:00:00', 'Cancha Bayer'),
-('Martes', '16:00:00', '18:00:00', 'Cancha Bayer'),
-('Miércoles', '16:00:00', '18:00:00', 'Cancha Bayer'),
-('Jueves', '16:00:00', '18:00:00', 'Cancha Bayer'),
-('Viernes', '16:00:00', '18:00:00', 'Cancha Bayer');
+INSERT INTO horarios (nombre_horario, dia, hora_inicial, hora_final, campo_de_entrenamiento) VALUES
+('Horario del 12 de julio','Miércoles', '16:00:00', '18:00:00', 'Cancha Bayer'),
+('Horario del 13 de julio','Jueves', '16:00:00', '18:00:00', 'Cancha Bayer'),
+('Horario del 14 de julio','Viernes', '16:00:00', '18:00:00', 'Cancha Bayer'),
+('Horario del 15 de julio','Sábado', '16:00:00', '18:00:00', 'Cancha Bayer'),
+('Horario del 16 de julio','Domingo', '16:00:00', '18:00:00', 'Cancha Bayer'),
+('Horario del 17 de julio','Lunes', '16:00:00', '18:00:00', 'Cancha Bayer'),
+('Horario del 18 de julio','Martes', '16:00:00', '18:00:00', 'Cancha Bayer'),
+('Horario del 19 de julio','Miércoles', '16:00:00', '18:00:00', 'Cancha Bayer'),
+('Horario del 20 de julio','Jueves', '16:00:00', '18:00:00', 'Cancha Bayer'),
+('Horario del 21 de julio','Viernes', '16:00:00', '18:00:00', 'Cancha Bayer');
 
 -- 5. categorias
-INSERT INTO categorias (nombre_categoria, edad_minima_permitida, edad_maxima_permitida, id_temporada, id_horario) VALUES
-('Nivel 1', '2000-01-01', '2017-12-31', 1, 1),
-('Nivel 2', '2000-01-01', '2011-12-31', 2, 2),
-('Nivel 3', '2000-01-01', '2008-12-31', 3, 1),
-('Nivel 4', '2000-01-01', '2005-12-31', 4, 2);
+INSERT INTO categorias (nombre_categoria, edad_minima_permitida, edad_maxima_permitida, id_temporada) VALUES
+('Nivel 1', '2000-01-01', '2017-12-31', 1),
+('Nivel 2', '2000-01-01', '2011-12-31', 2),
+('Nivel 3', '2000-01-01', '2008-12-31', 3),
+('Nivel 4', '2000-01-01', '2005-12-31', 4);
 
 -- 6. cuerpos_tecnicos
-INSERT INTO cuerpos_tecnicos (nombre_cuerpo_tecnico, primer_tecnico, segundo_tecnico, preparador_fisico, delegado) VALUES
-('Cuerpo Técnico 1', 1, 2, 3, 4),
-('Cuerpo Técnico 2', 2, 3, 4, 5),
-('Cuerpo Técnico 3', 3, 4, 5, 6),
-('Cuerpo Técnico 4', 4, 5, 6, 7),
-('Cuerpo Técnico 5', 5, 6, 7, 8),
-('Cuerpo Técnico 6', 6, 7, 8, 9),
-('Cuerpo Técnico 7', 7, 8, 9, 10),
-('Cuerpo Técnico 8', 8, 9, 10, 1),
-('Cuerpo Técnico 9', 9, 10, 1, 2),
-('Cuerpo Técnico 10', 10, 1, 2, 3);
+INSERT INTO cuerpos_tecnicos (nombre_cuerpo_tecnico) VALUES
+('Cuerpo Técnico 1'),
+('Cuerpo Técnico 2'),
+('Cuerpo Técnico 3'),
+('Cuerpo Técnico 4'),
+('Cuerpo Técnico 5'),
+('Cuerpo Técnico 6'),
+('Cuerpo Técnico 7'),
+('Cuerpo Técnico 8'),
+('Cuerpo Técnico 9'),
+('Cuerpo Técnico 10');
 
 -- 7. equipos
-INSERT INTO equipos (nombre_equipo, genero_equipo, telefono_contacto, id_cuerpo_tecnico, id_administrador, id_categoria, logo_equipo) VALUES
-('Barcelona', 'Masculino', '9865-2546', 1, 1, 1, 'default.jpg'),
-('Girona', 'Masculino', '3287-6854', 1, 1, 1, 'default.jpg'),
-('Real Madrid', 'Masculino', '2862-5882', 1, 1, 1, 'default.jpg'),
-('Inter milan', 'Femenino', '2012-8676', 1, 1, 1, 'default.jpg'),
-('Arsenal', 'Masculino', '0428-8654', 1, 1, 1, 'default.jpg'),
-('Chelsea', 'Masculino', '7986-5687', 1, 1, 1, 'default.jpg'),
-('Liverpool', 'Masculino', '3559-8751', 1, 1, 1, 'default.jpg'),
-('Villarreal', 'Masculino', '6597-6578', 1, 1, 1, 'default.jpg'),
-('Cádiz', 'Masculino', '5204-5687', 1, 1, 1, 'default.jpg'),
-('Getafe', 'Masculino', '7687-6554', 1, 1, 1, 'default.jpg');
+INSERT INTO equipos (nombre_equipo, genero_equipo, telefono_contacto, id_cuerpo_tecnico, id_categoria, logo_equipo) VALUES
+('Barcelona', 'Masculino', '9865-2546', 1,  1, 'default.jpg'),
+('Girona', 'Masculino', '3287-6854', 1, 1,  'default.jpg'),
+('Real Madrid', 'Masculino', '2862-5882', 1,  1, 'default.jpg'),
+('Inter milan', 'Femenino', '2012-8676', 1,  1, 'default.jpg'),
+('Arsenal', 'Masculino', '0428-8654', 1,  1, 'default.jpg'),
+('Chelsea', 'Masculino', '7986-5687', 1,  1, 'default.jpg'),
+('Liverpool', 'Masculino', '3559-8751', 1,  1, 'default.jpg'),
+('Villarreal', 'Masculino', '6597-6578', 1,  1, 'default.jpg'),
+('Cádiz', 'Masculino', '5204-5687', 1,  1, 'default.jpg'),
+('Getafe', 'Masculino', '7687-6554', 1,  1, 'default.jpg');
 
+SELECT * FROM equipos;
 -- 8. posiciones
 -- Inserción de posiciones de ataque
 INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Delantero centro', 'Ofensiva');
@@ -100,18 +101,19 @@ INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Lateral derecho', 'Def
 INSERT INTO posiciones (posicion, area_de_juego) VALUES ('Portero', 'Defensiva');
 
 -- 9. jugadores
-INSERT INTO jugadores (dorsal_jugador, nombre_jugador, apellido_jugador, estatus_jugador, fecha_nacimiento_jugador, genero_jugador, perfil_jugador, id_posicion_principal, id_posicion_secundaria, altura_jugador, peso_jugador, indice_masa_corporal, alias_jugador, clave_jugador, foto_jugador) VALUES
-(10, 'Lionel', 'Messi', 'Activo', '1987-06-24', 'Masculino', 'Zurdo', 6, 4, 1.70, 72, 24.91, 'Leo', 'leomessi10', 'default.jpg'),
-(7, 'Cristiano', 'Ronaldo', 'Activo', '1985-02-05', 'Masculino', 'Diestro', 5, 1, 1.87, 83, 23.77, 'CR7', 'ronaldo7', 'default.jpg'),
-(10, 'Neymar', 'Jr.', 'Baja temporal', '1992-02-05', 'Masculino', 'Ambidiestro', 6, 3, 1.75, 68, 22.2, 'Ney', 'neymar10', 'default.jpg'),
-(4, 'Sergio', 'Ramos', 'Activo', '1986-03-30', 'Masculino', 'Diestro', 13, 17, 1.83, 82, 24.43, 'SR4', 'ramos4', 'default.jpg'),
-(17, 'Kevin', 'De Bruyne', 'Activo', '1991-06-28', 'Masculino', 'Ambidiestro', 8, 4, 1.81, 70, 21.39, 'KDB', 'debruyne17', 'default.jpg'),
-(8, 'Andrés', 'Iniesta', 'Baja definitiva', '1984-05-11', 'Masculino', 'Diestro', 7, 11, 1.70, 68, 23.53, 'El Ilusionista', 'iniesta8', 'default.jpg'),
-(9, 'Robert', 'Lewandowski', 'Activo', '1988-08-21', 'Masculino', 'Diestro', 1, 2, 1.84, 80, 23.62, 'Lewy', 'lewandowski9', 'foto7.jpg'),
-(1, 'Manuel', 'Neuer', 'Activo', '1986-03-27', 'Masculino', 'Diestro', 18, 18, 1.93, 92, 24.69, 'Manu', 'neuer1', 'default.jpg'),
-(7, 'Kylian', 'Mbappé', 'Activo', '1998-12-20', 'Masculino', 'Diestro', 1, 6, 1.78, 73, 23.05, 'Kyky', 'mbappe11', 'default.jpg'),
-(6, 'Virgil', 'van Dijk', 'Baja temporal', '1991-07-08', 'Masculino', 'Diestro', 13, 14, 1.93, 92, 24.69, 'Big', 'virgil6', 'default.jpg');
+INSERT INTO jugadores (dorsal_jugador, nombre_jugador, apellido_jugador, estatus_jugador, fecha_nacimiento_jugador, genero_jugador, perfil_jugador, becado, id_posicion_principal, id_posicion_secundaria, alias_jugador, clave_jugador, foto_jugador, fecha_creacion) VALUES
+(10, 'Lionel', 'Messi', 'Activo', '1987-06-24', 'Masculino', 'Zurdo', 'Beca completa', 6, 4, 'Leo', 'leomessi10', 'default.jpg','2000-01-01'),
+(7, 'Cristiano', 'Ronaldo', 'Activo', '1985-02-05', 'Masculino', 'Diestro', 'Beca completa', 5, 1, 'CR7', 'ronaldo7', 'default.jpg','2000-01-01'),
+(10, 'Neymar', 'Jr.', 'Baja temporal', '1992-02-05', 'Masculino', 'Ambidiestro','Beca completa', 6, 3,  'Ney', 'neymar10', 'default.jpg','2000-01-01'),
+(4, 'Sergio', 'Ramos', 'Activo', '1986-03-30', 'Masculino', 'Diestro','Beca completa', 13, 17, 'SR4', 'ramos4', 'default.jpg','2000-01-01'),
+(17, 'Kevin', 'De Bruyne', 'Activo', '1991-06-28', 'Masculino', 'Ambidiestro', 'Beca completa', 8, 4, 'KDB', 'debruyne17', 'default.jpg','2000-01-01'),
+(8, 'Andrés', 'Iniesta', 'Baja definitiva', '1984-05-11', 'Masculino', 'Diestro', 'Beca completa', 7, 11, 'El Ilusionista', 'iniesta8', 'default.jpg','2000-01-01'),
+(9, 'Robert', 'Lewandowski', 'Activo', '1988-08-21', 'Masculino', 'Diestro', 'Beca completa', 1, 2, 'Lewy', 'lewandowski9', 'foto7.jpg','2000-01-01'),
+(1, 'Manuel', 'Neuer', 'Activo', '1986-03-27', 'Masculino', 'Diestro', 'Beca completa', 18, 18, 'Manu', 'neuer1', 'default.jpg','2000-01-01'),
+(7, 'Kylian', 'Mbappé', 'Activo', '1998-12-20', 'Masculino', 'Diestro', 'Beca completa', 1, 6,  'Kyky', 'mbappe11', 'default.jpg','2000-01-01'),
+(6, 'Virgil', 'van Dijk', 'Baja temporal', '1991-07-08', 'Masculino', 'Diestro', 'Beca completa', 13, 14, 'Big', 'virgil6', 'default.jpg','2000-01-01');
 
+SELECT * FROM jugadores;
 -- 10. caracteristicas_jugadores
 INSERT INTO caracteristicas_jugadores (nombre_caracteristica_jugador, clasificacion_caracteristica_jugador) VALUES
 ('PASE CORTO', 'Técnicos'),
@@ -125,20 +127,38 @@ INSERT INTO caracteristicas_jugadores (nombre_caracteristica_jugador, clasificac
 ('CONCENTRACIÓN', 'Psicologicos'),
 ('SACRIFICIO', 'Psicologicos');
 
+-- 11. plantillas
+INSERT INTO plantillas (nombre_plantilla) VALUES
+('plantilla equipo super poderosas 30020');
 -- 11. plantillas_equipos
-INSERT INTO plantillas_equipos (id_jugador, id_equipo) VALUES
-(1, 1),
-(2, 2),
-(3, 3),
-(4, 4),
-(5, 5),
-(6, 6),
-(7, 7),
-(8, 8),
-(9, 9),
-(10, 10);
+INSERT INTO plantillas_equipos (id_plantilla, id_jugador, id_temporada, id_equipo) VALUES
+(1, 1, 1, 1),
+(1, 2, 1, 2),
+(1, 3, 1, 3),
+(1, 4, 1, 4),
+(1, 5, 1, 5),
+(1, 6, 1, 6),
+(1, 7, 1, 7),
+(1, 8, 1, 8),
+(1, 9, 1, 9),
+(1, 10, 1, 10); 
 
--- 12. caracteristicas_analisis
+SELECT * FROM plantillas;
+
+-- 12. caracteristicas_jugadores
+INSERT INTO caracteristicas_jugadores (nombre_caracteristica_jugador, clasificacion_caracteristica_jugador) VALUES
+('Control del Balón', 'Técnicos'),
+('Visión de Juego', 'Tácticos'),
+('Resistencia Física', 'Condicionales'),
+('Motivación', 'Psicologicos'),
+('Liderazgo', 'Personales'),
+('Regate', 'Técnicos'),
+('Posicionamiento', 'Tácticos'),
+('Fuerza', 'Condicionales'),
+('Manejo del Estrés', 'Psicologicos'),
+('Trabajo en Equipo', 'Personales');
+
+-- 12 caracteristicas
 INSERT INTO caracteristicas_analisis (nota_caracteristica_analisis, id_jugador, id_caracteristica_jugador) VALUES
 (9.5, 1, 1),
 (5.0, 2, 2),
@@ -150,6 +170,10 @@ INSERT INTO caracteristicas_analisis (nota_caracteristica_analisis, id_jugador, 
 (3.5, 8, 8),
 (7.9, 9, 9),
 (5.6, 10, 10);
+
+SELECT * FROM caracteristicas_jugadores;
+SELECT * FROM caracteristicas_analisis;
+SELECT * FROM plantillas_equipos;
 
 -- 13. asistencias
 INSERT INTO asistencias (id_jugador, id_horario, asistencia, observacion_asistencia) VALUES
@@ -219,7 +243,7 @@ INSERT INTO detalles_contenidos(id_tarea, id_sub_tema_contenido, id_asistencia, 
 
 
 -- 18. jornadas
-INSERT INTO jornadas(nombre_jornada, numero_jornada, id_temporada, fecha_inicio_jornada, fecha_fin_jornada) VALUES
+INSERT INTO jornadas(nombre_jornada, numero_jornada, id_plantilla , fecha_inicio_jornada, fecha_fin_jornada) VALUES
 ('Jornada 1', 1, 1, '2024-01-01', '2024-01-31'),
 ('Jornada 2', 2, 1, '2024-02-01', '2024-02-29'),
 ('Jornada 3', 3, 1, '2024-03-01', '2024-03-31'),
@@ -230,6 +254,16 @@ INSERT INTO jornadas(nombre_jornada, numero_jornada, id_temporada, fecha_inicio_
 ('Jornada 8', 8, 1, '2024-08-01', '2024-08-31'),
 ('Jornada 9', 9, 1, '2024-09-01', '2024-09-30'),
 ('Jornada 10', 10, 1, '2024-10-01', '2024-11-13');
+
+CREATE TABLE entrenamientos(
+  id_entrenamiento INT AUTO_INCREMENT PRIMARY KEY, 
+  id_jornada INT NOT NULL, 
+  CONSTRAINT fk_identificador_de_jornada FOREIGN KEY (id_jornada) REFERENCES jornadas(id_jornada),
+  id_caracteristica_analisis INT NOT NULL,
+  CONSTRAINT fk_caracteristicas_analisis_jornada FOREIGN KEY (id_caracteristica_analisis) REFERENCES caracteristicas_analisis(id_caracteristica_analisis),
+  id_detalle_contenido INT NOT NULL, 
+  CONSTRAINT fk_detalle_contenido_jornada FOREIGN KEY (id_detalle_contenido) REFERENCES detalles_contenidos(id_detalle_contenido)
+);
 
 -- 19. entrenamientos
 INSERT INTO entrenamientos(id_jornada, id_caracteristica_analisis, id_detalle_contenido) VALUES
@@ -245,7 +279,7 @@ INSERT INTO entrenamientos(id_jornada, id_caracteristica_analisis, id_detalle_co
 (10,10,10);
 
 -- 20. partidos
-INSERT INTO partidos (id_entrenamiento, id_equipo, logo_rival, rival_partido, fecha_partido, cancha_partido, resultado_partido, localidad_partido, tipo_resultado_partido) VALUES
+INSERT INTO partidos (id_jornada, id_equipo, logo_rival, rival_partido, fecha_partido, cancha_partido, resultado_partido, localidad_partido, tipo_resultado_partido) VALUES
 (1, 1, 'logoRival.png', 'Mocaco', 2023-05-12, 'San Benito', '3 - 4', 'Localidad', 'Victoria'),
 (2, 2, 'logoTigres.png', 'Tigres', 2023-05-15, 'Mejicanos', '2 - 1', 'Visitante', 'Victoria'),
 (3, 3, 'logoLeon.png', 'León', 2023-05-18, 'San Jacinto', '1 - 1', 'Localidad', 'Empate'),
