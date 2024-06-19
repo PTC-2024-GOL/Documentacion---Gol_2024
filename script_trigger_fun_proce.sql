@@ -859,36 +859,36 @@ END //
 -- Procedimientos para la tabla plantillas_equipos
 
 CREATE PROCEDURE sp_insertar_plantilla_equipo (
-    IN id_plantilla INT, 
-    IN id_jugador INT, 
-    IN id_temporada INT, 
-    IN id_equipo INT
+    IN p_id_plantilla INT, 
+    IN p_id_jugador INT, 
+    IN p_id_temporada INT, 
+    IN p_id_equipo INT
 )
 BEGIN
     INSERT INTO plantillas_equipos(id_plantilla, id_jugador, id_temporada, id_equipo)
-    VALUES (id_plantilla, id_jugador, id_temporada, id_equipo);
+    VALUES (p_id_plantilla, p_id_jugador, p_id_temporada, p_id_equipo);
 END //
 
+DROP PROCEDURE IF EXISTS sp_actualizar_plantilla_equipo;
+DELIMITER //
 CREATE PROCEDURE sp_actualizar_plantilla_equipo (
-    IN id_plantilla_equipo INT, 
-    IN id_plantilla INT, 
-    IN id_jugador INT, 
-    IN id_temporada INT, 
-    IN id_equipo INT
+    IN p_id_plantilla_equipo INT, 
+    IN p_id_plantilla INT, 
+    IN p_id_jugador INT, 
+    IN p_id_temporada INT, 
+    IN p_id_equipo INT
 )
 BEGIN
     UPDATE plantillas_equipos 
-    SET id_plantilla = id_plantilla, id_jugador = id_jugador, id_temporada = id_temporada, id_equipo = id_equipo
-    WHERE id_plantilla_equipo = id_plantilla_equipo;
+    SET id_plantilla = p_id_plantilla, id_jugador = p_id_jugador, id_temporada = p_id_temporada, id_equipo = p_id_equipo
+    WHERE id_plantilla_equipo = p_id_plantilla_equipo;
 END //
 
 DROP PROCEDURE IF EXISTS sp_eliminar_plantilla_equipo;
 DELIMITER //
-CREATE PROCEDURE sp_eliminar_plantilla_equipo (IN id_plantilla INT, IN id_equipo INT, IN id_temporada INT)
+CREATE PROCEDURE sp_eliminar_plantilla_equipo (IN p_id_plantilla_equipo INT)
 BEGIN
-    DELETE FROM plantillas_equipos WHERE id_plantilla IN 
-        (SELECT id_plantilla FROM plantillas_equipos 
-         WHERE id_plantilla = id_plantilla AND id_equipo = id_equipo AND id_temporada = id_temporada) LIMIT 1;
+    DELETE FROM plantillas_equipos WHERE id_plantilla_equipo = p_id_plantilla_equipo;
 END //
 DELIMITER ;
 
