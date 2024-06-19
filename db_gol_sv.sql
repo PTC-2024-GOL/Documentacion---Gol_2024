@@ -1,4 +1,4 @@
-DROP DATABASE if EXISTS db_gol_sv;
+-- DROP DATABASE if EXISTS db_gol_sv;
 
 CREATE DATABASE db_gol_sv;
 USE db_gol_sv;
@@ -147,6 +147,13 @@ CREATE TABLE jugadores(
   fecha_creacion DATETIME NULL DEFAULT NOW(),
   CONSTRAINT chk_url_foto_jugador CHECK (foto_jugador LIKE '%.jpg' OR foto_jugador LIKE '%.png' OR foto_jugador LIKE '%.jpeg' OR foto_jugador LIKE '%.gif')
 );
+
+ALTER TABLE jugadores
+MODIFY COLUMN fecha_creacion DATE NULL DEFAULT NOW();
+
+ALTER TABLE jugadores
+MODIFY COLUMN foto_jugador VARCHAR(50) DEFAULT 'default.png';
+
 
 CREATE TABLE estados_fisicos_jugadores(
   id_estado_fisico_jugador INT AUTO_INCREMENT PRIMARY KEY,

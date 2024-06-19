@@ -1165,6 +1165,7 @@ SELECT TABLE_NAME
 FROM information_schema.TABLES
 WHERE TABLE_SCHEMA = 'db_gol_sv';
 
+-- Vista para ver los tipos de goles agregados.
 CREATE VIEW vista_tipos_goles AS
     SELECT
         tg.id_tipo_gol,
@@ -1175,3 +1176,83 @@ FROM
     tipos_goles tg
 INNER JOIN
     tipos_jugadas tj on tg.id_tipo_jugada =   tj.id_tipo_jugada;
+
+-- Vista para los jugadores.
+CREATE VIEW vista_jugadores AS
+    SELECT
+        j.id_jugador,
+        j.dorsal_jugador,
+        j.nombre_jugador,
+        j.apellido_jugador,
+        j.estatus_jugador,
+        j.fecha_nacimiento_jugador,
+        j.genero_jugador,
+        j.perfil_jugador,
+        j.becado,
+        j.id_posicion_principal,
+        j.id_posicion_secundaria,
+        j.alias_jugador,
+        j.clave_jugador,
+        j.foto_jugador,
+        j.fecha_creacion,
+        p1.posicion AS posicionPrincipal,
+        p2.posicion AS posicionSecundaria
+FROM jugadores j
+INNER JOIN
+    posiciones p1 ON j.id_posicion_principal = p1.id_posicion
+INNER JOIN
+    posiciones p2 ON j.id_posicion_secundaria = p2.id_posicion;
+
+SELECT * FROM vista_jugadores;
+
+-- Procedimiento para insertar un jugador
+DELIMITER $$
+CREATE PROCEDURE insertar_jugador(
+   IN p_dorsal_jugador INT UNSIGNED,
+   IN p_nombre_jugador VARCHAR(50),
+   IN p_apellido_jugador VARCHAR(100),
+   IN p_estatus_jugador VARCHAR(50),
+   IN p_fecha_nacimiento_jugador DATE,
+   IN p_genero_jugador VARCHAR(10),
+   IN p_perfil_jugador VARCHAR(50),
+   IN p_becado VARCHAR(50),
+   IN p_id_posicion_principal INT,
+   IN p_id_posicion_secundaria INT,
+   IN p_clave_jugador VARCHAR(100),
+   IN p_foto_jugador VARCHAR(50)
+)
+BEGIN
+    DECLARE p_alias_jugador VARCHAR(25);
+        -- Generar el alias utilizando la función, suponiendo que la función generar_alias_tecnico existe
+        SET p_alias_jugador = generar_alias_jugador(p_nombre_jugador, p_apellido_jugador, p_perfil_jugador, NOW());
+        INSERT INTO jugadores (dorsal_jugador, nombre_jugador, apellido_jugador, estatus_jugador, fecha_nacimiento_jugador, genero_jugador, perfil_jugador, becado, id_posicion_principal, id_posicion_secundaria, clave_jugador, foto_jugador, alias_jugador)
+        VALUES(p_dorsal_jugador, p_nombre_jugador, p_apellido_jugador, p_estatus_jugador, p_fecha_nacimiento_jugador, p_genero_jugador, p_perfil_jugador, p_becado, p_id_posicion_principal, p_id_posicion_secundaria, p_clave_jugador, p_foto_jugador, p_alias_jugador);
+END;
+$$
+DELIMITER ;
+
+-- Procedimiento para actualizar jugador
+DELIMITER //
+CREATE PROCEDURE actualizar_jugador (
+    IN id INT,
+    IN dorsal INT,
+    IN nombre VARCHAR(50),
+    IN apellido VARCHAR(50),
+    IN estatus VARCHAR(50),
+    IN nacimiento DATE,
+    IN genero VARCHAR(50),
+    IN perfil VARCHAR(50),
+    IN beca VARCHAR(50),
+    IN posicionPrincipal INT,
+    IN posicionSecundaria INT,
+    IN foto VARCHAR(36)
+)
+BEGIN
+    UPDATE jugadores
+    SET id_jugador = id, dorsal_jugador = dorsal, nombre_jugador = nombre, apellido_jugador = apellido,
+        estatus_jugador = estatus, fecha_nacimiento_jugador = nacimiento, genero_jugador = genero, perfil_jugador = perfil,
+        becado = beca, id_posicion_principal = posicionPrincipal, id_posicion_secundaria = posicionSecundaria, foto_jugador = foto
+    WHERE id_jugador = id;
+END //
+DELIMITER ;
+
