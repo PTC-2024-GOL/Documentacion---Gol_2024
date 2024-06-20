@@ -293,7 +293,7 @@ CREATE TABLE detalle_entrenamiento(
 
 /*
 Tan efimeras las flores que revolotean en desorden ante una primavera que no sabe adónde va.
-
+DROP TABLE detalle_entrenamiento;
 Si ya crearon la tabla de arriba entrenamientos, antes del 19 de junio, ejecutar estos códigos:
 ALTER TABLE detalle_entrenamiento
 ADD COLUMN id_jugador INT,

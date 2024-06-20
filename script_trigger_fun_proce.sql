@@ -1396,16 +1396,17 @@ JOIN
     
  
 -- Vista para conocer los horarios de un equipo en especifico, se usa en detalles contenidos - elegir horarios    
-CREATE VIEW vista_horarios_equipos AS
+ALTER  VIEW vista_horarios_equipos AS
 SELECT 
   e.id_equipo,
   e.id_entrenamiento,
   CONCAT(h.dia, ' de ', TIME_FORMAT(h.hora_inicial, '%H:%i'), ' A ', TIME_FORMAT(h.hora_final, '%H:%i')) AS horario
 FROM 
   entrenamientos e
-JOIN 
+INNER JOIN 
   horarios h ON e.id_horario = h.id_horario;
 
+SELECT * FROM vista_horarios_equipos WHERE id_equipo = 1;
 -- Vista para el GET de detalles contenidos
 CREATE VIEW vista_detalle_entrenamiento AS
 SELECT 
@@ -1662,4 +1663,16 @@ JOIN
     jornadas j ON p.id_jornada = j.id_jornada;
 
 
-
+SELECT 
+        e.id_estado_fisico_jugador,
+        e.id_jugador,
+        e.altura_jugador,
+        e.peso_jugador,
+        e.indice_masa_corporal,
+        e.fecha_creacion,
+        j.nombre_jugador,
+        DATE_FORMAT(e.fecha_creacion, '%d de %M de %Y') AS fecha_creacion_format
+        FROM estados_fisicos_jugadores e
+        INNER JOIN
+        jugadores j ON j.id_jugador = e.id_jugador
+        WHERE e.id_jugador = 2;
