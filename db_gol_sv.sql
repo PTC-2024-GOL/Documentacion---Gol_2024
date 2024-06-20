@@ -258,20 +258,48 @@ CREATE TABLE entrenamientos(
   fecha_entrenamiento DATE,
   sesion ENUM('Sesion 1', 'Sesion 2', 'Sesion 3'),
   id_jornada INT NOT NULL, 
-  CONSTRAINT fk_identificador_de_jornada_entrenamiento FOREIGN KEY (id_jornada) REFERENCES jornadas(id_jornada)
+  CONSTRAINT fk_identificador_de_jornada_entrenamiento FOREIGN KEY (id_jornada) REFERENCES jornadas(id_jornada),
+  id_equipo INT NOT NULL,
+	CONSTRAINT fk_identificador_de_equipo_entrenamiento FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
+	id_categoria INT NOT NULL,
+	CONSTRAINT fk_identificador_de_categoria_entrenamiento FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria),
+	id_horario INT NOT NULL,
+	CONSTRAINT fk_identificador_de_horario_entrenamiento FOREIGN KEY (id_horario) REFERENCES horarios(id_horario)
 );
 
-CREATE TABLE detalle_entrenamients(
+//*
+Si ya crearon la tabla de arriba entrenamientos, antes del 19 de junio, ejecutar estos códigos:
+ALTER TABLE entrenamientos
+ADD COLUMN id_equipo INT NOT NULL,
+ADD CONSTRAINT fk_identificador_de_equipo_entrenamiento FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
+ADD COLUMN id_categoria INT NOT NULL,
+ADD CONSTRAINT fk_identificador_de_categoria_entrenamiento FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria),
+ADD COLUMN id_horario INT NOT NULL,
+ADD CONSTRAINT fk_identificador_de_horario_entrenamiento FOREIGN KEY (id_horario) REFERENCES horarios(id_horario);
+*/
+CREATE TABLE detalle_entrenamiento(
   id_detalle INT AUTO_INCREMENT PRIMARY KEY,
   id_entrenamiento INT NOT NULL,
   CONSTRAINT fk_entrenamientos FOREIGN KEY (id_entrenamiento) REFERENCES entrenamientos(id_entrenamiento),
-  id_asistencia INT NOT NULL, 
+  id_asistencia INT, 
   CONSTRAINT fk_asistencia_contenidos FOREIGN KEY (id_asistencia) REFERENCES asistencias(id_asistencia),
-  id_caracteristica_analisis INT NOT NULL,
+  id_caracteristica_analisis INT,
   CONSTRAINT fk_caracteristicas_analisis_jornada FOREIGN KEY (id_caracteristica_analisis) REFERENCES caracteristicas_analisis(id_caracteristica_analisis),
-  id_detalle_contenido INT NOT NULL, 
-  CONSTRAINT fk_detalle_contenido_jornada FOREIGN KEY (id_detalle_contenido) REFERENCES detalles_contenidos(id_detalle_contenido)
+  id_detalle_contenido INT, 
+  CONSTRAINT fk_detalle_contenido_jornada FOREIGN KEY (id_detalle_contenido) REFERENCES detalles_contenidos(id_detalle_contenido),
+  id_jugador INT NOT NULL,
+	CONSTRAINT fk_identificador_de_jugador_entrenamiento FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador)
 );
+
+/*
+Tan efimeras las flores que revolotean en desorden ante una primavera que no sabe adónde va.
+
+Si ya crearon la tabla de arriba entrenamientos, antes del 19 de junio, ejecutar estos códigos:
+ALTER TABLE detalle_entrenamiento
+ADD COLUMN id_jugador INT,
+ADD CONSTRAINT fk_identificador_de_jugador_entrenamiento FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador);
+*/
+
 
 CREATE TABLE partidos(
   id_partido INT AUTO_INCREMENT PRIMARY KEY, 
@@ -365,8 +393,8 @@ CREATE TABLE lesiones(
   CONSTRAINT fk_registro_medico_del_tipo_de_lesion FOREIGN KEY (id_tipo_lesion) REFERENCES tipos_lesiones(id_tipo_lesion), 
   id_sub_tipologia INT NOT NULL,
   CONSTRAINT fk_id_subtipologia_lesiones FOREIGN KEY (id_sub_tipologia) REFERENCES sub_tipologias(id_sub_tipologia),
-  total_por_lesion INT NOT NULL DEFAULT 0,
-  porcentaje_por_lesion INT NULL DEFAULT 0
+  numero_lesiones INT UNSIGNED NOT NULL, 
+  promedio_lesiones INT UNSIGNED NULL DEFAULT 0
 );
 
 CREATE TABLE registros_medicos(

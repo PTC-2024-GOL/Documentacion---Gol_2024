@@ -1382,3 +1382,284 @@ INNER JOIN
 INNER JOIN
     sub_tipologias st ON l.id_sub_tipologia = st.id_sub_tipologia;
 
+-- ------------------------------------------------------------------------DETALLES CONTENIDOS----------------------------------------------------------------
+-- Vista para el GET de detalles contenidos- elegir horarios
+CREATE VIEW vista_equipos_categorias AS
+SELECT 
+    equipos.id_equipo, 
+    categorias.nombre_categoria, 
+    equipos.nombre_equipo
+FROM 
+    equipos
+JOIN 
+    categorias ON equipos.id_categoria = categorias.id_categoria;
+    
+ 
+-- Vista para conocer los horarios de un equipo en especifico, se usa en detalles contenidos - elegir horarios    
+CREATE VIEW vista_horarios_equipos AS
+SELECT 
+  e.id_equipo,
+  e.id_entrenamiento,
+  CONCAT(h.dia, ' de ', TIME_FORMAT(h.hora_inicial, '%H:%i'), ' A ', TIME_FORMAT(h.hora_final, '%H:%i')) AS horario
+FROM 
+  entrenamientos e
+JOIN 
+  horarios h ON e.id_horario = h.id_horario;
+
+-- Vista para el GET de detalles contenidos
+CREATE VIEW vista_detalle_entrenamiento AS
+SELECT 
+    e.id_equipo,
+    e.id_entrenamiento,
+    dc.id_detalle_contenido,
+    j.nombre_jugador,
+    stc.sub_tema_contenido AS nombre_subtema,
+    t.nombre_tarea
+FROM 
+    detalle_entrenamiento de
+JOIN 
+    entrenamientos e ON de.id_entrenamiento = e.id_entrenamiento
+JOIN 
+    detalles_contenidos dc ON de.id_detalle_contenido = dc.id_detalle_contenido
+JOIN 
+    jugadores j ON de.id_jugador = j.id_jugador
+JOIN 
+    sub_temas_contenidos stc ON dc.id_sub_tema_contenido = stc.id_sub_tema_contenido
+LEFT JOIN 
+    tareas t ON dc.id_tarea = t.id_tarea;
+
+-- Vista para el UPDATE de detalles contenidos
+CREATE VIEW vista_detalle_entrenamiento_especifico AS
+SELECT 
+    dc.id_detalle_contenido,
+    j.id_jugador,
+    stc.id_sub_tema_contenido,
+    dc.minutos_contenido,
+    dc.minutos_tarea,
+    t.id_tarea,
+    de.id_detalle
+FROM 
+    detalle_entrenamiento de
+JOIN 
+    detalles_contenidos dc ON de.id_detalle_contenido = dc.id_detalle_contenido
+JOIN 
+    jugadores j ON de.id_jugador = j.id_jugador
+JOIN 
+    sub_temas_contenidos stc ON dc.id_sub_tema_contenido = stc.id_sub_tema_contenido
+JOIN 
+    tareas t ON dc.id_tarea = t.id_tarea;    
+    
+SELECT * FROM vista_detalle_entrenamiento_especifico;
+
+-- Vista para conocr los jugadores de un equipo, solo se necesita saber el id equipo, se usa en detalles contenidos
+CREATE VIEW vista_equipos_jugadores AS
+SELECT 
+    e.id_equipo,
+    j.nombre_jugador,
+    j.id_jugador,
+    pe.id_plantilla_equipo
+FROM 
+    equipos e
+JOIN 
+    plantillas_equipos pe ON e.id_equipo = pe.id_equipo
+JOIN 
+    jugadores j ON pe.id_jugador = j.id_jugador;
+
+-- Procedimiento para insertar detalle contenido
+DELIMITER $$
+
+CREATE PROCEDURE insertarDetalleContenido(
+    IN p_subContenido_id INT UNSIGNED,
+    IN p_subContenido_minutos INT UNSIGNED,
+    IN p_tarea_id INT UNSIGNED,
+    IN p_tarea_minutos INT UNSIGNED,
+    IN p_id_jugador INT UNSIGNED,
+    IN p_id_entrenamiento INT UNSIGNED
+)
+BEGIN
+    DECLARE v_id_detalle_contenido INT;
+    DECLARE v_exists INT;
+    DECLARE v_exists2 INT;
+    DECLARE v_id INT;
+    DECLARE done INT DEFAULT 0;
+
+    -- Cursor para recorrer los registros
+    DECLARE cur CURSOR FOR
+        SELECT id_detalle FROM detalle_entrenamiento
+        WHERE id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento;
+
+    -- Handler para salir del cursor
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+    -- Insertar en detalles_contenidos
+    INSERT INTO detalles_contenidos (id_tarea, id_sub_tema_contenido, minutos_contenido, minutos_tarea)
+    VALUES (p_tarea_id, p_subContenido_id, p_subContenido_minutos, p_tarea_minutos);
+    
+    SET v_id_detalle_contenido = LAST_INSERT_ID();
+
+    -- Verificar si ya existe el registro en detalle_entrenamiento
+    SELECT COUNT(*) INTO v_exists
+    FROM detalle_entrenamiento
+    WHERE id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento;
+
+    -- Si no existe, insertar nuevo registro
+    IF v_exists = 0 THEN
+        INSERT INTO detalle_entrenamiento (id_entrenamiento, id_asistencia, id_caracteristica_analisis, id_detalle_contenido, id_jugador)
+        VALUES (p_id_entrenamiento, NULL, NULL, v_id_detalle_contenido, p_id_jugador);
+    ELSE
+        -- Aquí se verifica si en los registros con el mismo id entrenamiento y id jugador, algún registro tiene un dato NO NULLO en id_detalle_contenido
+        SELECT COUNT(*) INTO v_exists2
+        FROM detalle_entrenamiento
+        WHERE id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento AND id_detalle_contenido IS NOT NULL;
+        
+        -- En caso de que no exista (v_exists2 = 0), pasará a un if, en caso contrario (v_exists2 > 0), pasará a un else
+        IF v_exists2 >= 1 THEN
+            -- Abrir el cursor
+            OPEN cur;
+
+            -- Bucle para recorrer los registros
+            read_loop: LOOP
+                FETCH cur INTO v_id;
+                IF done THEN
+                    LEAVE read_loop;
+                END IF;
+
+                -- Verificar si id_detalle_contenido es NULL
+                IF (SELECT id_detalle_contenido FROM detalle_entrenamiento WHERE id_detalle = v_id) IS NULL THEN
+                    -- Actualizar el registro
+                    UPDATE detalle_entrenamiento
+                    SET id_asistencia = NULL,
+                        id_caracteristica_analisis = NULL,
+                        id_detalle_contenido = v_id_detalle_contenido
+                    WHERE id_detalle = v_id;
+                    LEAVE read_loop;
+                END IF;
+            END LOOP;
+
+            -- Cerrar el cursor
+            CLOSE cur;
+        ELSE
+            -- Si existe un id_detalle_contenido no nulo, insertar un nuevo registro
+            INSERT INTO detalle_entrenamiento (id_entrenamiento, id_asistencia, id_caracteristica_analisis, id_detalle_contenido, id_jugador)
+            VALUES (p_id_entrenamiento, NULL, NULL, v_id_detalle_contenido, p_id_jugador);
+        END IF;
+    END IF;
+END;
+$$
+
+DELIMITER ;
+
+-- Procedimiento para actualizar detalle contenido
+DELIMITER $$
+
+CREATE PROCEDURE actualizarDetalleContenido(
+    IN p_subContenido_id INT UNSIGNED,
+    IN p_subContenido_minutos INT UNSIGNED,
+    IN p_tarea_id INT UNSIGNED,
+    IN p_tarea_minutos INT UNSIGNED,
+    IN p_id_detalle_contenido INT UNSIGNED
+)
+BEGIN
+    
+      UPDATE detalles_contenidos
+      SET id_tarea = p_tarea_id,
+      id_sub_tema_contenido = p_subContenido_id,
+      minutos_contenido = p_subContenido_minutos,
+      minutos_tarea = p_tarea_minutos
+      WHERE id_detalle_contenido = p_id_detalle_contenido;
+      
+END;
+$$
+
+DELIMITER ;
+
+-- ------------------------------------------------------------------------PARTIDOS----------------------------------------------------------------
+-- Vista para partidos:
+CREATE VIEW vista_detalle_partidos AS
+SELECT
+    DATE_FORMAT(p.fecha_partido, '%e de %M del %Y') AS fecha,
+    p.localidad_partido,
+    p.resultado_partido,
+    p.logo_rival,
+    e.logo_equipo,
+    e.nombre_equipo,
+    p.rival_partido AS nombre_rival,
+    e.id_equipo
+FROM
+    partidos p
+INNER JOIN
+    equipos e ON p.id_equipo = e.id_equipo
+ORDER BY p.fecha_partido;
+
+SELECT * FROM vista_detalle_partidos;
+
+-- PROCEDIMIENTO ALMACENADO DE PARTIDOS
+DELIMITER $$
+
+CREATE PROCEDURE insertarPartido(
+    IN p_id_equipo INT,
+    IN p_logo_rival VARCHAR(50),
+    IN p_rival_partido VARCHAR(50),
+    IN p_cancha_partido VARCHAR(100),
+    IN p_resultado_partido VARCHAR(10),
+    IN p_localidad_partido ENUM('Local', 'Visitante'),
+    IN p_tipo_resultado_partido ENUM('Victoria', 'Empate', 'Derrota'),
+    IN p_id_jornada INT
+)
+BEGIN
+    DECLARE v_fecha_actual DATETIME;
+    -- Obtener la fecha actual
+    SET v_fecha_actual = NOW();
+
+    -- Insertar el nuevo registro en la tabla partidos
+    INSERT INTO partidos (
+        id_jornada,
+        id_equipo,
+        logo_rival,
+        rival_partido,
+        fecha_partido,
+        cancha_partido,
+        resultado_partido,
+        localidad_partido,
+        tipo_resultado_partido
+    )
+    VALUES (
+        p_id_jornada,
+        p_id_equipo,
+        p_logo_rival,
+        p_rival_partido,
+        v_fecha_actual,
+        p_cancha_partido,
+        p_resultado_partido,
+        p_localidad_partido,
+        p_tipo_resultado_partido
+    );
+END$$
+
+DELIMITER ;
+
+-- Vista para read one de partidos
+CREATE VIEW vista_partidos_equipos AS
+SELECT 
+    e.id_equipo,
+    e.nombre_equipo,
+    e.logo_equipo,
+    p.id_partido,
+    p.fecha_partido,
+    p.cancha_partido,
+    p.rival_partido AS nombre_rival,
+    p.logo_rival,
+    p.resultado_partido,
+    p.localidad_partido,
+    p.tipo_resultado_partido,
+    j.nombre_jornada,
+    j.id_jornada
+FROM 
+    partidos p
+JOIN 
+    equipos e ON p.id_equipo = e.id_equipo
+JOIN 
+    jornadas j ON p.id_jornada = j.id_jornada;
+
+
+
