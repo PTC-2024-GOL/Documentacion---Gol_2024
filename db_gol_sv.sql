@@ -365,15 +365,9 @@ CREATE TABLE lesiones(
   CONSTRAINT fk_registro_medico_del_tipo_de_lesion FOREIGN KEY (id_tipo_lesion) REFERENCES tipos_lesiones(id_tipo_lesion), 
   id_sub_tipologia INT NOT NULL,
   CONSTRAINT fk_id_subtipologia_lesiones FOREIGN KEY (id_sub_tipologia) REFERENCES sub_tipologias(id_sub_tipologia),
-  numero_lesiones INT UNSIGNED NOT NULL, 
-  promedio_lesiones INT UNSIGNED NULL DEFAULT 0
+  total_por_lesion INT NOT NULL DEFAULT 0,
+  porcentaje_por_lesion INT NULL DEFAULT 0
 );
-
-ALTER TABLE lesiones
-CHANGE numero_lesiones total_por_lesion INT NULL DEFAULT 0;
-
-ALTER TABLE lesiones
-CHANGE promedio_lesiones porcentaje_por_lesion INT NULL DEFAULT 0;
 
 CREATE TABLE registros_medicos(
   id_registro_medico INT AUTO_INCREMENT PRIMARY KEY, 
