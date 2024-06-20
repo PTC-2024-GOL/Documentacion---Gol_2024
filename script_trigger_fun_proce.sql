@@ -1256,3 +1256,112 @@ BEGIN
 END //
 DELIMITER ;
 
+
+-- PROCEDIMIENTO PARA INSERTAR LESIONES.
+DELIMITER $$
+CREATE PROCEDURE insertar_lesion(
+   IN l_id_tipo_lesion INT,
+   IN l_id_sub_tipologia INT
+)
+BEGIN
+        INSERT INTO lesiones (id_tipo_lesion, id_sub_tipologia)
+        VALUES(l_id_tipo_lesion, l_id_sub_tipologia);
+END;
+$$
+DELIMITER ;
+
+
+-- PROCEDIMIENTO PARA INSERTAR LOS CAMPOS TOTAL_POR_LESION Y PROMEDIO_POR_LESION EN LA TABLA LESIONES.
+DELIMITER //
+CREATE PROCEDURE insertar_campos_lesiones(IN p_id_lesion INT)
+BEGIN
+    -- Actualiza el número de lesiones para la lesión específica
+    UPDATE lesiones
+    SET total_por_lesion = (
+        SELECT COUNT(*)
+        FROM registros_medicos rm
+        WHERE rm.id_lesion = p_id_lesion
+    )
+    WHERE lesiones.id_lesion = p_id_lesion;
+
+    -- Calcula y actualizar el porcentaje de lesiones
+    UPDATE lesiones
+    SET porcentaje_por_lesion = (
+        SELECT COUNT(*)
+        FROM registros_medicos rm
+        WHERE rm.id_lesion = p_id_lesion
+    ) / (
+        SELECT COUNT(*)
+        FROM registros_medicos
+    ) * 100
+    WHERE lesiones.id_lesion = p_id_lesion;
+END //
+
+DELIMITER ;
+
+-- TRIGGER PARA INSERTAR LOS CAMPOS DE LESIONES AUTOMATICAMENTE, DESPUES DE UNA INSERCION EN LA TABLA REGISTRO MEDICO
+DELIMITER //
+
+CREATE TRIGGER trigger_insertar_lesiones
+AFTER INSERT ON registros_medicos
+FOR EACH ROW
+BEGIN
+ CALL insertar_campos_lesiones(NEW.id_lesion);
+END//
+
+DELIMITER ;
+
+-- TRIGGER QUE SE EJECUTA ANTES DE LA ACTUALIZACION DE UN REGISTRO EN LA TABLA DE REGISTRO MEDICO, ESTO PARA QUE TANTO EL TOTAL POR LESION
+-- COMO EL PORCENTAJE_POR_LESION SE REDUZCAN DE LA TABLA LESIONES, SI SE ACTUALIZA EL ID_LESION DE LA TABLA REGISTRO MEDICO.
+DELIMITER //
+
+CREATE TRIGGER trigger_actualizacion_antes_lesiones
+BEFORE UPDATE ON registros_medicos
+FOR EACH ROW
+BEGIN
+    -- Reduce el conteo de lesiones para el id_lesion antiguo si cambió
+    IF OLD.id_lesion <> NEW.id_lesion THEN
+        UPDATE lesiones
+        SET total_por_lesion = total_por_lesion - 1
+        WHERE id_lesion = OLD.id_lesion;
+
+     -- Actualizar el promedio de lesiones para el id_lesion antiguo
+        UPDATE lesiones
+        SET porcentaje_por_lesion = (
+            SELECT COUNT(*)
+            FROM registros_medicos rm
+            WHERE rm.id_lesion = OLD.id_lesion
+        ) / (
+            SELECT COUNT(*)
+            FROM registros_medicos
+        ) * 100
+        WHERE id_lesion = OLD.id_lesion;
+    END IF;
+END //
+
+DELIMITER ;
+
+-- TRIGGER PARA ACTUALIZAR LOS CAMPOS DE LESIONES AUTOMATICAMENTE, DESPUES DE UNA ACTUALIZACION EN LA TABLA REGISTRO MEDICO
+DELIMITER //
+
+CREATE TRIGGER trigger_actualizar_lesiones
+AFTER UPDATE ON registros_medicos
+FOR EACH ROW
+BEGIN
+    CALL insertar_campos_lesiones(NEW.id_lesion);
+END //
+
+DELIMITER ;
+
+-- TRIGGER PARA REDUCIR LA CANTIDAD EN LESIONES Y PORCENTAJE DE LOS CAMPOS DE LESIONES AUTOMATICAMENTE,
+-- DESPUES DE QUE SE HAYA ELIMINADO UNA INSERCION EN LA TABLA REGISTRO MEDICO
+DELIMITER //
+
+CREATE TRIGGER trigger_eliminar_lesiones
+AFTER DELETE ON registros_medicos
+FOR EACH ROW
+BEGIN
+    CALL insertar_campos_lesiones(OLD.id_lesion);
+END //
+
+DELIMITER ;

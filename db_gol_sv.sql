@@ -369,6 +369,12 @@ CREATE TABLE lesiones(
   promedio_lesiones INT UNSIGNED NULL DEFAULT 0
 );
 
+ALTER TABLE lesiones
+CHANGE numero_lesiones total_por_lesion INT NULL DEFAULT 0;
+
+ALTER TABLE lesiones
+CHANGE promedio_lesiones porcentaje_por_lesion INT NULL DEFAULT 0;
+
 CREATE TABLE registros_medicos(
   id_registro_medico INT AUTO_INCREMENT PRIMARY KEY, 
   id_jugador INT NOT NULL, 
