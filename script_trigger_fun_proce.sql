@@ -1365,3 +1365,20 @@ BEGIN
 END //
 
 DELIMITER ;
+
+-- Vista para ver las lesiones
+CREATE VIEW vista_lesiones AS
+    SELECT
+        l.id_lesion,
+        l.id_tipo_lesion,
+        l.id_sub_tipologia,
+        l.total_por_lesion,
+        l.porcentaje_por_lesion,
+        tl.tipo_lesion,
+        st.nombre_sub_tipologia
+FROM lesiones l
+INNER JOIN
+    tipos_lesiones tl ON l.id_tipo_lesion = tl.id_tipo_lesion
+INNER JOIN
+    sub_tipologias st ON l.id_sub_tipologia = st.id_sub_tipologia;
+
