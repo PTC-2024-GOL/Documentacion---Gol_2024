@@ -1432,7 +1432,7 @@ JOIN
     
  
 -- Vista para conocer los horarios de un equipo en especifico, se usa en detalles contenidos - elegir horarios    
-ALTER  VIEW vista_horarios_equipos AS
+CREATE  VIEW vista_horarios_equipos AS
 SELECT 
   e.id_equipo,
   e.id_entrenamiento,
@@ -1621,6 +1621,7 @@ SELECT
     e.logo_equipo,
     e.nombre_equipo,
     p.rival_partido AS nombre_rival,
+    p.id_partido,
     e.id_equipo
 FROM
     partidos p
@@ -1682,7 +1683,7 @@ SELECT
     e.nombre_equipo,
     e.logo_equipo,
     p.id_partido,
-    p.fecha_partido,
+    DATE(p.fecha_partido) AS fecha_partido,
     p.cancha_partido,
     p.rival_partido AS nombre_rival,
     p.logo_rival,
