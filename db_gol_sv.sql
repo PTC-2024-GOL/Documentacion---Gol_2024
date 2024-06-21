@@ -267,7 +267,7 @@ CREATE TABLE entrenamientos(
 	CONSTRAINT fk_identificador_de_horario_entrenamiento FOREIGN KEY (id_horario) REFERENCES horarios(id_horario)
 );
 
-//*
+/*
 Si ya crearon la tabla de arriba entrenamientos, antes del 19 de junio, ejecutar estos códigos:
 ALTER TABLE entrenamientos
 ADD COLUMN id_equipo INT NOT NULL,
@@ -277,18 +277,19 @@ ADD CONSTRAINT fk_identificador_de_categoria_entrenamiento FOREIGN KEY (id_categ
 ADD COLUMN id_horario INT NOT NULL,
 ADD CONSTRAINT fk_identificador_de_horario_entrenamiento FOREIGN KEY (id_horario) REFERENCES horarios(id_horario);
 */
+
 CREATE TABLE detalle_entrenamiento(
   id_detalle INT AUTO_INCREMENT PRIMARY KEY,
   id_entrenamiento INT NOT NULL,
-  CONSTRAINT fk_entrenamientos FOREIGN KEY (id_entrenamiento) REFERENCES entrenamientos(id_entrenamiento),
+  CONSTRAINT fk_entrenamientos_detalle_entrenamiento FOREIGN KEY (id_entrenamiento) REFERENCES entrenamientos(id_entrenamiento),
   id_asistencia INT, 
-  CONSTRAINT fk_asistencia_contenidos FOREIGN KEY (id_asistencia) REFERENCES asistencias(id_asistencia),
+  CONSTRAINT fk_asistencia_detalle_entrenamiento FOREIGN KEY (id_asistencia) REFERENCES asistencias(id_asistencia),
   id_caracteristica_analisis INT,
-  CONSTRAINT fk_caracteristicas_analisis_jornada FOREIGN KEY (id_caracteristica_analisis) REFERENCES caracteristicas_analisis(id_caracteristica_analisis),
+  CONSTRAINT fk_caracteristicas_analisis_detalle_entrenamiento FOREIGN KEY (id_caracteristica_analisis) REFERENCES caracteristicas_analisis(id_caracteristica_analisis),
   id_detalle_contenido INT, 
-  CONSTRAINT fk_detalle_contenido_jornada FOREIGN KEY (id_detalle_contenido) REFERENCES detalles_contenidos(id_detalle_contenido),
+  CONSTRAINT fk_detalle_contenido_detalle_entrenamiento FOREIGN KEY (id_detalle_contenido) REFERENCES detalles_contenidos(id_detalle_contenido),
   id_jugador INT NOT NULL,
-	CONSTRAINT fk_identificador_de_jugador_entrenamiento FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador)
+	CONSTRAINT fk_jugadores_detalle_entrenamiento FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador)
 );
 
 /*
