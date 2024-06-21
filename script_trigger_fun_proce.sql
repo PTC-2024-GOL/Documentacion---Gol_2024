@@ -851,9 +851,9 @@ DELIMITER ;
 
 
 DELIMITER //
-CREATE PROCEDURE sp_eliminar_jornada (IN id_jornada INT)
+CREATE PROCEDURE sp_eliminar_jornada (IN p_id_jornada INT)
 BEGIN
-    DELETE FROM jornadas WHERE id_jornada = id_jornada;
+    DELETE FROM jornadas WHERE id_jornada = p_id_jornada;
 END //
 
 -- Procedimientos para la tabla plantillas_equipos
@@ -896,30 +896,30 @@ DELIMITER ;
 
 DELIMITER //
 CREATE PROCEDURE sp_insertar_detalle_cuerpo_tecnico (
-    IN id_cuerpo_tecnico INT, 
-    IN id_tecnico INT, 
-    IN id_rol_tecnico INT
+    IN p_id_cuerpo_tecnico INT, 
+    IN p_id_tecnico INT, 
+    IN p_id_rol_tecnico INT
 )
 BEGIN
     INSERT INTO detalles_cuerpos_tecnicos(id_cuerpo_tecnico, id_tecnico, id_rol_tecnico)
-    VALUES (id_cuerpo_tecnico, id_tecnico, id_rol_tecnico);
+    VALUES (p_id_cuerpo_tecnico, p_id_tecnico, p_id_rol_tecnico);
 END //
 
 CREATE PROCEDURE sp_actualizar_detalle_cuerpo_tecnico (
-    IN id_detalle_cuerpo_tecnico INT, 
-    IN id_cuerpo_tecnico INT, 
-    IN id_tecnico INT, 
-    IN id_rol_tecnico INT
+    IN p_id_detalle_cuerpo_tecnico INT, 
+    IN p_id_cuerpo_tecnico INT, 
+    IN p_id_tecnico INT, 
+    IN p_id_rol_tecnico INT
 )
 BEGIN
     UPDATE detalles_cuerpos_tecnicos 
-    SET id_cuerpo_tecnico = id_cuerpo_tecnico, id_tecnico = id_tecnico, id_rol_tecnico = id_rol_tecnico
-    WHERE id_detalle_cuerpo_tecnico = id_detalle_cuerpo_tecnico;
+    SET id_cuerpo_tecnico = p_id_cuerpo_tecnico, id_tecnico = p_id_tecnico, id_rol_tecnico = p_id_rol_tecnico
+    WHERE id_detalle_cuerpo_tecnico = p_id_detalle_cuerpo_tecnico;
 END //
 
-CREATE PROCEDURE sp_eliminar_detalle_cuerpo_tecnico (IN id_detalle_cuerpo_tecnico INT)
+CREATE PROCEDURE sp_eliminar_detalle_cuerpo_tecnico (IN p_id_detalle_cuerpo_tecnico INT)
 BEGIN
-    DELETE FROM detalles_cuerpos_tecnicos WHERE id_detalle_cuerpo_tecnico = id_detalle_cuerpo_tecnico;
+    DELETE FROM detalles_cuerpos_tecnicos WHERE id_detalle_cuerpo_tecnico = p_id_detalle_cuerpo_tecnico;
 END //
 
 DELIMITER ;
