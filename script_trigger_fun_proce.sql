@@ -1382,6 +1382,42 @@ INNER JOIN
 INNER JOIN
     sub_tipologias st ON l.id_sub_tipologia = st.id_sub_tipologia;
 
+-- VISTA PARA LOS EQUIPOS
+CREATE VIEW vista_equipos AS
+    SELECT
+        e.id_equipo AS ID,
+        e.nombre_equipo AS NOMBRE,
+        e.genero_equipo,
+        e.telefono_contacto,
+        e.id_categoria,
+        e.id_cuerpo_tecnico,
+        e.logo_equipo,
+        c.nombre_categoria
+FROM equipos e
+INNER JOIN
+    categorias c ON e.id_categoria = c.id_categoria;
+
+-- VISTA PARA VER EL CUERPO TECNICO DE UN EQUIPO
+CREATE VIEW vista_tecnicos_equipos AS
+    SELECT
+        e.id_equipo AS ID,
+        e.id_cuerpo_tecnico,
+        e.id_categoria,
+        dt.id_tecnico,
+        t.nombre_tecnico,
+        t.apellido_tecnico,
+        dt.id_rol_tecnico,
+        rt.nombre_rol_tecnico,
+        t.foto_tecnico,
+        t.correo_tecnico
+FROM equipos e
+INNER JOIN
+    detalles_cuerpos_tecnicos dt ON e.id_cuerpo_tecnico = dt.id_cuerpo_tecnico
+INNER JOIN
+    tecnicos t ON dt.id_tecnico = t.id_tecnico
+INNER JOIN
+    rol_tecnico rt ON dt.id_rol_tecnico = rt.id_rol_tecnico;
+
 -- ------------------------------------------------------------------------DETALLES CONTENIDOS----------------------------------------------------------------
 -- Vista para el GET de detalles contenidos- elegir horarios
 CREATE VIEW vista_equipos_categorias AS
