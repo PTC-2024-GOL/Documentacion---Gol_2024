@@ -1713,3 +1713,4 @@ SELECT
         INNER JOIN
         jugadores j ON j.id_jugador = e.id_jugador
         WHERE e.id_jugador = 2;
+SELECT * FROM equipos;
