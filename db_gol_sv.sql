@@ -57,7 +57,7 @@ CREATE TABLE horarios(
   id_horario INT AUTO_INCREMENT PRIMARY KEY,
   nombre_horario VARCHAR(60) NOT NULL,
   CONSTRAINT uq_nombre_horario_unico UNIQUE(nombre_horario),
-  dia ENUM('Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo') NOT NULL, 
+  dia ENUM('Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo') NOT NULL, 
   hora_inicial TIME NOT NULL, 
   hora_final TIME NOT NULL, 
   CONSTRAINT chk_validacion_de_horas CHECK(hora_inicial < hora_final), 
