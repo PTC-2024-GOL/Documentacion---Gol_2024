@@ -1628,16 +1628,20 @@ JOIN
  
 -- Vista para conocer los horarios de un equipo en especifico, se usa en detalles contenidos - elegir horarios    
 CREATE  VIEW vista_horarios_equipos AS
+CREATE VIEW vista_horarios_equipos AS
 SELECT 
   e.id_equipo,
   e.id_entrenamiento,
   CONCAT(h.dia, ' de ', TIME_FORMAT(h.hora_inicial, '%H:%i'), ' A ', TIME_FORMAT(h.hora_final, '%H:%i')) AS horario
+  e.fecha_entrenamiento,
+  CONCAT(h.dia, DATE_FORMAT(e.fecha_entrenamiento, ' %d de %M'), ' de ', TIME_FORMAT(h.hora_inicial, '%H:%i'), ' A ', TIME_FORMAT(h.hora_final, '%H:%i')) AS horario
 FROM 
   entrenamientos e
 INNER JOIN 
   horarios h ON e.id_horario = h.id_horario;
 
 SELECT * FROM vista_horarios_equipos WHERE id_equipo = 1;
+	SELECT * FROM entrenamientos;
 -- Vista para el GET de detalles contenidos
 CREATE VIEW vista_detalle_entrenamiento AS
 SELECT 
