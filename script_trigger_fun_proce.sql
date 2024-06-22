@@ -1628,7 +1628,6 @@ JOIN
  
 -- Vista para conocer los horarios de un equipo en especifico, se usa en detalles contenidos - elegir horarios    
 CREATE  VIEW vista_horarios_equipos AS
-CREATE VIEW vista_horarios_equipos AS
 SELECT 
   e.id_equipo,
   e.id_entrenamiento,
@@ -1640,8 +1639,6 @@ FROM
 INNER JOIN 
   horarios h ON e.id_horario = h.id_horario;
 
-SELECT * FROM vista_horarios_equipos WHERE id_equipo = 1;
-	SELECT * FROM entrenamientos;
 -- Vista para el GET de detalles contenidos
 CREATE VIEW vista_detalle_entrenamiento AS
 SELECT 
