@@ -253,6 +253,7 @@ CREATE TABLE jornadas(
   CONSTRAINT chk_validacion_de_fechas_de_jornada CHECK(fecha_inicio_jornada < fecha_fin_jornada)
 );
 
+
 CREATE TABLE entrenamientos(
   id_entrenamiento INT AUTO_INCREMENT PRIMARY KEY, 
   fecha_entrenamiento DATE,
@@ -260,11 +261,11 @@ CREATE TABLE entrenamientos(
   id_jornada INT NOT NULL, 
   CONSTRAINT fk_identificador_de_jornada_entrenamiento FOREIGN KEY (id_jornada) REFERENCES jornadas(id_jornada),
   id_equipo INT NOT NULL,
-	CONSTRAINT fk_identificador_de_equipo_entrenamiento FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
-	id_categoria INT NOT NULL,
-	CONSTRAINT fk_identificador_de_categoria_entrenamiento FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria),
-	id_horario INT NOT NULL,
-	CONSTRAINT fk_identificador_de_horario_entrenamiento FOREIGN KEY (id_horario) REFERENCES horarios(id_horario)
+  CONSTRAINT fk_identificador_de_equipo_entrenamiento FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
+  id_categoria INT NOT NULL,
+  CONSTRAINT fk_identificador_de_categoria_entrenamiento FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria),
+  id_horario INT NOT NULL,
+  CONSTRAINT fk_identificador_de_horario_entrenamiento FOREIGN KEY (id_horario) REFERENCES horarios(id_horario)
 );
 
 /*
@@ -301,6 +302,12 @@ ADD COLUMN id_jugador INT,
 ADD CONSTRAINT fk_identificador_de_jugador_entrenamiento FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador);
 */
 
+CREATE TABLE rivales (
+    id_rival INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_rival VARCHAR(50) NOT NULL,
+    logo_rival VARCHAR(50) NULL,
+    CONSTRAINT chk_logo_rival CHECK (logo_rival LIKE '%.jpg' OR logo_rival LIKE '%.png' OR logo_rival LIKE '%.jpeg')
+);
 
 CREATE TABLE partidos(
   id_partido INT AUTO_INCREMENT PRIMARY KEY, 
@@ -308,14 +315,13 @@ CREATE TABLE partidos(
   CONSTRAINT fk_jornada_partido FOREIGN KEY (id_jornada) REFERENCES jornadas(id_jornada), 
   id_equipo INT NOT NULL, 
   CONSTRAINT fk_equipo_partido FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
-  logo_rival VARCHAR(50) NULL, 
-  CONSTRAINT chk_url_logo_equipo_rival CHECK (logo_rival LIKE '%.jpg' OR logo_rival LIKE '%.png' OR logo_rival LIKE '%.jpeg' OR logo_rival LIKE '%.gif'),
-  rival_partido VARCHAR(50) NOT NULL,
   fecha_partido DATETIME NOT NULL,
   cancha_partido VARCHAR(100) NOT NULL,
   resultado_partido VARCHAR(10) NULL,
   localidad_partido ENUM('Local', 'Visitante') NOT NULL,
-  tipo_resultado_partido ENUM('Victoria', 'Empate', 'Derrota') NULL
+  tipo_resultado_partido ENUM('Victoria', 'Empate', 'Derrota') NULL,
+  id_rival INT NOT NULL,
+  CONSTRAINT fk_rivales_partidos FOREIGN KEY (id_rival) REFERENCES rivales(id_rival)
 );
 
 CREATE TABLE tipos_jugadas(
