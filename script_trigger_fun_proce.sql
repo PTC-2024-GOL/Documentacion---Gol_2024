@@ -1339,6 +1339,7 @@ SELECT
     dct.id_tecnico AS ID_TECNICO,
     dct.id_rol_tecnico AS ID_ROL,
     ct.nombre_cuerpo_tecnico AS CUERPO_TECNICO,
+    t.foto_tecnico AS IMAGEN,
     CONCAT(t.nombre_tecnico, ' ', t.apellido_tecnico) AS TECNICO,
     rt.nombre_rol_tecnico AS ROL_TECNICO
 FROM 
