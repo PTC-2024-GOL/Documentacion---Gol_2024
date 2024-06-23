@@ -1808,32 +1808,35 @@ DELIMITER ;
 
 -- ------------------------------------------------------------------------PARTIDOS----------------------------------------------------------------
 -- Vista para partidos:
+DROP VIEW IF EXISTS vista_detalle_partidos;
 CREATE VIEW vista_detalle_partidos AS
 SELECT
     DATE_FORMAT(p.fecha_partido, '%e de %M del %Y') AS fecha,
     p.localidad_partido,
     p.resultado_partido,
-    p.logo_rival,
+    i.logo_rival,
     e.logo_equipo,
     e.nombre_equipo,
-    p.rival_partido AS nombre_rival,
+    i.nombre_rival AS nombre_rival,
     p.id_partido,
     e.id_equipo
 FROM
     partidos p
 INNER JOIN
     equipos e ON p.id_equipo = e.id_equipo
+INNER JOIN
+	rivales i ON p.id_rival = i.id_rival
 ORDER BY p.fecha_partido;
 
 SELECT * FROM vista_detalle_partidos;
 
 -- PROCEDIMIENTO ALMACENADO DE PARTIDOS
+DROP PROCEDURE insertarPartido;
 DELIMITER $$
 
 CREATE PROCEDURE insertarPartido(
     IN p_id_equipo INT,
-    IN p_logo_rival VARCHAR(50),
-    IN p_rival_partido VARCHAR(50),
+    IN p_id_rival INT,
     IN p_cancha_partido VARCHAR(100),
     IN p_resultado_partido VARCHAR(10),
     IN p_localidad_partido ENUM('Local', 'Visitante'),
@@ -1849,30 +1852,29 @@ BEGIN
     INSERT INTO partidos (
         id_jornada,
         id_equipo,
-        logo_rival,
-        rival_partido,
         fecha_partido,
         cancha_partido,
         resultado_partido,
         localidad_partido,
-        tipo_resultado_partido
+        tipo_resultado_partido,
+        id_rival
     )
     VALUES (
         p_id_jornada,
         p_id_equipo,
-        p_logo_rival,
-        p_rival_partido,
         v_fecha_actual,
         p_cancha_partido,
         p_resultado_partido,
         p_localidad_partido,
-        p_tipo_resultado_partido
+        p_tipo_resultado_partido,
+        p_id_rival
     );
 END$$
 
 DELIMITER ;
 
 -- Vista para read one de partidos
+DROP VIEW IF EXISTS vista_partidos_equipos;
 CREATE VIEW vista_partidos_equipos AS
 SELECT 
     e.id_equipo,
@@ -1881,8 +1883,8 @@ SELECT
     p.id_partido,
     DATE(p.fecha_partido) AS fecha_partido,
     p.cancha_partido,
-    p.rival_partido AS nombre_rival,
-    p.logo_rival,
+    i.nombre_rival AS nombre_rival,
+    i.logo_rival,
     p.resultado_partido,
     p.localidad_partido,
     p.tipo_resultado_partido,
@@ -1892,21 +1894,8 @@ FROM
     partidos p
 JOIN 
     equipos e ON p.id_equipo = e.id_equipo
+JOIN
+	rivales i ON p.id_rival = i.id_rival
 JOIN 
     jornadas j ON p.id_jornada = j.id_jornada;
 
-
-SELECT 
-        e.id_estado_fisico_jugador,
-        e.id_jugador,
-        e.altura_jugador,
-        e.peso_jugador,
-        e.indice_masa_corporal,
-        e.fecha_creacion,
-        j.nombre_jugador,
-        DATE_FORMAT(e.fecha_creacion, '%d de %M de %Y') AS fecha_creacion_format
-        FROM estados_fisicos_jugadores e
-        INNER JOIN
-        jugadores j ON j.id_jugador = e.id_jugador
-        WHERE e.id_jugador = 2;
-SELECT * FROM equipos;
