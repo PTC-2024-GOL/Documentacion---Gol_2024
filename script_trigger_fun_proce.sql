@@ -856,8 +856,203 @@ BEGIN
     DELETE FROM jornadas WHERE id_jornada = p_id_jornada;
 END //
 
--- Procedimientos para la tabla plantillas_equipos
+-- Procedimiento para insertar un nuevo horario
+CREATE PROCEDURE sp_insertar_horario (
+    IN p_nombre_horario VARCHAR(60),
+    IN p_dia ENUM('Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'),
+    IN p_hora_inicial TIME,
+    IN p_hora_final TIME,
+    IN p_campo_de_entrenamiento VARCHAR(100)
+)
+BEGIN
+    INSERT INTO horarios (nombre_horario, dia, hora_inicial, hora_final, campo_de_entrenamiento)
+    VALUES (p_nombre_horario, p_dia, p_hora_inicial, p_hora_final, p_campo_de_entrenamiento);
+END //
 
+-- Procedimiento para actualizar un horario existente
+DROP PROCEDURE IF EXISTS sp_actualizar_horario;
+DELIMITER //
+CREATE PROCEDURE sp_actualizar_horario (
+    IN p_id_horario INT,
+    IN p_nombre_horario VARCHAR(60),
+    IN p_dia ENUM('Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'),
+    IN p_hora_inicial TIME,
+    IN p_hora_final TIME,
+    IN p_campo_de_entrenamiento VARCHAR(100)
+)
+BEGIN
+    UPDATE horarios
+    SET nombre_horario = p_nombre_horario,
+        dia = p_dia,
+        hora_inicial = p_hora_inicial,
+        hora_final = p_hora_final,
+        campo_de_entrenamiento = p_campo_de_entrenamiento
+    WHERE id_horario = p_id_horario;
+END //
+
+-- Procedimiento para eliminar un horario
+DROP PROCEDURE IF EXISTS sp_eliminar_horario;
+DELIMITER //
+CREATE PROCEDURE sp_eliminar_horario (
+    IN p_id_horario INT
+)
+BEGIN
+    DELETE FROM horarios WHERE id_horario = p_id_horario;
+END //
+DELIMITER ;
+
+-- Procedimiento para insertar una nueva posición
+DELIMITER //
+CREATE PROCEDURE sp_insertar_posicion (
+    IN p_posicion VARCHAR(60), 
+    IN p_area_de_juego ENUM('Ofensiva', 'Defensiva', 'Ofensiva y defensiva')
+)
+BEGIN
+    INSERT INTO posiciones(posicion, area_de_juego)
+    VALUES (p_posicion, p_area_de_juego);
+END //
+DELIMITER ;
+
+-- Procedimiento para actualizar una posición
+DELIMITER //
+CREATE PROCEDURE sp_actualizar_posicion (
+    IN p_id_posicion INT, 
+    IN p_posicion VARCHAR(60), 
+    IN p_area_de_juego ENUM('Ofensiva', 'Defensiva', 'Ofensiva y defensiva')
+)
+BEGIN
+    UPDATE posiciones 
+    SET posicion = p_posicion, area_de_juego = p_area_de_juego
+    WHERE id_posicion = p_id_posicion;
+END //
+DELIMITER ;
+
+-- Procedimiento para eliminar una posición
+DELIMITER //
+CREATE PROCEDURE sp_eliminar_posicion (IN p_id_posicion INT)
+BEGIN
+    DELETE FROM posiciones WHERE id_posicion = p_id_posicion;
+END //
+DELIMITER ;
+
+-- Procedimiento para insertar una nueva categoría
+DELIMITER //
+CREATE PROCEDURE sp_insertar_categoria (
+    IN p_nombre_categoria VARCHAR(80), 
+    IN p_edad_minima_permitida INT, 
+    IN p_edad_maxima_permitida INT, 
+    IN p_id_temporada INT
+)
+BEGIN
+    INSERT INTO categorias(nombre_categoria, edad_minima_permitida, edad_maxima_permitida, id_temporada)
+    VALUES (p_nombre_categoria, p_edad_minima_permitida, p_edad_maxima_permitida, p_id_temporada);
+END //
+DELIMITER ;
+
+-- Procedimiento para actualizar una categoría
+DELIMITER //
+CREATE PROCEDURE sp_actualizar_categoria (
+    IN p_id_categoria INT, 
+    IN p_nombre_categoria VARCHAR(80), 
+    IN p_edad_minima_permitida INT, 
+    IN p_edad_maxima_permitida INT, 
+    IN p_id_temporada INT
+)
+BEGIN
+    UPDATE categorias 
+    SET nombre_categoria = p_nombre_categoria, edad_minima_permitida = p_edad_minima_permitida, edad_maxima_permitida = p_edad_maxima_permitida, id_temporada = p_id_temporada
+    WHERE id_categoria = p_id_categoria;
+END //
+DELIMITER ;
+
+-- Procedimiento para eliminar una categoría
+DELIMITER //
+CREATE PROCEDURE sp_eliminar_categoria (IN p_id_categoria INT)
+BEGIN
+    DELETE FROM categorias WHERE id_categoria = p_id_categoria;
+END //
+DELIMITER ;
+
+-- Procedimiento para insertar horarios_categorias
+DELIMITER //
+CREATE PROCEDURE sp_insertar_horario_categoria (
+    IN p_id_categoria INT, 
+    IN p_id_horario INT
+)
+BEGIN
+    INSERT INTO horarios_categorias(id_categoria, id_horario)
+    VALUES (p_id_categoria, p_id_horario);
+END //
+DELIMITER ;
+
+-- Procedimiento para actualizar horarios_categorias
+DELIMITER //
+CREATE PROCEDURE sp_actualizar_horario_categoria (
+    IN p_id_horario_categoria INT, 
+    IN p_id_categoria INT, 
+    IN p_id_horario INT
+)
+BEGIN
+    UPDATE horarios_categorias 
+    SET id_categoria = p_id_categoria, id_horario = p_id_horario
+    WHERE id_horario_categoria = p_id_horario_categoria;
+END //
+DELIMITER ;
+
+-- Procedimiento para eliminar horarios_categorias
+DELIMITER //
+CREATE PROCEDURE sp_eliminar_horario_categoria (IN p_id_horario_categoria INT)
+BEGIN
+    DELETE FROM horarios_categorias WHERE id_horario_categoria = p_id_horario_categoria;
+END //
+DELIMITER ;
+
+-- Procedimiento para insertar registros_medicos
+DELIMITER //
+CREATE PROCEDURE sp_insertar_registro_medico (
+    IN p_id_jugador INT, 
+    IN p_fecha_lesion DATE, 
+    IN p_fecha_registro DATE, 
+    IN p_dias_lesionado INT, 
+    IN p_id_lesion INT, 
+    IN p_retorno_entreno DATE, 
+    IN p_retorno_partido INT
+)
+BEGIN
+    INSERT INTO registros_medicos(id_jugador, fecha_lesion, fecha_registro, dias_lesionado, id_lesion, retorno_entreno, retorno_partido)
+    VALUES (p_id_jugador, p_fecha_lesion, p_fecha_registro, p_dias_lesionado, p_id_lesion, p_retorno_entreno, p_retorno_partido);
+END //
+DELIMITER ;
+
+-- Procedimiento para actualizar registros_medicos
+DELIMITER //
+CREATE PROCEDURE sp_actualizar_registro_medico (
+    IN p_id_registro_medico INT, 
+    IN p_id_jugador INT, 
+    IN p_fecha_lesion DATE, 
+    IN p_fecha_registro DATE, 
+    IN p_dias_lesionado INT, 
+    IN p_id_lesion INT, 
+    IN p_retorno_entreno DATE, 
+    IN p_retorno_partido INT
+)
+BEGIN
+    UPDATE registros_medicos 
+    SET id_jugador = p_id_jugador, fecha_lesion = p_fecha_lesion, fecha_registro = p_fecha_registro, dias_lesionado = p_dias_lesionado, id_lesion = p_id_lesion, retorno_entreno = p_retorno_entreno, retorno_partido = p_retorno_partido
+    WHERE id_registro_medico = p_id_registro_medico;
+END //
+DELIMITER ;
+
+-- Procedimiento para eliminar registros_medicos
+DELIMITER //
+CREATE PROCEDURE sp_eliminar_registro_medico (IN p_id_registro_medico INT)
+BEGIN
+    DELETE FROM registros_medicos WHERE id_registro_medico = p_id_registro_medico;
+END //
+DELIMITER ;
+
+-- Procedimientos para la tabla plantillas_equipos
+DELIMITER //
 CREATE PROCEDURE sp_insertar_plantilla_equipo (
     IN p_id_plantilla INT, 
     IN p_id_jugador INT, 
@@ -1437,12 +1632,13 @@ SELECT
   e.id_equipo,
   e.id_entrenamiento,
   CONCAT(h.dia, ' de ', TIME_FORMAT(h.hora_inicial, '%H:%i'), ' A ', TIME_FORMAT(h.hora_final, '%H:%i')) AS horario
+  e.fecha_entrenamiento,
+  CONCAT(h.dia, DATE_FORMAT(e.fecha_entrenamiento, ' %d de %M'), ' de ', TIME_FORMAT(h.hora_inicial, '%H:%i'), ' A ', TIME_FORMAT(h.hora_final, '%H:%i')) AS horario
 FROM 
   entrenamientos e
 INNER JOIN 
   horarios h ON e.id_horario = h.id_horario;
 
-SELECT * FROM vista_horarios_equipos WHERE id_equipo = 1;
 -- Vista para el GET de detalles contenidos
 CREATE VIEW vista_detalle_entrenamiento AS
 SELECT 
