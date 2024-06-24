@@ -1806,7 +1806,7 @@ $$
 
 DELIMITER ;
 
--- Procedimientos rivales
+-- ------------------------------------------------------------------------RIVALES----------------------------------------------------------------
 
 DELIMITER //
 CREATE PROCEDURE sp_insertar_rival (
@@ -1944,6 +1944,7 @@ SELECT
     p.cancha_partido,
     i.nombre_rival AS nombre_rival,
     i.logo_rival,
+    i.id_rival,
     p.resultado_partido,
     p.localidad_partido,
     p.tipo_resultado_partido,
@@ -1958,3 +1959,4 @@ JOIN
 JOIN 
     jornadas j ON p.id_jornada = j.id_jornada;
 
+SELECT * FROM vista_partidos_equipos WHERE id_partido = 2;
