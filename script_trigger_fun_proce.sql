@@ -1877,6 +1877,7 @@ SELECT
     e.nombre_equipo,
     i.nombre_rival AS nombre_rival,
     p.id_partido,
+    p.tipo_resultado_partido,
     e.id_equipo
 FROM
     partidos p
@@ -1930,7 +1931,7 @@ DELIMITER ;
 -- Vista para read one de partidos
 DROP VIEW IF EXISTS vista_partidos_equipos;
 CREATE VIEW vista_partidos_equipos AS
-SELECT 
+SELECT
     e.id_equipo,
     e.nombre_equipo,
     e.logo_equipo,
@@ -1945,13 +1946,91 @@ SELECT
     p.tipo_resultado_partido,
     j.nombre_jornada,
     j.id_jornada
-FROM 
+FROM
     partidos p
-JOIN 
+JOIN
     equipos e ON p.id_equipo = e.id_equipo
 JOIN
 	rivales i ON p.id_rival = i.id_rival
-JOIN 
+JOIN
     jornadas j ON p.id_jornada = j.id_jornada;
 
 SELECT * FROM vista_partidos_equipos WHERE id_partido = 2;
+
+-- ----------------------------------------------- PARTICIPACIONES  --------------------------------------------------------------------------
+
+-- VER JUGADORES POR EQUIPO
+CREATE VIEW vista_jugadores_por_equipo AS
+    SELECT
+        pe.id_plantilla,
+        pe.id_jugador,
+        pe.id_equipo,
+        pe.id_temporada,
+        J.nombre_jugador,
+        j.apellido_jugador,
+        j.dorsal_jugador,
+        j.foto_jugador,
+        j.id_posicion_principal,
+        p.posicion,
+        t.nombre_temporada
+FROM plantillas_equipos pe
+INNER JOIN
+    jugadores j ON pe.id_jugador = j.id_jugador
+INNER JOIN
+    posiciones p ON j.id_posicion_principal = p.id_posicion
+INNER JOIN
+    temporadas t ON pe.id_temporada = t.id_temporada;
+
+-- Vista para ver los tipos de goles de un jugador
+CREATE VIEW vista_detalles_goles AS
+    SELECT
+        dt.id_detalle_gol,
+        dt.id_participacion,
+        dt.cantidad_tipo_gol,
+        dt.id_tipo_gol,
+        tg.nombre_tipo_gol
+FROM detalles_goles dt
+INNER JOIN
+    tipos_goles tg ON dt.id_tipo_gol = tg.id_tipo_gol;
+
+
+-- TRIGGER PARA INSERTAR, ACTUALIZAR O ELIMINAR GOLES EN PARTICIPACIONES PARTIDO.
+
+DELIMITER //
+CREATE TRIGGER trigger_insertar_participacion
+AFTER INSERT ON detalles_goles
+FOR EACH ROW
+BEGIN
+    DECLARE p_goles INT;
+    SET p_goles = COALESCE((SELECT COUNT(cantidad_tipo_gol) FROM detalles_goles INNER JOIN participaciones_partidos p WHERE detalles_goles.id_participacion = p.id_participacion ), 0);
+
+    UPDATE participaciones_partidos SET goles = p_goles WHERE id_participacion = NEW.id_participacion;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER trigger_actualizar_participacion
+AFTER UPDATE ON detalles_goles
+FOR EACH ROW
+BEGIN
+    DECLARE p_goles INT;
+    SET p_goles = COALESCE((SELECT COUNT(cantidad_tipo_gol) FROM detalles_goles INNER JOIN participaciones_partidos p WHERE detalles_goles.id_participacion = p.id_participacion ), 0);
+
+    UPDATE participaciones_partidos SET goles = p_goles WHERE id_participacion = NEW.id_participacion;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER trigger_eliminar_participacion
+AFTER DELETE ON detalles_goles
+FOR EACH ROW
+BEGIN
+    DECLARE p_goles INT;
+    SET p_goles = COALESCE((SELECT COUNT(cantidad_tipo_gol) FROM detalles_goles INNER JOIN participaciones_partidos p WHERE detalles_goles.id_participacion = p.id_participacion ), 0);
+
+    UPDATE participaciones_partidos SET goles = p_goles WHERE id_participacion = OLD.id_participacion;
+END //
+
+DELIMITER ;

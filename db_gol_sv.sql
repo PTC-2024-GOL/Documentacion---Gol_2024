@@ -371,6 +371,9 @@ CREATE TABLE participaciones_partidos(
   puntuacion INT UNSIGNED NULL DEFAULT 0
 );
 
+ALTER TABLE participaciones_partidos
+MODIFY COLUMN puntuacion DECIMAL(5,2) UNSIGNED NULL DEFAULT 0;
+
 CREATE TABLE detalles_goles (
   id_detalle_gol INT AUTO_INCREMENT PRIMARY KEY,
   id_participacion INT NOT NULL,
