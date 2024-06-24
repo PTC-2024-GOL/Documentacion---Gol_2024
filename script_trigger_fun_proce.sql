@@ -1877,6 +1877,7 @@ SELECT
     e.nombre_equipo,
     i.nombre_rival AS nombre_rival,
     p.id_partido,
+    p.tipo_resultado_partido,
     e.id_equipo
 FROM
     partidos p
