@@ -1632,7 +1632,6 @@ CREATE  VIEW vista_horarios_equipos AS
 SELECT 
   e.id_equipo,
   e.id_entrenamiento,
-  CONCAT(h.dia, ' de ', TIME_FORMAT(h.hora_inicial, '%H:%i'), ' A ', TIME_FORMAT(h.hora_final, '%H:%i')) AS horario,
   CONCAT(h.dia, DATE_FORMAT(e.fecha_entrenamiento, ' %d de %M'), ' de ', TIME_FORMAT(h.hora_inicial, '%H:%i'), ' A ', TIME_FORMAT(h.hora_final, '%H:%i')) AS horario
 FROM 
   entrenamientos e
@@ -1885,29 +1884,25 @@ INNER JOIN
     equipos e ON p.id_equipo = e.id_equipo
 INNER JOIN
 	rivales i ON p.id_rival = i.id_rival
-ORDER BY p.fecha_partido;
+ORDER BY p.fecha_partido DESC;
 
 SELECT * FROM vista_detalle_partidos;
 
 -- PROCEDIMIENTO ALMACENADO DE PARTIDOS
 DROP PROCEDURE insertarPartido;
-DELIMITER $$
 
+DELIMITER $$
 CREATE PROCEDURE insertarPartido(
     IN p_id_equipo INT,
     IN p_id_rival INT,
     IN p_cancha_partido VARCHAR(100),
     IN p_resultado_partido VARCHAR(10),
     IN p_localidad_partido ENUM('Local', 'Visitante'),
-    IN p_tipo_resultado_partido ENUM('Victoria', 'Empate', 'Derrota'),
-    IN p_id_jornada INT
+    IN p_tipo_resultado_partido ENUM('Victoria', 'Empate', 'Derrota', 'Pendiente'),
+    IN p_id_jornada INT,
+    IN p_fecha_partido DATETIME
 )
 BEGIN
-    DECLARE v_fecha_actual DATETIME;
-    -- Obtener la fecha actual
-    SET v_fecha_actual = NOW();
-
-    -- Insertar el nuevo registro en la tabla partidos
     INSERT INTO partidos (
         id_jornada,
         id_equipo,
@@ -1921,7 +1916,7 @@ BEGIN
     VALUES (
         p_id_jornada,
         p_id_equipo,
-        v_fecha_actual,
+        p_fecha_partido,
         p_cancha_partido,
         p_resultado_partido,
         p_localidad_partido,
@@ -1940,7 +1935,7 @@ SELECT
     e.nombre_equipo,
     e.logo_equipo,
     p.id_partido,
-    DATE(p.fecha_partido) AS fecha_partido,
+    p.fecha_partido,
     p.cancha_partido,
     i.nombre_rival AS nombre_rival,
     i.logo_rival,

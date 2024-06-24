@@ -334,6 +334,9 @@ INSERT INTO rivales(nombre_rival, logo_rival) values ('Barcelona', 'barcelona.pn
 UPDATE partidos SET id_rival = 1;
 ALTER TABLE partidos
 ADD CONSTRAINT fk_rivales_partidos FOREIGN KEY (id_rival) REFERENCES rivales(id_rival);
+ALTER TABLE partidos
+MODIFY COLUMN tipo_resultado_partido ENUM('Victoria', 'Empate', 'Derrota', 'Pendiente') NULL;
+
 
 SELECT * FROM partidos;
 SELECT * FROM rivales;
