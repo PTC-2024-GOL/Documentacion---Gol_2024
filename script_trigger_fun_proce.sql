@@ -1806,6 +1806,65 @@ $$
 
 DELIMITER ;
 
+-- Procedimientos rivales
+
+DELIMITER //
+CREATE PROCEDURE sp_insertar_rival (
+    IN p_nombre_rival VARCHAR(50), 
+    IN p_logo_rival VARCHAR(50)
+)
+BEGIN
+    INSERT INTO rivales (nombre_rival, logo_rival)
+    VALUES (p_nombre_rival, p_logo_rival);
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE sp_actualizar_rival (
+    IN p_id_rival INT, 
+    IN p_nombre_rival VARCHAR(50), 
+    IN p_logo_rival VARCHAR(50)
+)
+BEGIN
+    UPDATE rivales
+    SET nombre_rival = p_nombre_rival, 
+        logo_rival = p_logo_rival
+    WHERE id_rival = p_id_rival;
+END //
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sp_eliminar_rival (
+    IN p_id_rival INT
+)
+BEGIN
+    DECLARE contador_partidos INT;
+    -- Contar cuántos registros en la tabla partidos están asociados con el id_rival
+    SELECT COUNT(*)
+    INTO contador_partidos
+    FROM partidos
+    WHERE id_rival = p_id_rival;
+    -- Verificar si hay registros asociados
+    IF contador_partidos > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No se puede eliminar el rival, porque está asociado con registros en la tabla partidos';
+    ELSE
+        DELETE FROM rivales
+        WHERE id_rival = p_id_rival;
+    END IF;
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+CREATE VIEW vista_rivales AS
+SELECT 
+    id_rival AS 'ID',
+    nombre_rival AS 'Nombre',
+    logo_rival AS 'Logo'
+FROM rivales;
+$$
+DELIMITER ;
+
 -- ------------------------------------------------------------------------PARTIDOS----------------------------------------------------------------
 -- Vista para partidos:
 DROP VIEW IF EXISTS vista_detalle_partidos;
