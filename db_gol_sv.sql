@@ -433,8 +433,8 @@ CREATE TABLE registros_medicos(
   dias_lesionado INT UNSIGNED NULL, 
   id_lesion INT NOT NULL, 
   CONSTRAINT fk_lesion_jugador FOREIGN KEY (id_lesion) REFERENCES lesiones(id_lesion), 
-  retorno_entreno DATE NOT NULL, 
-  retorno_partido INT NOT NULL, 
+  retorno_entreno DATE NULL, 
+  retorno_partido INT NULL, 
   CONSTRAINT fk_retorno_partido FOREIGN KEY (retorno_partido) REFERENCES partidos(id_partido)
 );
 
