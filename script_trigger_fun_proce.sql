@@ -1374,9 +1374,11 @@ INNER JOIN
     tipos_jugadas tj on tg.id_tipo_jugada =   tj.id_tipo_jugada;
 
 -- Vista para los jugadores.
+DROP VIEW IF EXISTS vista_jugadores;
 CREATE VIEW vista_jugadores AS
     SELECT
         j.id_jugador,
+        CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS NOMBRE_COMPLETO,
         j.dorsal_jugador,
         j.nombre_jugador,
         j.apellido_jugador,
@@ -1566,12 +1568,12 @@ DELIMITER ;
 CREATE VIEW vista_lesiones AS
     SELECT
         l.id_lesion,
+	st.nombre_sub_tipologia,
         l.id_tipo_lesion,
         l.id_sub_tipologia,
         l.total_por_lesion,
         l.porcentaje_por_lesion,
-        tl.tipo_lesion,
-        st.nombre_sub_tipologia
+        tl.tipo_lesion
 FROM lesiones l
 INNER JOIN
     tipos_lesiones tl ON l.id_tipo_lesion = tl.id_tipo_lesion
@@ -1869,6 +1871,7 @@ DELIMITER ;
 DROP VIEW IF EXISTS vista_detalle_partidos;
 CREATE VIEW vista_detalle_partidos AS
 SELECT
+    p.id_partido,
     DATE_FORMAT(p.fecha_partido, '%e de %M del %Y') AS fecha,
     p.localidad_partido,
     p.resultado_partido,
@@ -1876,7 +1879,6 @@ SELECT
     e.logo_equipo,
     e.nombre_equipo,
     i.nombre_rival AS nombre_rival,
-    p.id_partido,
     p.tipo_resultado_partido,
     e.id_equipo
 FROM
@@ -2034,3 +2036,30 @@ BEGIN
 END //
 
 DELIMITER ;
+
+-- Vista de registros medicos
+CREATE VIEW vista_registros_medicos AS
+SELECT 
+    rm.id_registro_medico,
+    rm.id_jugador,
+    CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS nombre_completo_jugador,
+    rm.fecha_lesion,
+    rm.fecha_registro,
+    rm.dias_lesionado,
+    rm.id_lesion,
+    l.id_tipo_lesion,
+    l.id_sub_tipologia,
+    st.nombre_sub_tipologia,
+    rm.retorno_entreno,
+    rm.retorno_partido,
+    p.fecha_partido
+FROM 
+    registros_medicos rm
+INNER JOIN 
+    jugadores j ON rm.id_jugador = j.id_jugador
+INNER JOIN 
+    lesiones l ON rm.id_lesion = l.id_lesion
+INNER JOIN 
+    sub_tipologias st ON l.id_sub_tipologia = st.id_sub_tipologia
+LEFT JOIN 
+    partidos p ON rm.retorno_partido = p.id_partido;
