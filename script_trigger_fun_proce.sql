@@ -2067,3 +2067,31 @@ INNER JOIN
 LEFT JOIN 
     partidos p ON rm.retorno_partido = p.id_partido;
 
+-- Vista de categorias
+CREATE VIEW vista_categorias AS
+SELECT 
+    c.id_categoria,
+    c.nombre_categoria,
+    c.edad_minima_permitida,
+    c.edad_maxima_permitida,
+    c.id_temporada,
+    t.nombre_temporada
+FROM 
+    categorias c
+INNER JOIN 
+    temporadas t ON c.id_temporada = t.id_temporada;
+    
+-- Vista de horarios_categorias
+CREATE VIEW vista_horarios_categorias AS
+SELECT 
+    hc.id_horario_categoria,
+    hc.id_horario,
+    h.nombre_horario,
+    hc.id_categoria,
+    c.nombre_categoria
+FROM 
+    horarios_categorias hc
+INNER JOIN 
+    horarios h ON hc.id_horario = h.id_horario
+INNER JOIN 
+    categorias c ON hc.id_categoria = c.id_categoria;
