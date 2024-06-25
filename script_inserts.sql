@@ -283,17 +283,17 @@ INSERT INTO detalle_entrenamiento(id_entrenamiento, id_asistencia, id_caracteris
 
 SELECT * FROM detalle_entrenamiento;
 -- 20. partidos
-INSERT INTO partidos (id_jornada, id_equipo, logo_rival, rival_partido, fecha_partido, cancha_partido, resultado_partido, localidad_partido, tipo_resultado_partido) VALUES
-(1, 1, 'logoRival.png', 'Mocaco', 2023-05-12, 'San Benito', '3 - 4', 'Localidad', 'Victoria'),
-(2, 2, 'logoTigres.png', 'Tigres', 2023-05-15, 'Mejicanos', '2 - 1', 'Visitante', 'Victoria'),
-(3, 3, 'logoLeon.png', 'León', 2023-05-18, 'San Jacinto', '1 - 1', 'Localidad', 'Empate'),
-(4, 4, 'logoÁguila.png', 'Águila', 2023-05-21, 'Soyapango', '0 - 2', 'Visitante', 'Derrota'),
-(5, 1, 'logoAlianza.png', 'Alianza', 2023-05-24, 'San Salvador', '4 - 0', 'Localidad', 'Victoria'),
-(6, 2, 'logoFAS.png', 'FAS', 2023-05-27, 'Santa Ana', '2 - 3', 'Visitante', 'Derrota'),
-(7, 3, 'logoMetapán.png', 'Metapán', 2023-05-30, 'Chalatenango', '3 - 1', 'Localidad', 'Victoria'),
-(8, 4, 'logoChalatenango.png', 'Chalatenango', 2023-06-02, 'San Miguel', '1 - 0', 'Visitante', 'Victoria'),
-(9, 1, 'logoIsidroMetapán.png', 'Isidro Metapán', 2023-06-05, 'Usulután', '2 - 2', 'Localidad', 'Empate'),
-(10, 2, 'logoOnceLobos.png', 'Once Lobos', 2023-06-08, 'Ahuachapán', '4 - 1', 'Visitante', 'Victoria');
+INSERT INTO partidos (id_jornada, id_equipo, id_rival, fecha_partido, cancha_partido, resultado_partido, localidad_partido, tipo_resultado_partido) VALUES
+(1, 1, 1, 2023-05-12, 'San Benito', '3-4', 'Localidad', 'Victoria'),
+(2, 2, 1, 2023-05-15, 'Mejicanos', '2-1', 'Visitante', 'Victoria'),
+(3, 3, 1, 2023-05-18, 'San Jacinto', '1-1', 'Localidad', 'Empate'),
+(4, 4, 1, 2023-05-21, 'Soyapango', '0-2', 'Visitante', 'Derrota'),
+(5, 1, 1, 2023-05-24, 'San Salvador', '4-0', 'Localidad', 'Victoria'),
+(6, 2, 1, 2023-05-27, 'Santa Ana', '2 - 3', 'Visitante', 'Derrota'),
+(7, 3, 1, 2023-05-30, 'Chalatenango', '3-1', 'Localidad', 'Victoria'),
+(8, 4, 1, 2023-06-02, 'San Miguel', '1-0', 'Visitante', 'Victoria'),
+(9, 1, 1, 2023-06-05, 'Usulután', '2-2', 'Localidad', 'Empate'),
+(10, 2, 1, 2023-06-08, 'Ahuachapán', '0-0', 'Visitante', 'Pendiente');
 SELECT * FROM partidos;
 -- 21. tipos_jugadas
 INSERT INTO tipos_jugadas (id_tipo_jugada, nombre_tipo_juego) VALUES
@@ -394,7 +394,7 @@ INSERT INTO sub_tipologias (nombre_sub_tipologia, id_tipologia) VALUES
 
 
 -- 29. lesiones
-INSERT INTO lesiones (id_tipo_lesion, id_sub_tipologia, numero_lesiones, promedio_lesiones) VALUES 
+INSERT INTO lesiones (id_tipo_lesion, id_sub_tipologia, total_por_lesion, porcentaje_por_lesion) VALUES 
 (1, 1, 5, 3),
 (2, 3, 2, 2),
 (2, 4, 3, 2),
@@ -406,7 +406,7 @@ INSERT INTO lesiones (id_tipo_lesion, id_sub_tipologia, numero_lesiones, promedi
 (2, 5, 1, 1),
 (1, 2, 4, 3);
 
-
+SELECT * FROM lesiones;
 -- 30. registro_medico
 INSERT INTO registros_medicos (id_jugador, fecha_lesion, dias_lesionado, id_lesion, retorno_entreno, retorno_partido) VALUES
 (1, '2024-03-15', 10, 1, '2024-03-25', 1),

@@ -217,6 +217,7 @@ END;
 $$
 
 -- PROCEDIMIENTO ALMACENADO PARTIDOS
+/*
 DELIMITER //
 
 CREATE PROCEDURE insertar_o_actualizar_partido(
@@ -284,7 +285,7 @@ BEGIN
 END //
 
 DELIMITER $$
-
+*/
 DELIMITER $$
 
 CREATE PROCEDURE eliminar_partido(
@@ -1629,11 +1630,14 @@ JOIN
     categorias ON equipos.id_categoria = categorias.id_categoria;
     
  
--- Vista para conocer los horarios de un equipo en especifico, se usa en detalles contenidos - elegir horarios    
-CREATE  VIEW vista_horarios_equipos AS
+-- Vista para conocer los horarios de un equipo en especifico, se usa en detalles contenidos - elegir horarios 
+SELECT * FROM entrenamientos;
+SELECT * FROM horarios;   
+CREATE VIEW vista_horarios_equipos AS
 SELECT 
   e.id_equipo,
   e.id_entrenamiento,
+  e.fecha_entrenamiento,
   CONCAT(h.dia, DATE_FORMAT(e.fecha_entrenamiento, ' %d de %M'), ' de ', TIME_FORMAT(h.hora_inicial, '%H:%i'), ' A ', TIME_FORMAT(h.hora_final, '%H:%i')) AS horario
 FROM 
   entrenamientos e
@@ -1892,7 +1896,6 @@ ORDER BY p.fecha_partido DESC;
 SELECT * FROM vista_detalle_partidos;
 
 -- PROCEDIMIENTO ALMACENADO DE PARTIDOS
-DROP PROCEDURE insertarPartido;
 
 DELIMITER $$
 CREATE PROCEDURE insertarPartido(
@@ -2063,3 +2066,4 @@ INNER JOIN
     sub_tipologias st ON l.id_sub_tipologia = st.id_sub_tipologia
 LEFT JOIN 
     partidos p ON rm.retorno_partido = p.id_partido;
+
