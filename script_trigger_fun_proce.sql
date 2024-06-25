@@ -2098,13 +2098,17 @@ INNER JOIN
     temporadas t ON c.id_temporada = t.id_temporada;
     
 -- Vista de horarios_categorias
+DROP VIEW IF EXISTS vista_horarios_categorias;
 CREATE VIEW vista_horarios_categorias AS
 SELECT 
     hc.id_horario_categoria,
     hc.id_horario,
     h.nombre_horario,
     hc.id_categoria,
-    c.nombre_categoria
+    c.nombre_categoria,
+    h.dia,
+    h.hora_inicial,
+    h.hora_final
 FROM 
     horarios_categorias hc
 INNER JOIN 
