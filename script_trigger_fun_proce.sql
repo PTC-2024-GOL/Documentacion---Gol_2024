@@ -1998,8 +1998,12 @@ FROM detalles_goles dt
 INNER JOIN
     tipos_goles tg ON dt.id_tipo_gol = tg.id_tipo_gol;
 
-
 -- TRIGGER PARA INSERTAR, ACTUALIZAR O ELIMINAR GOLES EN PARTICIPACIONES PARTIDO.
+
+-- Si ya habia creado estos trigger ejecuten estas lineas y vuelvan a crearlo. att. Con cariño su coordi :3
+DROP TRIGGER trigger_insertar_participacion;
+DROP TRIGGER trigger_actualizar_participacion;
+DROP TRIGGER trigger_eliminar_participacion;
 
 DELIMITER //
 CREATE TRIGGER trigger_insertar_participacion
@@ -2007,9 +2011,13 @@ AFTER INSERT ON detalles_goles
 FOR EACH ROW
 BEGIN
     DECLARE p_goles INT;
-    SET p_goles = COALESCE((SELECT COUNT(cantidad_tipo_gol) FROM detalles_goles INNER JOIN participaciones_partidos p WHERE detalles_goles.id_participacion = p.id_participacion ), 0);
+    SET p_goles = COALESCE((SELECT SUM(cantidad_tipo_gol)
+                            FROM detalles_goles
+                            WHERE id_participacion = NEW.id_participacion), 0);
 
-    UPDATE participaciones_partidos SET goles = p_goles WHERE id_participacion = NEW.id_participacion;
+    UPDATE participaciones_partidos
+    SET goles = p_goles
+    WHERE id_participacion = NEW.id_participacion;
 END //
 
 DELIMITER ;
@@ -2020,9 +2028,13 @@ AFTER UPDATE ON detalles_goles
 FOR EACH ROW
 BEGIN
     DECLARE p_goles INT;
-    SET p_goles = COALESCE((SELECT COUNT(cantidad_tipo_gol) FROM detalles_goles INNER JOIN participaciones_partidos p WHERE detalles_goles.id_participacion = p.id_participacion ), 0);
+    SET p_goles = COALESCE((SELECT SUM(cantidad_tipo_gol)
+                            FROM detalles_goles
+                            WHERE id_participacion = NEW.id_participacion), 0);
 
-    UPDATE participaciones_partidos SET goles = p_goles WHERE id_participacion = NEW.id_participacion;
+    UPDATE participaciones_partidos
+    SET goles = p_goles
+    WHERE id_participacion = NEW.id_participacion;
 END //
 
 DELIMITER ;
@@ -2033,9 +2045,13 @@ AFTER DELETE ON detalles_goles
 FOR EACH ROW
 BEGIN
     DECLARE p_goles INT;
-    SET p_goles = COALESCE((SELECT COUNT(cantidad_tipo_gol) FROM detalles_goles INNER JOIN participaciones_partidos p WHERE detalles_goles.id_participacion = p.id_participacion ), 0);
+    SET p_goles = COALESCE((SELECT SUM(cantidad_tipo_gol)
+                            FROM detalles_goles
+                            WHERE id_participacion = OLD.id_participacion), 0);
 
-    UPDATE participaciones_partidos SET goles = p_goles WHERE id_participacion = OLD.id_participacion;
+    UPDATE participaciones_partidos
+    SET goles = p_goles
+    WHERE id_participacion = OLD.id_participacion;
 END //
 
 DELIMITER ;

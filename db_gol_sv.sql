@@ -359,7 +359,7 @@ CREATE TABLE participaciones_partidos(
   id_partido INT NOT NULL, 
   CONSTRAINT fk_partido_participacion FOREIGN KEY (id_partido) REFERENCES partidos(id_partido), 
   id_jugador INT NOT NULL, 
-  CONSTRAINT fk_jugador_participacion FOREIGN KEY (id_jugador) REFERENCES plantillas_equipos(id_plantilla_equipo),  
+  CONSTRAINT fk_jugador_participacion FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador),
   titular BOOLEAN NULL DEFAULT 0, 
   sustitucion BOOLEAN NULL DEFAULT 0, 
   minutos_jugados INT UNSIGNED NULL DEFAULT 0, 
@@ -370,6 +370,13 @@ CREATE TABLE participaciones_partidos(
   ) NULL DEFAULT 'Normal',
   puntuacion INT UNSIGNED NULL DEFAULT 0
 );
+
+-- EJECUTAR ESTAS DOS LINEAS DE CODIGO;
+ALTER TABLE participaciones_partidos
+    DROP CONSTRAINT fk_jugador_participacion;
+
+ALTER TABLE participaciones_partidos
+    ADD CONSTRAINT fk_jugador_participacion FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador);
 
 ALTER TABLE participaciones_partidos
 MODIFY COLUMN puntuacion DECIMAL(5,2) UNSIGNED NULL DEFAULT 0;
