@@ -49,6 +49,7 @@ INSERT INTO categorias (nombre_categoria, edad_minima_permitida, edad_maxima_per
 ('Nivel 3', '2000-01-01', '2008-12-31', 3),
 ('Nivel 4', '2000-01-01', '2005-12-31', 4);
 
+	SELECT * FROM categorias;
 -- 6. cuerpos_tecnicos
 INSERT INTO cuerpos_tecnicos (nombre_cuerpo_tecnico) VALUES
 ('Cuerpo Técnico 1'),

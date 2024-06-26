@@ -1693,8 +1693,8 @@ SELECT * FROM vista_detalle_entrenamiento_especifico;
 CREATE VIEW vista_equipos_jugadores AS
 SELECT 
     e.id_equipo,
-    j.nombre_jugador,
-    j.id_jugador,
+    j.nombre_jugador AS jugadores,
+    j.id_jugador AS id,
     pe.id_plantilla_equipo
 FROM 
     equipos e
@@ -1703,6 +1703,8 @@ JOIN
 JOIN 
     jugadores j ON pe.id_jugador = j.id_jugador;
 
+SELECT * FROM vista_equipos_jugadores;
+SELECT * FROM plantillas_equipos;
 -- Procedimiento para insertar detalle contenido
 DELIMITER $$
 
@@ -2115,3 +2117,7 @@ INNER JOIN
     horarios h ON hc.id_horario = h.id_horario
 INNER JOIN 
     categorias c ON hc.id_categoria = c.id_categoria;
+
+
+SELECT * FROM jugadores;
+SELECT * FROM equipos;

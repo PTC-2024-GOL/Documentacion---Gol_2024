@@ -319,7 +319,7 @@ CREATE TABLE partidos(
   cancha_partido VARCHAR(100) NOT NULL,
   resultado_partido VARCHAR(10) NULL,
   localidad_partido ENUM('Local', 'Visitante') NOT NULL,
-  tipo_resultado_partido ENUM('Victoria', 'Empate', 'Derrota') NULL,
+  tipo_resultado_partido ENUM('Victoria', 'Empate', 'Derrota', 'Pendiente') NULL,
   id_rival INT NOT NULL,
   CONSTRAINT fk_rivales_partidos FOREIGN KEY (id_rival) REFERENCES rivales(id_rival)
 );
@@ -334,8 +334,9 @@ INSERT INTO rivales(nombre_rival, logo_rival) values ('Barcelona', 'barcelona.pn
 UPDATE partidos SET id_rival = 1;
 ALTER TABLE partidos
 ADD CONSTRAINT fk_rivales_partidos FOREIGN KEY (id_rival) REFERENCES rivales(id_rival);
+use db_gol_sv;
 ALTER TABLE partidos
-MODIFY COLUMN tipo_resultado_partido ENUM('Victoria', 'Empate', 'Derrota', 'Pendiente') NULL;
+MODIFY COLUMN tipo_resultado_partido ENUM('Victoria', 'Empate', 'Derrota', 'Pendiente') NULL; 
 
 
 SELECT * FROM partidos;
