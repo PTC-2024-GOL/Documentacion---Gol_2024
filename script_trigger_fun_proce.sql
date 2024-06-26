@@ -217,75 +217,75 @@ END;
 $$
 
 -- PROCEDIMIENTO ALMACENADO PARTIDOS
-/*
-DELIMITER //
 
-CREATE PROCEDURE insertar_o_actualizar_partido(
-    IN insertorUpdate INT,
-    IN id_jornada_param INT,
-    IN id_equipo_param INT,
-    IN logo_rival_param VARCHAR(50),
-    IN rival_partido_param VARCHAR(50),
-    IN fecha_partido_param DATETIME,
-    IN cancha_partido_param VARCHAR(100),
-    IN resultado_partido_param VARCHAR(10),
-    IN localidad_partido_param ENUM('Local', 'Visitante'),
-    IN tipo_resultado_partido_param ENUM('Victoria', 'Empate', 'Derrota')
-)
-BEGIN
-    DECLARE fecha_inicio_jornada DATE;
-    DECLARE fecha_fin_jornada DATE;
+# DELIMITER //
+#
+# CREATE PROCEDURE insertar_o_actualizar_partido(
+#     IN insertorUpdate INT,
+#     IN id_jornada_param INT,
+#     IN id_equipo_param INT,
+#     IN logo_rival_param VARCHAR(50),
+#     IN rival_partido_param VARCHAR(50),
+#     IN fecha_partido_param DATETIME,
+#     IN cancha_partido_param VARCHAR(100),
+#     IN resultado_partido_param VARCHAR(10),
+#     IN localidad_partido_param ENUM('Local', 'Visitante'),
+#     IN tipo_resultado_partido_param ENUM('Victoria', 'Empate', 'Derrota')
+# )
+# BEGIN
+#     DECLARE fecha_inicio_jornada DATE;
+#     DECLARE fecha_fin_jornada DATE;
+#
+#     -- Verificar que la fecha del partido esté dentro de las fechas de la jornada
+#     SELECT fecha_inicio_jornada, fecha_fin_jornada INTO fecha_inicio_jornada, fecha_fin_jornada
+#     FROM jornadas
+#     WHERE id_jornada = id_jornada_param;
+#
+#     IF fecha_partido_param < fecha_inicio_jornada OR fecha_partido_param > fecha_fin_jornada THEN
+#         SIGNAL SQLSTATE '45000'
+#         SET MESSAGE_TEXT = 'La fecha del partido está fuera del rango de fechas de la jornada';
+#     END IF;
+#
+#     IF insertorUpdate = 0 THEN
+#         INSERT INTO partidos (
+#             id_jornada,
+#             id_equipo,
+#             logo_rival,
+#             rival_partido,
+#             fecha_partido,
+#             cancha_partido,
+#             resultado_partido,
+#             localidad_partido,
+#             tipo_resultado_partido
+#         )
+#         VALUES (
+#             id_jornada_param,
+#             id_equipo_param,
+#             logo_rival_param,
+#             rival_partido_param,
+#             fecha_partido_param,
+#             cancha_partido_param,
+#             resultado_partido_param,
+#             localidad_partido_param,
+#             tipo_resultado_partido_param
+#         );
+#     ELSE
+#         UPDATE partidos
+#         SET id_jornada = id_jornada_param,
+#             id_equipo = id_equipo_param,
+#             logo_rival = logo_rival_param,
+#             rival_partido = rival_partido_param,
+#             fecha_partido = fecha_partido_param,
+#             cancha_partido = cancha_partido_param,
+#             resultado_partido = resultado_partido_param,
+#             localidad_partido = localidad_partido_param,
+#             tipo_resultado_partido = tipo_resultado_partido_param
+#         WHERE id_partido = insertorUpdate;
+#     END IF;
+# END //
+#
+# DELIMITER $$
 
-    -- Verificar que la fecha del partido esté dentro de las fechas de la jornada
-    SELECT fecha_inicio_jornada, fecha_fin_jornada INTO fecha_inicio_jornada, fecha_fin_jornada
-    FROM jornadas
-    WHERE id_jornada = id_jornada_param;
-
-    IF fecha_partido_param < fecha_inicio_jornada OR fecha_partido_param > fecha_fin_jornada THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'La fecha del partido está fuera del rango de fechas de la jornada';
-    END IF;
-
-    IF insertorUpdate = 0 THEN
-        INSERT INTO partidos (
-            id_jornada, 
-            id_equipo, 
-            logo_rival, 
-            rival_partido, 
-            fecha_partido, 
-            cancha_partido, 
-            resultado_partido, 
-            localidad_partido, 
-            tipo_resultado_partido
-        ) 
-        VALUES (
-            id_jornada_param, 
-            id_equipo_param, 
-            logo_rival_param, 
-            rival_partido_param, 
-            fecha_partido_param, 
-            cancha_partido_param, 
-            resultado_partido_param, 
-            localidad_partido_param, 
-            tipo_resultado_partido_param
-        );
-    ELSE
-        UPDATE partidos 
-        SET id_jornada = id_jornada_param, 
-            id_equipo = id_equipo_param, 
-            logo_rival = logo_rival_param, 
-            rival_partido = rival_partido_param, 
-            fecha_partido = fecha_partido_param, 
-            cancha_partido = cancha_partido_param, 
-            resultado_partido = resultado_partido_param, 
-            localidad_partido = localidad_partido_param, 
-            tipo_resultado_partido = tipo_resultado_partido_param
-        WHERE id_partido = insertorUpdate;
-    END IF;
-END //
-
-DELIMITER $$
-*/
 DELIMITER $$
 
 CREATE PROCEDURE eliminar_partido(
@@ -1205,7 +1205,6 @@ INNER JOIN jugadores j ON p.id_jugador = j.id_jugador;
 $$
 DELIMITER ;
 
-
 -- VISTA para tabla sub tipología
 DROP VIEW IF EXISTS vista_sub_tipologias;
 DELIMITER $$
@@ -1236,15 +1235,6 @@ FROM caracteristicas_analisis
 GROUP BY id_jugador;
 //
 DELIMITER ;
-
--- VISTA para tabla de ingresos
-DELIMITER //
-CREATE VIEW vista_ingresos AS
-SELECT nombre_jugador, apellido_jugador, becado, cantidad_pago, pago_tardio, mes_pago, fecha_pago
-FROM jugadores
-INNER JOIN pagos ON jugadores.id_jugador = pagos.id_jugador;
-//
-DELIMITER  ;
 
 -- VISTA para la tabla temporadas
 CREATE VIEW vista_temporadas AS
@@ -2128,3 +2118,13 @@ SELECT * FROM equipos;
 CALL insertarDetalleContenido (1, 30, 1, 30, 2, 1);
 SELECT * FROM detalle_entrenamiento;
 SELECT * FROM detalles_contenidos;
+
+SELECT SUM(cantidad_pago) FROM pagos GROUP BY mes_pago;
+
+-- ---------------------------------------VISTA PARA INGRESOS----------------------------------------------------
+CREATE VIEW vista_ingresos AS
+    SELECT
+        mes_pago AS mes,
+        SUM(cantidad_pago) AS cantidad
+FROM pagos GROUP BY mes_pago;
+
