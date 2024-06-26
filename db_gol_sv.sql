@@ -445,6 +445,8 @@ CREATE TABLE registros_medicos(
   CONSTRAINT fk_retorno_partido FOREIGN KEY (retorno_partido) REFERENCES partidos(id_partido)
 );
 
+ALTER TABLE registros_medicos MODIFY COLUMN retorno_partido INT DEFAULT NULL;
+
 CREATE TABLE pagos(
   id_pago INT AUTO_INCREMENT PRIMARY KEY, 
   fecha_pago DATE NOT NULL,

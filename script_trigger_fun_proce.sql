@@ -1569,7 +1569,7 @@ DELIMITER ;
 CREATE VIEW vista_lesiones AS
     SELECT
         l.id_lesion,
-	st.nombre_sub_tipologia,
+	    st.nombre_sub_tipologia,
         l.id_tipo_lesion,
         l.id_sub_tipologia,
         l.total_por_lesion,
@@ -1963,7 +1963,7 @@ JOIN
 SELECT * FROM vista_partidos_equipos WHERE id_partido = 2;
 
 -- ----------------------------------------------- PARTICIPACIONES  --------------------------------------------------------------------------
-
+DROP VIEW vista_jugadores_por_equipo;
 -- VER JUGADORES POR EQUIPO
 CREATE VIEW vista_jugadores_por_equipo AS
     SELECT
@@ -1971,12 +1971,13 @@ CREATE VIEW vista_jugadores_por_equipo AS
         pe.id_jugador,
         pe.id_equipo,
         pe.id_temporada,
-        J.nombre_jugador,
+        j.nombre_jugador,
         j.apellido_jugador,
         j.dorsal_jugador,
         j.foto_jugador,
         j.id_posicion_principal,
         p.posicion,
+        p.area_de_juego,
         t.nombre_temporada
 FROM plantillas_equipos pe
 INNER JOIN
