@@ -1193,10 +1193,13 @@ CREATE VIEW vista_pagos AS
 SELECT p.id_pago AS 'ID',
        p.fecha_pago AS 'FECHA',
        p.cantidad_pago AS 'CANTIDAD',
-       p.pago_tardio AS 'TARDIO',
        p.mora_pago AS 'MORA',
        p.mes_pago AS 'MES',
-       CONCAT(j.nombre_jugador,' ',j.apellido_jugador) AS 'NOMBRE'
+       CONCAT(j.nombre_jugador,' ',j.apellido_jugador) AS 'NOMBRE',
+		CASE
+			WHEN p.pago_tardio = 1 THEN 'Si'
+           		WHEN p.pago_tardio = 0 THEN 'No'
+		END AS 'TARDIO'
 FROM pagos p
 INNER JOIN jugadores j ON p.id_jugador = j.id_jugador;
 $$
