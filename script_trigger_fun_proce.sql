@@ -2122,3 +2122,6 @@ INNER JOIN
 
 SELECT * FROM jugadores;
 SELECT * FROM equipos;
+CALL insertarDetalleContenido (1, 30, 1, 30, 2, 1);
+SELECT * FROM detalle_entrenamiento;
+SELECT * FROM detalles_contenidos;
