@@ -1638,7 +1638,7 @@ INNER JOIN
   horarios h ON e.id_horario = h.id_horario;
 
 -- Vista para el GET de detalles contenidos
-CREATE VIEW vista_detalle_entrenamiento AS
+ALTER VIEW vista_detalle_entrenamiento AS
 SELECT 
     e.id_equipo,
     e.id_entrenamiento,
@@ -1656,7 +1656,7 @@ JOIN
     jugadores j ON de.id_jugador = j.id_jugador
 JOIN 
     sub_temas_contenidos stc ON dc.id_sub_tema_contenido = stc.id_sub_tema_contenido
-LEFT JOIN 
+JOIN 
     tareas t ON dc.id_tarea = t.id_tarea;
 
 -- Vista para el UPDATE de detalles contenidos
@@ -1699,6 +1699,7 @@ JOIN
 SELECT * FROM vista_equipos_jugadores;
 SELECT * FROM plantillas_equipos;
 -- Procedimiento para insertar detalle contenido
+DROP PROCEDURE insertarDetalleContenido;
 DELIMITER $$
 
 CREATE PROCEDURE insertarDetalleContenido(
@@ -1758,15 +1759,17 @@ BEGIN
                 END IF;
 
                 -- Verificar si id_detalle_contenido es NULL
-                IF (SELECT id_detalle_contenido FROM detalle_entrenamiento WHERE id_detalle = v_id) IS NULL THEN
+                IF (SELECT id_detalle_contenido FROM detalle_entrenamiento WHERE id_detalle = v_id AND id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento) IS NULL THEN
                     -- Actualizar el registro
                     UPDATE detalle_entrenamiento
-                    SET id_asistencia = NULL,
-                        id_caracteristica_analisis = NULL,
-                        id_detalle_contenido = v_id_detalle_contenido
+                    SET id_detalle_contenido = v_id_detalle_contenido
                     WHERE id_detalle = v_id;
                     LEAVE read_loop;
-                END IF;
+                
+                ELSE
+                	 INSERT INTO detalle_entrenamiento (id_entrenamiento, id_asistencia, id_caracteristica_analisis, id_detalle_contenido, id_jugador)
+            		 VALUES (p_id_entrenamiento, NULL, NULL, v_id_detalle_contenido, p_id_jugador);
+            END IF;
             END LOOP;
 
             -- Cerrar el cursor
@@ -2128,3 +2131,43 @@ CREATE VIEW vista_ingresos AS
         SUM(cantidad_pago) AS cantidad
 FROM pagos GROUP BY mes_pago;
 
+
+-- ------------------------------------------------------------------------ENTRENAMIENTOS----------------------------------------------------------------
+-- -Vista para el read all
+CREATE VIEW vista_jornadas_entrenamientos AS
+SELECT 
+    j.id_jornada, 
+    e.id_entrenamiento,
+    CONCAT(DATE_FORMAT(e.fecha_entrenamiento, '%e de %M del %Y'), ' - ', e.sesion) AS detalle_entrenamiento
+FROM 
+    jornadas j
+JOIN 
+    entrenamientos e ON j.id_jornada = e.id_jornada;
+SELECT * FROM vista_jornadas_entrenamientos WHERE id_jornada = ?;
+
+-- -Agregar un entrenamiento
+/*
+INSERT INTO (fecha_entrenamiento, sesion, id_jornada, id_equipo, id_categoria, id_horario)
+VALUES (?,?,?,?,?,?);
+*/
+
+-- Vista para ver los contenidos de un entrenamientos
+CREATE VIEW vista_entrenamientos_contenidos AS
+SELECT 
+    e.id_entrenamiento,
+    CONCAT(tc.nombre_tema_contenido, ' - ', stc.sub_tema_contenido) AS detalle_contenido
+FROM 
+    entrenamientos e
+JOIN 
+    detalle_entrenamiento de ON e.id_entrenamiento = de.id_entrenamiento
+JOIN 
+    detalles_contenidos dc ON de.id_detalle_contenido = dc.id_detalle_contenido
+JOIN 
+    sub_temas_contenidos stc ON dc.id_sub_tema_contenido = stc.id_sub_tema_contenido
+JOIN 
+    temas_contenidos tc ON stc.id_tema_contenido = tc.id_tema_contenido
+GROUP BY 
+    e.id_entrenamiento, detalle_contenido;
+
+
+SELECT * FROM vista_entrenamientos_contenidos WHERE id_entrenamiento = 1;
