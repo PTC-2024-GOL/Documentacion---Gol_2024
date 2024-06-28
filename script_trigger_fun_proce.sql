@@ -2171,3 +2171,22 @@ GROUP BY
 
 
 SELECT * FROM vista_entrenamientos_contenidos WHERE id_entrenamiento = 1;
+
+
+-- -----------------------------------VISTA PARA CARACTERISTICAS ANALISIS -------------------------------------------------------------------------
+DROP VIEW IF EXISTS vista_caracteristicas_analisis;
+CREATE VIEW vista_caracteristicas_analisis AS
+SELECT ca.id_caracteristica_analisis AS IDA, ca.nota_caracteristica_analisis AS NOTA,
+ca.id_jugador AS IDJCA, j.id_jugador AS IDJ,
+CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS JUGADOR,
+cj.id_caracteristica_jugador AS IDC, cj.nombre_caracteristica_jugador AS CARACTERISTICA,
+cj.clasificacion_caracteristica_jugador TIPO, de.id_entrenamiento IDE
+FROM detalle_entrenamiento de
+JOIN caracteristicas_analisis ca ON de.id_caracteristica_analisis = ca.id_caracteristica_analisis
+JOIN jugadores j ON de.id_jugador = j.id_jugador
+JOIN caracteristicas_jugadores cj ON ca.id_caracteristica_jugador = cj.id_caracteristica_jugador;
+
+SELECT JUGADOR, AVG(NOTA) AS PROMEDIO
+FROM vista_caracteristicas_analisis
+WHERE IDE = 1
+GROUP BY JUGADOR;
