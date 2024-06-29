@@ -2158,10 +2158,10 @@ VALUES (?,?,?,?,?,?);
 UPDATE entrenameientos SET fecha_entrenamiento = ?, sesion = ?, id_jornada ?, id_categoria = ?, id_horario = ? WHERE id_entrenamiento = ?
 */
 -- Vista para ver los contenidos de un entrenamientos
-CREATE VIEW vista_entrenamientos_contenidos AS
+CRATE VIEW vista_entrenamientos_contenidos AS
 SELECT 
     e.id_entrenamiento,
-    CONCAT(tc.nombre_tema_contenido, ' - ', stc.sub_tema_contenido) AS detalle_contenido
+    CONCAT(tc.nombre_tema_contenido, ' - ', stc.sub_tema_contenido) AS contenidos
 FROM 
     entrenamientos e
 JOIN 
@@ -2173,12 +2173,23 @@ JOIN
 JOIN 
     temas_contenidos tc ON stc.id_tema_contenido = tc.id_tema_contenido
 GROUP BY 
-    e.id_entrenamiento, detalle_contenido;
+    e.id_entrenamiento, contenidos;
 
-
-<<<<<<< Updated upstream
+SELECT * FROM vista_entrenamientos_contenidos;
 SELECT * FROM vista_entrenamientos_contenidos WHERE id_entrenamiento = 1;
 
+-- vista para el titulo de entrenamientos
+CREATE VIEW vista_jornadas AS
+SELECT 
+    id_jornada,
+    CONCAT(
+        'Jornada del ',
+        DATE_FORMAT(fecha_inicio_jornada, '%e de %M'),
+        ' - ',
+        DATE_FORMAT(fecha_fin_jornada, '%e de %M')
+    ) AS titulo
+FROM 
+    jornadas;
 
 -- -----------------------------------VISTA PARA CARACTERISTICAS ANALISIS -------------------------------------------------------------------------
 DROP VIEW IF EXISTS vista_caracteristicas_analisis;
@@ -2197,11 +2208,10 @@ SELECT JUGADOR, AVG(NOTA) AS PROMEDIO
 FROM vista_caracteristicas_analisis
 WHERE IDE = 1
 GROUP BY JUGADOR;
-=======
 SELECT id_entrenamiento, detalle contenido FROM vista_entrenamientos_contenidos WHERE id_entrenamiento = 1;
 
 USE db_gol_sv;
 
 
 SELECT fecha_entrenamiento, id_entrenamiento FROM entrenamientos WHERE id_entrenamiento = 1;
->>>>>>> Stashed changes
+
