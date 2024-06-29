@@ -2134,6 +2134,8 @@ FROM pagos GROUP BY mes_pago;
 
 -- ------------------------------------------------------------------------ENTRENAMIENTOS----------------------------------------------------------------
 -- -Vista para el read all
+USE db_gol_sv;
+ALTER VIEW vista_jornadas_entrenamientos AS
 SELECT 
     j.id_jornada, 
     e.id_entrenamiento,
@@ -2143,12 +2145,10 @@ FROM
     jornadas j
 JOIN 
     entrenamientos e ON j.id_jornada = e.id_jornada;
-SELECT * FROM vista_jornadas_entrenamientos WHERE id_jornada = ?;
 SELECT * FROM vista_jornadas_entrenamientos WHERE id_jornada = 1;
 
 -- -Agregar un entrenamiento
 /*
-INSERT INTO (fecha_entrenamiento, sesion, id_jornada, id_equipo, id_categoria, id_horario)
 INSERT INTO entrenamientos (fecha_entrenamiento, sesion, id_jornada, id_equipo, id_categoria, id_horario)
 VALUES (?,?,?,?,?,?);
 */
