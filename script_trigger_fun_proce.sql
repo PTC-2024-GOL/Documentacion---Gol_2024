@@ -2134,23 +2134,29 @@ FROM pagos GROUP BY mes_pago;
 
 -- ------------------------------------------------------------------------ENTRENAMIENTOS----------------------------------------------------------------
 -- -Vista para el read all
-CREATE VIEW vista_jornadas_entrenamientos AS
 SELECT 
     j.id_jornada, 
     e.id_entrenamiento,
+    e.fecha_entrenamiento,
     CONCAT(DATE_FORMAT(e.fecha_entrenamiento, '%e de %M del %Y'), ' - ', e.sesion) AS detalle_entrenamiento
 FROM 
     jornadas j
 JOIN 
     entrenamientos e ON j.id_jornada = e.id_jornada;
 SELECT * FROM vista_jornadas_entrenamientos WHERE id_jornada = ?;
+SELECT * FROM vista_jornadas_entrenamientos WHERE id_jornada = 1;
 
 -- -Agregar un entrenamiento
 /*
 INSERT INTO (fecha_entrenamiento, sesion, id_jornada, id_equipo, id_categoria, id_horario)
+INSERT INTO entrenamientos (fecha_entrenamiento, sesion, id_jornada, id_equipo, id_categoria, id_horario)
 VALUES (?,?,?,?,?,?);
 */
 
+-- -Update
+/*
+UPDATE entrenameientos SET fecha_entrenamiento = ?, sesion = ?, id_jornada ?, id_categoria = ?, id_horario = ? WHERE id_entrenamiento = ?
+*/
 -- Vista para ver los contenidos de un entrenamientos
 CREATE VIEW vista_entrenamientos_contenidos AS
 SELECT 
@@ -2170,6 +2176,7 @@ GROUP BY
     e.id_entrenamiento, detalle_contenido;
 
 
+<<<<<<< Updated upstream
 SELECT * FROM vista_entrenamientos_contenidos WHERE id_entrenamiento = 1;
 
 
@@ -2190,3 +2197,11 @@ SELECT JUGADOR, AVG(NOTA) AS PROMEDIO
 FROM vista_caracteristicas_analisis
 WHERE IDE = 1
 GROUP BY JUGADOR;
+=======
+SELECT id_entrenamiento, detalle contenido FROM vista_entrenamientos_contenidos WHERE id_entrenamiento = 1;
+
+USE db_gol_sv;
+
+
+SELECT fecha_entrenamiento, id_entrenamiento FROM entrenamientos WHERE id_entrenamiento = 1;
+>>>>>>> Stashed changes
