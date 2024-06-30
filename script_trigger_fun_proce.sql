@@ -1012,16 +1012,15 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE sp_insertar_registro_medico (
     IN p_id_jugador INT, 
-    IN p_fecha_lesion DATE, 
-    IN p_fecha_registro DATE, 
+    IN p_fecha_lesion DATE,
     IN p_dias_lesionado INT, 
     IN p_id_lesion INT, 
     IN p_retorno_entreno DATE, 
     IN p_retorno_partido INT
 )
 BEGIN
-    INSERT INTO registros_medicos(id_jugador, fecha_lesion, fecha_registro, dias_lesionado, id_lesion, retorno_entreno, retorno_partido)
-    VALUES (p_id_jugador, p_fecha_lesion, p_fecha_registro, p_dias_lesionado, p_id_lesion, p_retorno_entreno, p_retorno_partido);
+    INSERT INTO registros_medicos(id_jugador, fecha_lesion, dias_lesionado, id_lesion, retorno_entreno, retorno_partido)
+    VALUES (p_id_jugador, p_fecha_lesion, p_dias_lesionado, p_id_lesion, p_retorno_entreno, p_retorno_partido);
 END //
 DELIMITER ;
 
@@ -1030,8 +1029,7 @@ DELIMITER //
 CREATE PROCEDURE sp_actualizar_registro_medico (
     IN p_id_registro_medico INT, 
     IN p_id_jugador INT, 
-    IN p_fecha_lesion DATE, 
-    IN p_fecha_registro DATE, 
+    IN p_fecha_lesion DATE,
     IN p_dias_lesionado INT, 
     IN p_id_lesion INT, 
     IN p_retorno_entreno DATE, 
@@ -1039,7 +1037,7 @@ CREATE PROCEDURE sp_actualizar_registro_medico (
 )
 BEGIN
     UPDATE registros_medicos 
-    SET id_jugador = p_id_jugador, fecha_lesion = p_fecha_lesion, fecha_registro = p_fecha_registro, dias_lesionado = p_dias_lesionado, id_lesion = p_id_lesion, retorno_entreno = p_retorno_entreno, retorno_partido = p_retorno_partido
+    SET id_jugador = p_id_jugador, fecha_lesion = p_fecha_lesion, dias_lesionado = p_dias_lesionado, id_lesion = p_id_lesion, retorno_entreno = p_retorno_entreno, retorno_partido = p_retorno_partido
     WHERE id_registro_medico = p_id_registro_medico;
 END //
 DELIMITER ;
@@ -1638,7 +1636,7 @@ INNER JOIN
   horarios h ON e.id_horario = h.id_horario;
 
 -- Vista para el GET de detalles contenidos
-ALTER VIEW vista_detalle_entrenamiento AS
+CREATE VIEW vista_detalle_entrenamiento AS
 SELECT 
     e.id_equipo,
     e.id_entrenamiento,
@@ -1699,7 +1697,7 @@ JOIN
 SELECT * FROM vista_equipos_jugadores;
 SELECT * FROM plantillas_equipos;
 -- Procedimiento para insertar detalle contenido
-DROP PROCEDURE insertarDetalleContenido;
+-- DROP PROCEDURE insertarDetalleContenido;
 DELIMITER $$
 
 CREATE PROCEDURE insertarDetalleContenido(
@@ -1961,7 +1959,7 @@ JOIN
 SELECT * FROM vista_partidos_equipos WHERE id_partido = 2;
 
 -- ----------------------------------------------- PARTICIPACIONES  --------------------------------------------------------------------------
-DROP VIEW vista_jugadores_por_equipo;
+-- DROP VIEW vista_jugadores_por_equipo;
 -- VER JUGADORES POR EQUIPO
 CREATE VIEW vista_jugadores_por_equipo AS
     SELECT
@@ -2000,9 +1998,9 @@ INNER JOIN
 -- TRIGGER PARA INSERTAR, ACTUALIZAR O ELIMINAR GOLES EN PARTICIPACIONES PARTIDO.
 
 -- Si ya habia creado estos trigger ejecuten estas lineas y vuelvan a crearlo. att. Con cariño su coordi :3
-DROP TRIGGER trigger_insertar_participacion;
-DROP TRIGGER trigger_actualizar_participacion;
-DROP TRIGGER trigger_eliminar_participacion;
+-- DROP TRIGGER trigger_insertar_participacion;
+-- DROP TRIGGER trigger_actualizar_participacion;
+-- DROP TRIGGER trigger_eliminar_participacion;
 
 DELIMITER //
 CREATE TRIGGER trigger_insertar_participacion
@@ -2116,14 +2114,6 @@ INNER JOIN
     categorias c ON hc.id_categoria = c.id_categoria;
 
 
-SELECT * FROM jugadores;
-SELECT * FROM equipos;
-CALL insertarDetalleContenido (1, 30, 1, 30, 2, 1);
-SELECT * FROM detalle_entrenamiento;
-SELECT * FROM detalles_contenidos;
-
-SELECT SUM(cantidad_pago) FROM pagos GROUP BY mes_pago;
-
 -- ---------------------------------------VISTA PARA INGRESOS----------------------------------------------------
 CREATE VIEW vista_ingresos AS
     SELECT
@@ -2134,8 +2124,7 @@ FROM pagos GROUP BY mes_pago;
 
 -- ------------------------------------------------------------------------ENTRENAMIENTOS----------------------------------------------------------------
 -- -Vista para el read all
-USE db_gol_sv;
-ALTER VIEW vista_jornadas_entrenamientos AS
+CREATE VIEW vista_jornadas_entrenamientos AS
 SELECT 
     j.id_jornada, 
     e.id_entrenamiento,
@@ -2230,7 +2219,6 @@ BEGIN
 END$$
 DELIMITER ;
 
-CALL resultadosPartido(2);
 
 -- PROCEDIMIENTO PARA SACAR EL PROMEDIO PARA CADA AREA DE ENTRENAMIENTO DE UN EQUIPO
 DELIMITER $$
@@ -2251,6 +2239,6 @@ BEGIN
 END$$
 DELIMITER ;
 
-CALL analisisEntrenamientos(2);
+
 
 
