@@ -1132,6 +1132,7 @@ correo_administrador AS 'CORREO',
 telefono_administrador AS 'TELÉFONO',
 dui_administrador AS 'DUI',
 fecha_nacimiento_administrador AS 'NACIMIENTO',
+alias_administrador AS 'ALIAS',
     CASE 
         WHEN estado_administrador = 1 THEN 'Activo'
         WHEN estado_administrador = 0 THEN 'Bloqueado'
@@ -2198,7 +2199,7 @@ FROM vista_caracteristicas_analisis
 WHERE IDE = 1
 GROUP BY JUGADOR;
 
-
+DELIMITER $$
 CREATE PROCEDURE insertarCaracteristicasYDetalles(
     IN p_id_jugador INT UNSIGNED,
     IN p_id_entrenamiento INT UNSIGNED,
