@@ -2158,7 +2158,7 @@ VALUES (?,?,?,?,?,?);
 UPDATE entrenameientos SET fecha_entrenamiento = ?, sesion = ?, id_jornada ?, id_categoria = ?, id_horario = ? WHERE id_entrenamiento = ?
 */
 -- Vista para ver los contenidos de un entrenamientos
-CRATE VIEW vista_entrenamientos_contenidos AS
+CREATE VIEW vista_entrenamientos_contenidos AS
 SELECT 
     e.id_entrenamiento,
     CONCAT(tc.nombre_tema_contenido, ' - ', stc.sub_tema_contenido) AS contenidos
@@ -2208,10 +2208,49 @@ SELECT JUGADOR, AVG(NOTA) AS PROMEDIO
 FROM vista_caracteristicas_analisis
 WHERE IDE = 1
 GROUP BY JUGADOR;
-SELECT id_entrenamiento, detalle contenido FROM vista_entrenamientos_contenidos WHERE id_entrenamiento = 1;
-
-USE db_gol_sv;
 
 
-SELECT fecha_entrenamiento, id_entrenamiento FROM entrenamientos WHERE id_entrenamiento = 1;
+-- --------------------------------PROCEDIMIENTOS PARA EL DASHBOARD ----------------------------------------------------------------------------
+
+-- PROCEDIMIENTO PARA SABER LOS RESULTADOS ESTADISTICOS DE UN EQUIPO
+DELIMITER $$
+CREATE PROCEDURE resultadosPartido(
+    IN p_id_equipo INT
+)
+BEGIN
+    SELECT
+        SUM(CASE WHEN tipo_resultado_partido = 'Victoria' THEN 1 ELSE 0 END) AS victorias,
+        SUM(CASE WHEN tipo_resultado_partido = 'Empate' THEN 1 ELSE 0 END) AS empates,
+        SUM(CASE WHEN tipo_resultado_partido = 'Derrota' THEN 1 ELSE 0 END) AS derrotas,
+        SUM(SUBSTRING_INDEX(resultado_partido, '-', 1)) AS golesAFavor,
+        SUM(SUBSTRING_INDEX(resultado_partido, '-', -1)) AS golesEnContra,
+        (SUM(SUBSTRING_INDEX(resultado_partido, '-', 1)) - SUM(SUBSTRING_INDEX(resultado_partido, '-', -1))) AS diferencia
+    FROM partidos WHERE id_equipo = p_id_equipo;
+
+END$$
+DELIMITER ;
+
+CALL resultadosPartido(2);
+
+-- PROCEDIMIENTO PARA SACAR EL PROMEDIO PARA CADA AREA DE ENTRENAMIENTO DE UN EQUIPO
+DELIMITER $$
+CREATE PROCEDURE analisisEntrenamientos(
+    IN p_id_equipo INT
+)
+BEGIN
+    SELECT
+        pj.id_jugador,
+        pj.id_equipo,
+        cj.nombre_caracteristica_jugador AS caracteristica,
+        ROUND(AVG(C.nota_caracteristica_analisis), 2) AS promedio
+    FROM plantillas_equipos pj
+        INNER JOIN caracteristicas_analisis c ON pj.id_plantilla_equipo = c.id_jugador
+        INNER JOIN caracteristicas_jugadores cj ON c.id_caracteristica_jugador = cj.id_caracteristica_jugador
+    WHERE id_equipo = p_id_equipo GROUP BY cj.clasificacion_caracteristica_jugador;
+
+END$$
+DELIMITER ;
+
+CALL analisisEntrenamientos(2);
+
 
