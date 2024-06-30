@@ -2199,6 +2199,95 @@ WHERE IDE = 1
 GROUP BY JUGADOR;
 
 
+CREATE PROCEDURE insertarCaracteristicasYDetalles(
+    IN p_id_jugador INT UNSIGNED,
+    IN p_id_entrenamiento INT UNSIGNED,
+    IN p_caracteristicas JSON
+)
+BEGIN
+    DECLARE v_id_caracteristica_analisis INT;
+    DECLARE v_exists INT;
+    DECLARE v_exists2 INT;
+    DECLARE v_id INT;
+    DECLARE done INT DEFAULT 0;
+
+    -- Cursor para recorrer los registros
+    DECLARE cur CURSOR FOR
+        SELECT id_detalle FROM detalle_entrenamiento
+        WHERE id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento;
+
+    -- Handler para salir del cursor
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+    -- Loop para insertar cada característica
+    SET @caracteristicas = p_caracteristicas;
+    SET @i = 0;
+    WHILE @i < JSON_LENGTH(@caracteristicas) DO
+        SET @id_caracteristica_jugador = JSON_UNQUOTE(JSON_EXTRACT(@caracteristicas, CONCAT('$[', @i, '].id_caracteristica_jugador')));
+        SET @nota_caracteristica_analisis = JSON_UNQUOTE(JSON_EXTRACT(@caracteristicas, CONCAT('$[', @i, '].nota_caracteristica_analisis')));
+
+        -- Insertar en caracteristicas_analisis
+        INSERT INTO caracteristicas_analisis (nota_caracteristica_analisis, id_jugador, id_caracteristica_jugador)
+        VALUES (@nota_caracteristica_analisis, p_id_jugador, @id_caracteristica_jugador);
+
+        SET v_id_caracteristica_analisis = LAST_INSERT_ID();
+
+        -- Verificar si ya existe el registro en detalle_entrenamiento
+        SELECT COUNT(*) INTO v_exists
+        FROM detalle_entrenamiento
+        WHERE id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento;
+
+        -- Si no existe, insertar nuevo registro
+        IF v_exists = 0 THEN
+            INSERT INTO detalle_entrenamiento (id_entrenamiento, id_asistencia, id_caracteristica_analisis, id_detalle_contenido, id_jugador)
+            VALUES (p_id_entrenamiento, NULL, v_id_caracteristica_analisis, NULL, p_id_jugador);
+        ELSE
+            -- Aquí se verifica si en los registros con el mismo id entrenamiento y id jugador, algún registro tiene un dato NO NULLO en id_caracteristica_analisis
+            SELECT COUNT(*) INTO v_exists2
+            FROM detalle_entrenamiento
+            WHERE id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento AND id_caracteristica_analisis IS NOT NULL;
+
+            -- En caso de que no exista (v_exists2 = 0), pasará a un if, en caso contrario (v_exists2 > 0), pasará a un else
+            IF v_exists2 >= 1 THEN
+                -- Abrir el cursor
+                OPEN cur;
+
+                -- Bucle para recorrer los registros
+                read_loop: LOOP
+                    FETCH cur INTO v_id;
+                    IF done THEN
+                        LEAVE read_loop;
+                    END IF;
+
+                    -- Verificar si id_caracteristica_analisis es NULL
+                    IF (SELECT id_caracteristica_analisis FROM detalle_entrenamiento WHERE id_detalle = v_id) IS NULL THEN
+                        -- Actualizar el registro
+                        UPDATE detalle_entrenamiento
+                        SET id_asistencia = NULL,
+                            id_caracteristica_analisis = v_id_caracteristica_analisis,
+                            id_detalle_contenido = NULL
+                        WHERE id_detalle = v_id;
+                        LEAVE read_loop;
+                    END IF;
+                END LOOP;
+
+                -- Cerrar el cursor
+                CLOSE cur;
+            ELSE
+                -- Si existe un id_caracteristica_analisis no nulo, insertar un nuevo registro
+                INSERT INTO detalle_entrenamiento (id_entrenamiento, id_asistencia, id_caracteristica_analisis, id_detalle_contenido, id_jugador)
+                VALUES (p_id_entrenamiento, NULL, v_id_caracteristica_analisis, NULL, p_id_jugador);
+            END IF;
+        END IF;
+
+        SET @i = @i + 1;
+    END WHILE;
+END;
+$$
+
+DELIMITER ;
+
+
 -- --------------------------------PROCEDIMIENTOS PARA EL DASHBOARD ----------------------------------------------------------------------------
 
 -- PROCEDIMIENTO PARA SABER LOS RESULTADOS ESTADISTICOS DE UN EQUIPO
