@@ -2185,15 +2185,27 @@ FROM
 -- -----------------------------------VISTA PARA CARACTERISTICAS ANALISIS -------------------------------------------------------------------------
 DROP VIEW IF EXISTS vista_caracteristicas_analisis;
 CREATE VIEW vista_caracteristicas_analisis AS
-SELECT ca.id_caracteristica_analisis AS IDA, ca.nota_caracteristica_analisis AS NOTA,
-ca.id_jugador AS IDJCA, j.id_jugador AS IDJ,
-CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS JUGADOR,
-cj.id_caracteristica_jugador AS IDC, cj.nombre_caracteristica_jugador AS CARACTERISTICA,
-cj.clasificacion_caracteristica_jugador TIPO, de.id_entrenamiento IDE
-FROM detalle_entrenamiento de
-JOIN caracteristicas_analisis ca ON de.id_caracteristica_analisis = ca.id_caracteristica_analisis
-JOIN jugadores j ON de.id_jugador = j.id_jugador
-JOIN caracteristicas_jugadores cj ON ca.id_caracteristica_jugador = cj.id_caracteristica_jugador;
+SELECT 
+    ca.id_caracteristica_analisis AS IDA,
+    CASE 
+        WHEN ca.id_caracteristica_analisis IS NULL THEN 0
+        ELSE ca.nota_caracteristica_analisis
+    END AS NOTA,
+    de.id_jugador AS IDJCA,
+    j.id_jugador AS IDJ,
+    CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS JUGADOR,
+    cj.id_caracteristica_jugador AS IDC,
+    cj.nombre_caracteristica_jugador AS CARACTERISTICA,
+    cj.clasificacion_caracteristica_jugador AS TIPO,
+    de.id_entrenamiento AS IDE
+FROM 
+    detalle_entrenamiento de
+LEFT JOIN 
+    caracteristicas_analisis ca ON de.id_caracteristica_analisis = ca.id_caracteristica_analisis
+JOIN 
+    jugadores j ON de.id_jugador = j.id_jugador
+LEFT JOIN 
+    caracteristicas_jugadores cj ON ca.id_caracteristica_jugador = cj.id_caracteristica_jugador;
 
 SELECT JUGADOR, AVG(NOTA) AS PROMEDIO
 FROM vista_caracteristicas_analisis
