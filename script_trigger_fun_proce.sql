@@ -1151,6 +1151,7 @@ correo_tecnico AS 'CORREO',
 telefono_tecnico AS 'TELÉFONO',
 dui_tecnico AS 'DUI',
 fecha_nacimiento_tecnico AS 'NACIMIENTO',
+alias_tecnico AS 'ALIAS',
     CASE 
         WHEN estado_tecnico = 1 THEN 'Activo'
         WHEN estado_tecnico = 0 THEN 'Bloqueado'
