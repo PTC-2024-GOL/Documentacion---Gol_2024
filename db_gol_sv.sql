@@ -191,7 +191,7 @@ CREATE TABLE caracteristicas_jugadores(
   id_caracteristica_jugador INT AUTO_INCREMENT PRIMARY KEY,
   nombre_caracteristica_jugador VARCHAR(50) NOT NULL,
   CONSTRAINT uq_nombre_sub_caracteristica_unico UNIQUE(nombre_caracteristica_jugador),
-  clasificacion_caracteristica_jugador ENUM('Técnicos', 'Tácticos', 'Condicionales', 'Psicologicos', 'Personales') NOT NULL
+  clasificacion_caracteristica_jugador ENUM('Técnicos', 'Tácticos', 'Psicológicos', 'Físicos') NOT NULL
 );
 
 CREATE TABLE caracteristicas_analisis(
