@@ -1,5 +1,4 @@
--- DROP DATABASE if EXISTS db_gol_sv;
-
+DROP DATABASE if EXISTS db_gol_sv;
 CREATE DATABASE db_gol_sv;
 USE db_gol_sv;
 
@@ -187,6 +186,33 @@ CREATE TABLE plantillas_equipos(
   CONSTRAINT fk_equipo_plantilla FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo)
 );
 
+
+CREATE TABLE jornadas(
+  id_jornada INT AUTO_INCREMENT PRIMARY KEY, 
+  nombre_jornada VARCHAR(60) NULL,
+  numero_jornada INT UNSIGNED NOT NULL, 
+  id_plantilla INT NOT NULL, 
+  CONSTRAINT fk_plantilla_jornada FOREIGN KEY (id_plantilla) REFERENCES plantillas(id_plantilla), 
+  fecha_inicio_jornada DATE NOT NULL,
+  fecha_fin_jornada DATE NOT NULL,
+  CONSTRAINT chk_validacion_de_fechas_de_jornada CHECK(fecha_inicio_jornada < fecha_fin_jornada)
+);
+
+CREATE TABLE entrenamientos(
+  id_entrenamiento BIGINT AUTO_INCREMENT PRIMARY KEY, 
+  fecha_entrenamiento DATE,
+  sesion ENUM('Sesion 1', 'Sesion 2', 'Sesion 3'),
+  id_jornada INT NOT NULL, 
+  CONSTRAINT fk_identificador_de_jornada_entrenamiento FOREIGN KEY (id_jornada) REFERENCES jornadas(id_jornada),
+  id_equipo INT NOT NULL,
+  CONSTRAINT fk_identificador_de_equipo_entrenamiento FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
+  id_categoria INT NOT NULL,
+  CONSTRAINT fk_identificador_de_categoria_entrenamiento FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria),
+  id_horario INT NOT NULL,
+  CONSTRAINT fk_identificador_de_horario_entrenamiento FOREIGN KEY (id_horario) REFERENCES horarios(id_horario)
+);
+
+
 CREATE TABLE caracteristicas_jugadores(
   id_caracteristica_jugador INT AUTO_INCREMENT PRIMARY KEY,
   nombre_caracteristica_jugador VARCHAR(50) NOT NULL,
@@ -195,23 +221,27 @@ CREATE TABLE caracteristicas_jugadores(
 );
 
 CREATE TABLE caracteristicas_analisis(
-  id_caracteristica_analisis INT AUTO_INCREMENT PRIMARY KEY,
+  id_caracteristica_analisis BIGINT AUTO_INCREMENT PRIMARY KEY,
   nota_caracteristica_analisis DECIMAL(5,3) UNSIGNED NOT NULL,
   id_jugador INT NOT NULL, 
-  CONSTRAINT fk_jugador_caracteristica_general FOREIGN KEY (id_jugador) REFERENCES plantillas_equipos(id_plantilla_equipo), 
+  CONSTRAINT fk_jugador_caracteristica_general FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador), 
   id_caracteristica_jugador INT NOT NULL,
-  CONSTRAINT fk_sub_caracteristica_jugador_caracteristica_general FOREIGN KEY (id_caracteristica_jugador) REFERENCES caracteristicas_jugadores(id_caracteristica_jugador)
+  CONSTRAINT fk_sub_caracteristica_jugador_caracteristica_general FOREIGN KEY (id_caracteristica_jugador) REFERENCES caracteristicas_jugadores(id_caracteristica_jugador),
+  id_entrenamiento BIGINT NOT NULL, 
+  CONSTRAINT fk_entrenamiento_del_analisis_de_la_caracteristica FOREIGN KEY (id_entrenamiento) REFERENCES entrenamientos(id_entrenamiento)
 );
 
 CREATE TABLE asistencias(
-  id_asistencia INT AUTO_INCREMENT PRIMARY KEY, 
+  id_asistencia BIGINT AUTO_INCREMENT PRIMARY KEY, 
   id_jugador INT NOT NULL, 
   CONSTRAINT fk_jugador_asistencia FOREIGN KEY (id_jugador) REFERENCES plantillas_equipos(id_plantilla_equipo), 
   id_horario INT NOT NULL, 
   CONSTRAINT fk_horario_asistencia FOREIGN KEY (id_horario) REFERENCES horarios(id_horario), 
   fecha_asistencia DATE NULL DEFAULT NOW(),
   asistencia ENUM('Asistencia', 'Ausencia injustificada', 'Enfermedad', 'Estudio', 'Trabajo', 'Viaje', 'Permiso', 'Falta', 'Lesion', 'Otro') NOT NULL, 
-  observacion_asistencia VARCHAR(2000) NULL
+  observacion_asistencia VARCHAR(2000) NULL,
+  id_entrenamiento BIGINT NOT NULL, 
+  CONSTRAINT fk_asistencias_del_entrenamiento FOREIGN KEY (id_entrenamiento) REFERENCES entrenamientos(id_entrenamiento)
 );
 
 CREATE TABLE temas_contenidos(
@@ -242,65 +272,16 @@ CREATE TABLE detalles_contenidos(
   minutos_tarea INT UNSIGNED NULL
 );
 
-CREATE TABLE jornadas(
-  id_jornada INT AUTO_INCREMENT PRIMARY KEY, 
-  nombre_jornada VARCHAR(60) NULL,
-  numero_jornada INT UNSIGNED NOT NULL, 
-  id_plantilla INT NOT NULL, 
-  CONSTRAINT fk_plantilla_jornada FOREIGN KEY (id_plantilla) REFERENCES plantillas(id_plantilla), 
-  fecha_inicio_jornada DATE NOT NULL,
-  fecha_fin_jornada DATE NOT NULL,
-  CONSTRAINT chk_validacion_de_fechas_de_jornada CHECK(fecha_inicio_jornada < fecha_fin_jornada)
-);
-
-
-CREATE TABLE entrenamientos(
-  id_entrenamiento INT AUTO_INCREMENT PRIMARY KEY, 
-  fecha_entrenamiento DATE,
-  sesion ENUM('Sesion 1', 'Sesion 2', 'Sesion 3'),
-  id_jornada INT NOT NULL, 
-  CONSTRAINT fk_identificador_de_jornada_entrenamiento FOREIGN KEY (id_jornada) REFERENCES jornadas(id_jornada),
-  id_equipo INT NOT NULL,
-  CONSTRAINT fk_identificador_de_equipo_entrenamiento FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
-  id_categoria INT NOT NULL,
-  CONSTRAINT fk_identificador_de_categoria_entrenamiento FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria),
-  id_horario INT NOT NULL,
-  CONSTRAINT fk_identificador_de_horario_entrenamiento FOREIGN KEY (id_horario) REFERENCES horarios(id_horario)
-);
-
-/*
-Si ya crearon la tabla de arriba entrenamientos, antes del 19 de junio, ejecutar estos códigos:
-ALTER TABLE entrenamientos
-ADD COLUMN id_equipo INT NOT NULL,
-ADD CONSTRAINT fk_identificador_de_equipo_entrenamiento FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
-ADD COLUMN id_categoria INT NOT NULL,
-ADD CONSTRAINT fk_identificador_de_categoria_entrenamiento FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria),
-ADD COLUMN id_horario INT NOT NULL,
-ADD CONSTRAINT fk_identificador_de_horario_entrenamiento FOREIGN KEY (id_horario) REFERENCES horarios(id_horario);
-*/
 
 CREATE TABLE detalle_entrenamiento(
-  id_detalle INT AUTO_INCREMENT PRIMARY KEY,
-  id_entrenamiento INT NOT NULL,
+  id_detalle BIGINT AUTO_INCREMENT PRIMARY KEY,
+  id_entrenamiento BIGINT NOT NULL,
   CONSTRAINT fk_entrenamientos_detalle_entrenamiento FOREIGN KEY (id_entrenamiento) REFERENCES entrenamientos(id_entrenamiento),
-  id_asistencia INT, 
-  CONSTRAINT fk_asistencia_detalle_entrenamiento FOREIGN KEY (id_asistencia) REFERENCES asistencias(id_asistencia),
-  id_caracteristica_analisis INT,
-  CONSTRAINT fk_caracteristicas_analisis_detalle_entrenamiento FOREIGN KEY (id_caracteristica_analisis) REFERENCES caracteristicas_analisis(id_caracteristica_analisis),
   id_detalle_contenido INT, 
   CONSTRAINT fk_detalle_contenido_detalle_entrenamiento FOREIGN KEY (id_detalle_contenido) REFERENCES detalles_contenidos(id_detalle_contenido),
   id_jugador INT NOT NULL,
-	CONSTRAINT fk_jugadores_detalle_entrenamiento FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador)
+  CONSTRAINT fk_jugadores_detalle_entrenamiento FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador)
 );
-
-/*
-Tan efimeras las flores que revolotean en desorden ante una primavera que no sabe adónde va.
-DROP TABLE detalle_entrenamiento;
-Si ya crearon la tabla de arriba entrenamientos, antes del 19 de junio, ejecutar estos códigos:
-ALTER TABLE detalle_entrenamiento
-ADD COLUMN id_jugador INT,
-ADD CONSTRAINT fk_identificador_de_jugador_entrenamiento FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador);
-*/
 
 CREATE TABLE rivales (
     id_rival INT AUTO_INCREMENT PRIMARY KEY,
@@ -324,24 +305,6 @@ CREATE TABLE partidos(
   CONSTRAINT fk_rivales_partidos FOREIGN KEY (id_rival) REFERENCES rivales(id_rival)
 );
 
-/*
-códigos por si ya habían creado partidos y tiene que eliminar logo_rival, rival_partido y agregar id_rival:
-ALTER TABLE partidos
-DROP COLUMN logo_rival;
-ALTER TABLE partidos
-DROP COLUMN rival_partido;
-INSERT INTO rivales(nombre_rival, logo_rival) values ('Barcelona', 'barcelona.png');
-UPDATE partidos SET id_rival = 1;
-ALTER TABLE partidos
-ADD CONSTRAINT fk_rivales_partidos FOREIGN KEY (id_rival) REFERENCES rivales(id_rival);
-use db_gol_sv;
-ALTER TABLE partidos
-MODIFY COLUMN tipo_resultado_partido ENUM('Victoria', 'Empate', 'Derrota', 'Pendiente') NULL; 
-
-
-SELECT * FROM partidos;
-SELECT * FROM rivales;
-*/
 CREATE TABLE tipos_jugadas(
   id_tipo_jugada INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_tipo_juego VARCHAR(50) NOT NULL, 
@@ -356,7 +319,7 @@ CREATE TABLE tipos_goles(
 );
 
 CREATE TABLE participaciones_partidos(
-  id_participacion INT AUTO_INCREMENT PRIMARY KEY, 
+  id_participacion BIGINT AUTO_INCREMENT PRIMARY KEY, 
   id_partido INT NOT NULL, 
   CONSTRAINT fk_partido_participacion FOREIGN KEY (id_partido) REFERENCES partidos(id_partido), 
   id_jugador INT NOT NULL, 
@@ -384,7 +347,7 @@ MODIFY COLUMN puntuacion DECIMAL(5,2) UNSIGNED NULL DEFAULT 0;
 
 CREATE TABLE detalles_goles (
   id_detalle_gol INT AUTO_INCREMENT PRIMARY KEY,
-  id_participacion INT NOT NULL,
+  id_participacion BIGINT NOT NULL,
   CONSTRAINT fk_participacion_detalle_gol FOREIGN KEY (id_participacion) REFERENCES participaciones_partidos(id_participacion),
   cantidad_tipo_gol INT UNSIGNED NULL,
   id_tipo_gol INT NOT NULL,
@@ -393,7 +356,7 @@ CREATE TABLE detalles_goles (
 
 CREATE TABLE detalles_amonestaciones (
   id_detalle_amonestacion INT AUTO_INCREMENT PRIMARY KEY,
-  id_participacion INT NOT NULL,
+  id_participacion BIGINT NOT NULL,
   CONSTRAINT fk_participacion_detalle_amonestacion FOREIGN KEY (id_participacion) REFERENCES participaciones_partidos(id_participacion),
   amonestacion ENUM(
     'Tarjeta amarilla', 'Tarjeta roja',
