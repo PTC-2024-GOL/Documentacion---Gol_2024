@@ -330,17 +330,39 @@ CREATE PROCEDURE insertar_administrador_validado(
 )
 BEGIN
     DECLARE p_alias_administrador VARCHAR(25);
+    DECLARE email_count INT;
+    DECLARE dui_count INT;
+
+    -- Validar formato de correo
     IF p_correo_administrador REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
+        
+        -- Verificar si el correo ya existe
+        SELECT COUNT(*) INTO email_count
+        FROM administradores
+        WHERE correo_administrador = p_correo_administrador;
+        
+        -- Verificar si el DUI ya existe
+        SELECT COUNT(*) INTO dui_count
+        FROM administradores
+        WHERE dui_administrador = p_dui_administrador;
+
+        -- Si existe un duplicado de correo o DUI, generar un error
+        IF email_count > 0 THEN
+            SIGNAL SQLSTATE '45001' SET MESSAGE_TEXT = 'Correo electrónico ya existe';
+        ELSEIF dui_count > 0 THEN
+            SIGNAL SQLSTATE '45002' SET MESSAGE_TEXT = 'DUI ya existe';
+        ELSE
             -- Generar el alias utilizando la función
             SET p_alias_administrador = generar_alias_administrador(p_nombre_administrador, p_apellido_administrador, NOW());
             INSERT INTO administradores (nombre_administrador, apellido_administrador, clave_administrador, correo_administrador, telefono_administrador, dui_administrador, fecha_nacimiento_administrador, alias_administrador, foto_administrador)
             VALUES(p_nombre_administrador, p_apellido_administrador, p_clave_administrador, p_correo_administrador, p_telefono_administrador, p_dui_administrador, p_fecha_nacimiento_administrador, p_alias_administrador, p_foto_administrador);
+        END IF;
     ELSE
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Formato de correo electrónico no válido';
     END IF;
 END;
 $$
-
+DELIMITER ;
 
 DROP PROCEDURE IF EXISTS actualizar_administrador_validado;
 DELIMITER $$
@@ -355,20 +377,47 @@ CREATE PROCEDURE actualizar_administrador_validado(
    IN p_foto_administrador VARCHAR(50)
 )
 BEGIN
+    DECLARE email_count INT;
+    DECLARE dui_count INT;
+
+    -- Validar formato de correo
     IF p_correo_administrador REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
-            UPDATE administradores SET nombre_administrador = p_nombre_administrador, 
-            apellido_administrador = p_apellido_administrador, 
-            correo_administrador = p_correo_administrador,
-            telefono_administrador = p_telefono_administrador, 
-            dui_administrador = p_dui_administrador, 
-            fecha_nacimiento_administrador = p_fecha_nacimiento_administrador,
-            foto_administrador = p_foto_administrador
+        
+        -- Verificar si el correo ya existe para otro administrador
+        SELECT COUNT(*) INTO email_count
+        FROM administradores
+        WHERE correo_administrador = p_correo_administrador
+        AND id_administrador <> p_id_administrador;
+        
+        -- Verificar si el DUI ya existe para otro administrador
+        SELECT COUNT(*) INTO dui_count
+        FROM administradores
+        WHERE dui_administrador = p_dui_administrador
+        AND id_administrador <> p_id_administrador;
+
+        -- Si existe un duplicado de correo o DUI, generar un error
+        IF email_count > 0 THEN
+            SIGNAL SQLSTATE '45001' SET MESSAGE_TEXT = 'Correo electrónico ya existe';
+        ELSEIF dui_count > 0 THEN
+            SIGNAL SQLSTATE '45002' SET MESSAGE_TEXT = 'DUI ya existe';
+        ELSE
+            -- Actualizar el registro del administrador
+            UPDATE administradores SET 
+                nombre_administrador = p_nombre_administrador, 
+                apellido_administrador = p_apellido_administrador, 
+                correo_administrador = p_correo_administrador,
+                telefono_administrador = p_telefono_administrador, 
+                dui_administrador = p_dui_administrador, 
+                fecha_nacimiento_administrador = p_fecha_nacimiento_administrador,
+                foto_administrador = p_foto_administrador
             WHERE id_administrador = p_id_administrador;
+        END IF;
     ELSE
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Formato de correo electrónico no válido';
     END IF;
 END;
 $$
+DELIMITER ;
 
 DROP PROCEDURE IF EXISTS eliminar_administrador;
 DELIMITER $$
