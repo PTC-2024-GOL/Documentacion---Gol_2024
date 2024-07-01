@@ -454,7 +454,7 @@ DROP PROCEDURE IF EXISTS insertar_caracteristica_jugador;
 DELIMITER $$
 CREATE PROCEDURE insertar_caracteristica_jugador(
     IN p_nombre_caracteristica VARCHAR(50),
-    IN p_clasificacion ENUM('Técnicos', 'Tácticos', 'Condicionales', 'Psicologicos', 'Personales')
+    IN p_clasificacion ENUM('Técnicos', 'Tácticos', 'Psicológicos', 'Físicos') 
 )
 BEGIN
     INSERT INTO caracteristicas_jugadores (nombre_caracteristica_jugador, clasificacion_caracteristica_jugador)
@@ -468,7 +468,7 @@ DELIMITER $$
 CREATE PROCEDURE actualizar_caracteristica_jugador(
     IN p_id_caracteristica INT,
     IN p_nuevo_nombre VARCHAR(50),
-    IN p_nueva_clasificacion ENUM('Técnicos', 'Tácticos', 'Condicionales', 'Psicologicos', 'Personales')
+    IN p_nueva_clasificacion ENUM('Técnicos', 'Tácticos', 'Psicológicos', 'Físicos') 
 )
 BEGIN
     UPDATE caracteristicas_jugadores
