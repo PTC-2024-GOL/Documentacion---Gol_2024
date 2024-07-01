@@ -2357,6 +2357,180 @@ BEGIN
 END$$
 DELIMITER ;
 
+-- ----------------------------------------------------ASISTENCIAS PROCEDIMIENTOS Y VISTAS--------------------------------------------------------------------------
+
+-- -Vista para saber si un regisro de id entrenamiento tiene asistencias o no, tambien entrega datos generales que la asistencia necesitará, como el id_horario
+CREATE VIEW vista_asistencias_entrenamiento AS
+SELECT 
+    e.id_entrenamiento,
+    e.id_horario,
+    CASE 
+        WHEN COUNT(de.id_detalle) > 0 THEN 1 
+        ELSE 0 
+    END AS asistencia
+FROM 
+    entrenamientos e
+LEFT JOIN 
+    detalle_entrenamiento de ON e.id_entrenamiento = de.id_entrenamiento
+GROUP BY 
+    e.id_entrenamiento;
+
+SELECT id_entrenamiento, id_horario, asistencia FROM vista_asistencias_entrenamiento WHERE id_entrenamiento = 8;
+
+-- -Procedimiento para agregar o actualizar una asistencia
+DELIMITER $$
+
+CREATE PROCEDURE Asistencia(
+    IN p_id_entrenamiento INT,
+    IN p_id_jugador INT,
+    IN p_id_horario INT,
+    IN p_asistencia ENUM('Asistencia', 'Ausencia injustificada', 'Enfermedad', 'Estudio', 'Trabajo', 'Viaje', 'Permiso', 'Falta', 'Lesion', 'Otro'),
+    IN p_observacion VARCHAR(2000),
+    IN p_id_asistencia INT,
+    IN p_asistencia_bool BOOL
+)
+BEGIN
+    DECLARE v_id INT; 	
+    DECLARE done INT DEFAULT 0;
+    DECLARE v_id_asistencia INT;
+    DECLARE v_exists INT;
+    DECLARE v_exists2 INT;
+
+    -- Cursor para recorrer los registros
+    DECLARE cur CURSOR FOR
+        SELECT id_detalle FROM detalle_entrenamiento
+        WHERE id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento;
+
+    -- Handler para salir del cursor
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+    IF (p_asistencia_bool = 1) THEN
+        -- Actualizar el registro
+        UPDATE asistencias
+        SET 
+            id_horario = p_id_horario,
+            id_jugador = p_id_jugador,
+            asistencia = p_asistencia,
+            observacion_asistencia = p_observacion
+        WHERE id_asistencia = p_id_asistencia;
+    ELSE
+        -- Insertar un nuevo registro
+        INSERT INTO asistencias (id_jugador, id_horario, asistencia, observacion_asistencia)
+        VALUES (p_id_jugador, p_id_horario, p_asistencia, p_observacion);
+        
+        SET v_id_asistencia = LAST_INSERT_ID();
+        
+        -- Verificar si ya existe el registro en detalle_entrenamiento
+        SELECT COUNT(*) INTO v_exists
+        FROM detalle_entrenamiento
+        WHERE id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento;
+
+        -- Si no existe, insertar nuevo registro
+        IF v_exists = 0 THEN
+            INSERT INTO detalle_entrenamiento (id_entrenamiento, id_asistencia, id_caracteristica_analisis, id_detalle_contenido, id_jugador)
+            VALUES (p_id_entrenamiento, v_id_asistencia, NULL, NULL, p_id_jugador);
+        ELSE
+            -- Aquí se verifica si en los registros con el mismo id entrenamiento y id jugador, algún registro tiene un dato NO NULLO en id_asistencia
+            SELECT COUNT(*) INTO v_exists2
+            FROM detalle_entrenamiento
+            WHERE id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento AND id_asistencia IS NOT NULL;
+
+            -- En caso de que no exista (v_exists2 = 0), pasará a un if, en caso contrario (v_exists2 > 0), pasará a un else
+            IF v_exists2 >= 1 THEN
+                -- Abrir el cursor
+                OPEN cur;
+
+                -- Bucle para recorrer los registros
+                read_loop: LOOP
+                    FETCH cur INTO v_id;
+                    IF done THEN
+                        LEAVE read_loop;
+                    END IF;
+
+                    -- Verificar si id_asistencia es NULL
+                    IF (SELECT id_asistencia FROM detalle_entrenamiento WHERE id_detalle = v_id AND id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento) IS NULL THEN
+                        -- Actualizar el registro
+                        UPDATE detalle_entrenamiento
+                        SET id_asistencia = v_id_asistencia
+                        WHERE id_detalle = v_id;
+                        LEAVE read_loop;
+                    ELSE
+                        INSERT INTO detalle_entrenamiento (id_entrenamiento, id_asistencia, id_caracteristica_analisis, id_detalle_contenido, id_jugador)
+                        VALUES (p_id_entrenamiento, v_id_asistencia, NULL, NULL, p_id_jugador);
+                    END IF;
+                END LOOP;
+
+                -- Cerrar el cursor
+                CLOSE cur;
+            ELSE
+                -- Si existe un id_asistencia no nulo, insertar un nuevo registro
+                INSERT INTO detalle_entrenamiento (id_entrenamiento, id_asistencia, id_caracteristica_analisis, id_detalle_contenido, id_jugador)
+                VALUES (p_id_entrenamiento, v_id_asistencia, NULL, NULL, p_id_jugador);
+            END IF;
+        END IF;
+    END IF;
+END$$
+
+DELIMITER ;
 
 
+-- ---Vista para ver las asistecias y los jugadores
+-- -Vista cuando se sabe que existen registros en asistencias
+CREATE VIEW vista_asistencias AS
+SELECT 
+    j.nombre_jugador AS jugador,
+    j.id_jugador AS id,
+    e.id_entrenamiento,
+    a.asistencia AS asistencia,
+    a.observacion_asistencia AS observacion,
+    de.id_asistencia AS id_asistencia
+FROM 
+    entrenamientos e
+JOIN 
+    equipos eq ON e.id_equipo = eq.id_equipo
+JOIN 
+    plantillas_equipos pe ON eq.id_equipo = pe.id_equipo
+JOIN 
+    jugadores j ON pe.id_jugador = j.id_jugador
+JOIN 
+    detalle_entrenamiento de ON j.id_jugador = de.id_jugador AND e.id_entrenamiento = de.id_entrenamiento
+JOIN 
+    asistencias a ON de.id_asistencia = a.id_asistencia
+WHERE 
+    pe.id_equipo = e.id_equipo;
 
+-- Vista cuando se sabe que no hay registros
+CREATE VIEW vista_asistencias_default AS
+SELECT 
+    j.nombre_jugador AS jugador,
+    j.id_jugador AS id,
+    e.id_entrenamiento,
+    'Asistencia' AS asistencia,
+    NULL AS observacion,
+    0 AS id_asistencia
+FROM 
+    entrenamientos e
+JOIN 
+    equipos eq ON e.id_equipo = eq.id_equipo
+JOIN 
+    plantillas_equipos pe ON eq.id_equipo = pe.id_equipo
+JOIN 
+    jugadores j ON pe.id_jugador = j.id_jugador
+WHERE 
+    pe.id_equipo = e.id_equipo
+GROUP BY 
+    j.id_jugador, e.id_entrenamiento;
+
+
+SELECT * FROM vista_asistencias_default WHERE id_entrenamiento = 3;
+SELECT * FROM vista_asistencias WHERE id_entrenamiento = 1;
+SELECT * FROM vista_horarios_equipos WHERE id_equipo = 1;
+SELECT * FROM vista_asistencias_entrenamiento WHERE id_entrenamiento = 8;
+SELECT * FROM plantillas_equipos;
+SELECT * FROM entrenamientos;
+SELECT * FROM horarios;
+SELECT * FROM detalle_entrenamiento;
+SELECT * FROM jugadores;
+SELECT * FROM equipos;
+SELECT * FROM asistencias;
+DELETE FROM plantillas_equipos WHERE id_plantilla_equipo = 11;
