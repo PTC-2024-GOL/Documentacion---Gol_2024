@@ -2212,7 +2212,10 @@ FROM vista_caracteristicas_analisis
 WHERE IDE = 1
 GROUP BY JUGADOR;
 
+
+DROP procedure IF exists insertarCaracteristicasYDetalles;
 DELIMITER $$
+
 CREATE PROCEDURE insertarCaracteristicasYDetalles(
     IN p_id_jugador INT UNSIGNED,
     IN p_id_entrenamiento INT UNSIGNED,
@@ -2240,11 +2243,23 @@ BEGIN
         SET @id_caracteristica_jugador = JSON_UNQUOTE(JSON_EXTRACT(@caracteristicas, CONCAT('$[', @i, '].id_caracteristica_jugador')));
         SET @nota_caracteristica_analisis = JSON_UNQUOTE(JSON_EXTRACT(@caracteristicas, CONCAT('$[', @i, '].nota_caracteristica_analisis')));
 
-        -- Insertar en caracteristicas_analisis
-        INSERT INTO caracteristicas_analisis (nota_caracteristica_analisis, id_jugador, id_caracteristica_jugador)
-        VALUES (@nota_caracteristica_analisis, p_id_jugador, @id_caracteristica_jugador);
+        -- Verificar si ya existe una fila en caracteristicas_analisis para el par (id_jugador, id_caracteristica_jugador)
+        SELECT id_caracteristica_analisis INTO v_id_caracteristica_analisis
+        FROM caracteristicas_analisis
+        WHERE id_jugador = p_id_jugador AND id_caracteristica_jugador = @id_caracteristica_jugador;
 
-        SET v_id_caracteristica_analisis = LAST_INSERT_ID();
+        IF v_id_caracteristica_analisis IS NOT NULL THEN
+            -- Actualizar la fila existente
+            UPDATE caracteristicas_analisis
+            SET nota_caracteristica_analisis = @nota_caracteristica_analisis
+            WHERE id_caracteristica_analisis = v_id_caracteristica_analisis;
+        ELSE
+            -- Insertar una nueva fila
+            INSERT INTO caracteristicas_analisis (nota_caracteristica_analisis, id_jugador, id_caracteristica_jugador)
+            VALUES (@nota_caracteristica_analisis, p_id_jugador, @id_caracteristica_jugador);
+
+            SET v_id_caracteristica_analisis = LAST_INSERT_ID();
+        END IF;
 
         -- Verificar si ya existe el registro en detalle_entrenamiento
         SELECT COUNT(*) INTO v_exists
