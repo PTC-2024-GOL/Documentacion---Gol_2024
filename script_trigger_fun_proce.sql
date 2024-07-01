@@ -1947,7 +1947,6 @@ JOIN
 JOIN
     jornadas j ON p.id_jornada = j.id_jornada;
 
-SELECT * FROM vista_partidos_equipos WHERE id_partido = 2;
 
 -- ----------------------------------------------- PARTICIPACIONES  --------------------------------------------------------------------------
 -- DROP VIEW vista_jugadores_por_equipo;
@@ -2288,20 +2287,6 @@ LEFT JOIN
 GROUP BY 
     e.id_entrenamiento;
 
-/*
-CREATE TABLE asistencias(
-  id_asistencia BIGINT AUTO_INCREMENT PRIMARY KEY, 
-  id_jugador INT NOT NULL, 
-  CONSTRAINT fk_jugador_asistencia FOREIGN KEY (id_jugador) REFERENCES plantillas_equipos(id_plantilla_equipo), 
-  id_horario INT NOT NULL, 
-  CONSTRAINT fk_horario_asistencia FOREIGN KEY (id_horario) REFERENCES horarios(id_horario), 
-  fecha_asistencia DATE NULL DEFAULT NOW(),
-  asistencia ENUM('Asistencia', 'Ausencia injustificada', 'Enfermedad', 'Estudio', 'Trabajo', 'Viaje', 'Permiso', 'Falta', 'Lesion', 'Otro') NOT NULL, 
-  observacion_asistencia VARCHAR(2000) NULL,
-  id_entrenamiento BIGINT NOT NULL, 
-  CONSTRAINT fk_asistencias_del_entrenamiento FOREIGN KEY (id_entrenamiento) REFERENCES entrenamientos(id_entrenamiento)
-);
-*/
 -- -Procedimiento para agregar o actualizar una asistencia
 DELIMITER $$
 
