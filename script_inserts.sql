@@ -146,19 +146,6 @@ INSERT INTO plantillas_equipos (id_plantilla, id_jugador, id_temporada, id_equip
 
 SELECT * FROM plantillas;
 
--- 12. caracteristicas_jugadores
-INSERT INTO caracteristicas_jugadores (nombre_caracteristica_jugador, clasificacion_caracteristica_jugador) VALUES
-('Control del Balón', 'Técnicos'),
-('Visión de Juego', 'Tácticos'),
-('Resistencia Física', 'Condicionales'),
-('Motivación', 'Psicologicos'),
-('Liderazgo', 'Personales'),
-('Regate', 'Técnicos'),
-('Posicionamiento', 'Tácticos'),
-('Fuerza', 'Condicionales'),
-('Manejo del Estrés', 'Psicologicos'),
-('Trabajo en Equipo', 'Personales');
-
 -- 12 caracteristicas
 INSERT INTO caracteristicas_analisis (nota_caracteristica_analisis, id_jugador, id_caracteristica_jugador) VALUES
 (9.5, 1, 1),
