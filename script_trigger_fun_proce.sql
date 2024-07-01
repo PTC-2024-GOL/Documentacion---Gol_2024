@@ -2350,7 +2350,7 @@ SELECT
     e.id_entrenamiento,
     a.asistencia AS asistencia,
     a.observacion_asistencia AS observacion,
-    e.id_asistencia AS id_asistencia
+    a.id_asistencia AS id_asistencia
 FROM 
     entrenamientos e
 JOIN 
