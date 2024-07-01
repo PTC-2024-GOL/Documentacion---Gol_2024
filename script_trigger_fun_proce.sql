@@ -2314,8 +2314,100 @@ BEGIN
 END;
 $$
 
-DELIMITER ;
+DROP PROCEDURE IF EXISTS insertarCaracteristicasYDetallesRemodelado;
+DELIMITER $$
 
+CREATE PROCEDURE insertarCaracteristicasYDetallesRemodelado(
+    IN p_id_jugador INT UNSIGNED,
+    IN p_id_entrenamiento INT UNSIGNED,
+    IN p_id_caracteristica_jugador INT UNSIGNED,
+    IN p_nota_caracteristica_analisis DECIMAL(5,2)
+)
+BEGIN
+    DECLARE v_id_caracteristica_analisis INT;
+    DECLARE v_exists INT;
+    DECLARE v_exists2 INT;
+    DECLARE v_id INT;
+    DECLARE done INT DEFAULT 0;
+
+    -- Cursor para recorrer los registros
+    DECLARE cur CURSOR FOR
+        SELECT id_detalle FROM detalle_entrenamiento
+        WHERE id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento;
+
+    -- Handler para salir del cursor
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+    -- Verificar si ya existe una fila en detalle_entrenamiento para el par (id_jugador, id_caracteristica_jugador, id_entrenamiento)
+    SELECT id_caracteristica_analisis INTO v_id_caracteristica_analisis
+    FROM detalle_entrenamiento
+    WHERE id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento AND id_caracteristica_analisis = (
+        SELECT id_caracteristica_analisis 
+        FROM caracteristicas_analisis 
+        WHERE id_jugador = p_id_jugador AND id_caracteristica_jugador = p_id_caracteristica_jugador
+    );
+
+    IF v_id_caracteristica_analisis IS NOT NULL THEN
+        -- Actualizar la fila existente en caracteristicas_analisis
+        UPDATE caracteristicas_analisis
+        SET nota_caracteristica_analisis = p_nota_caracteristica_analisis
+        WHERE id_caracteristica_analisis = v_id_caracteristica_analisis;
+    ELSE
+        -- Insertar una nueva fila en caracteristicas_analisis
+        INSERT INTO caracteristicas_analisis (nota_caracteristica_analisis, id_jugador, id_caracteristica_jugador)
+        VALUES (p_nota_caracteristica_analisis, p_id_jugador, p_id_caracteristica_jugador);
+
+        SET v_id_caracteristica_analisis = LAST_INSERT_ID();
+    END IF;
+
+    -- Verificar si ya existe el registro en detalle_entrenamiento con el mismo id_entrenamiento y id_jugador
+    SELECT COUNT(*) INTO v_exists
+    FROM detalle_entrenamiento
+    WHERE id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento;
+
+    -- Si no existe, insertar nuevo registro
+    IF v_exists = 0 THEN
+        INSERT INTO detalle_entrenamiento (id_entrenamiento, id_asistencia, id_caracteristica_analisis, id_detalle_contenido, id_jugador)
+        VALUES (p_id_entrenamiento, NULL, v_id_caracteristica_analisis, NULL, p_id_jugador);
+    ELSE
+        -- Verificar si en los registros con el mismo id_entrenamiento y id_jugador, algún registro tiene un dato NO NULLO en id_caracteristica_analisis
+        SELECT COUNT(*) INTO v_exists2
+        FROM detalle_entrenamiento
+        WHERE id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento AND id_caracteristica_analisis IS NOT NULL;
+
+        IF v_exists2 = 0 THEN
+            -- Insertar un nuevo registro si no existe un id_caracteristica_analisis no nulo
+            INSERT INTO detalle_entrenamiento (id_entrenamiento, id_asistencia, id_caracteristica_analisis, id_detalle_contenido, id_jugador)
+            VALUES (p_id_entrenamiento, NULL, v_id_caracteristica_analisis, NULL, p_id_jugador);
+        ELSE
+            -- Abrir el cursor para recorrer los registros
+            OPEN cur;
+
+            -- Bucle para recorrer los registros
+            read_loop: LOOP
+                FETCH cur INTO v_id;
+                IF done THEN
+                    LEAVE read_loop;
+                END IF;
+
+                -- Verificar si id_caracteristica_analisis es NULL
+                IF (SELECT id_caracteristica_analisis FROM detalle_entrenamiento WHERE id_detalle = v_id) IS NULL THEN
+                    -- Actualizar el registro
+                    UPDATE detalle_entrenamiento
+                    SET id_asistencia = NULL,
+                        id_caracteristica_analisis = v_id_caracteristica_analisis,
+                        id_detalle_contenido = NULL
+                    WHERE id_detalle = v_id;
+                    LEAVE read_loop;
+                END IF;
+            END LOOP;
+
+            -- Cerrar el cursor
+            CLOSE cur;
+        END IF;
+    END IF;
+END;
+$$
 
 -- --------------------------------PROCEDIMIENTOS PARA EL DASHBOARD ----------------------------------------------------------------------------
 
