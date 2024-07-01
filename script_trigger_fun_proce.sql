@@ -1761,74 +1761,14 @@ CREATE PROCEDURE insertarDetalleContenido(
 )
 BEGIN
     DECLARE v_id_detalle_contenido INT;
-    DECLARE v_exists INT;
-    DECLARE v_exists2 INT;
-    DECLARE v_id INT;
-    DECLARE done INT DEFAULT 0;
-
-    -- Cursor para recorrer los registros
-    DECLARE cur CURSOR FOR
-        SELECT id_detalle FROM detalle_entrenamiento
-        WHERE id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento;
-
-    -- Handler para salir del cursor
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
-
     -- Insertar en detalles_contenidos
     INSERT INTO detalles_contenidos (id_tarea, id_sub_tema_contenido, minutos_contenido, minutos_tarea)
     VALUES (p_tarea_id, p_subContenido_id, p_subContenido_minutos, p_tarea_minutos);
     
     SET v_id_detalle_contenido = LAST_INSERT_ID();
 
-    -- Verificar si ya existe el registro en detalle_entrenamiento
-    SELECT COUNT(*) INTO v_exists
-    FROM detalle_entrenamiento
-    WHERE id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento;
-
-    -- Si no existe, insertar nuevo registro
-    IF v_exists = 0 THEN
-        INSERT INTO detalle_entrenamiento (id_entrenamiento, id_asistencia, id_caracteristica_analisis, id_detalle_contenido, id_jugador)
-        VALUES (p_id_entrenamiento, NULL, NULL, v_id_detalle_contenido, p_id_jugador);
-    ELSE
-        -- Aquí se verifica si en los registros con el mismo id entrenamiento y id jugador, algún registro tiene un dato NO NULLO en id_detalle_contenido
-        SELECT COUNT(*) INTO v_exists2
-        FROM detalle_entrenamiento
-        WHERE id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento AND id_detalle_contenido IS NOT NULL;
-        
-        -- En caso de que no exista (v_exists2 = 0), pasará a un if, en caso contrario (v_exists2 > 0), pasará a un else
-        IF v_exists2 >= 1 THEN
-            -- Abrir el cursor
-            OPEN cur;
-
-            -- Bucle para recorrer los registros
-            read_loop: LOOP
-                FETCH cur INTO v_id;
-                IF done THEN
-                    LEAVE read_loop;
-                END IF;
-
-                -- Verificar si id_detalle_contenido es NULL
-                IF (SELECT id_detalle_contenido FROM detalle_entrenamiento WHERE id_detalle = v_id AND id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento) IS NULL THEN
-                    -- Actualizar el registro
-                    UPDATE detalle_entrenamiento
-                    SET id_detalle_contenido = v_id_detalle_contenido
-                    WHERE id_detalle = v_id;
-                    LEAVE read_loop;
-                
-                ELSE
-                	 INSERT INTO detalle_entrenamiento (id_entrenamiento, id_asistencia, id_caracteristica_analisis, id_detalle_contenido, id_jugador)
-            		 VALUES (p_id_entrenamiento, NULL, NULL, v_id_detalle_contenido, p_id_jugador);
-            END IF;
-            END LOOP;
-
-            -- Cerrar el cursor
-            CLOSE cur;
-        ELSE
-            -- Si existe un id_detalle_contenido no nulo, insertar un nuevo registro
-            INSERT INTO detalle_entrenamiento (id_entrenamiento, id_asistencia, id_caracteristica_analisis, id_detalle_contenido, id_jugador)
-            VALUES (p_id_entrenamiento, NULL, NULL, v_id_detalle_contenido, p_id_jugador);
-        END IF;
-    END IF;
+    INSERT INTO detalle_entrenamiento (id_entrenamiento, id_detalle_contenido, id_jugador)
+    VALUES (p_id_entrenamiento, v_id_detalle_contenido, p_id_jugador);
 END;
 $$
 
