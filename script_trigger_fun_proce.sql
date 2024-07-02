@@ -822,21 +822,53 @@ BEGIN
 END //
 
 -- Tabla tipos_lesiones
-
+DROP PROCEDURE IF EXISTS insertar_tipo_lesion;
 DELIMITER //
 
 CREATE PROCEDURE insertar_tipo_lesion(IN p_tipo_lesion VARCHAR(50))
 BEGIN
-    INSERT INTO tipos_lesiones (tipo_lesion)
-    VALUES (p_tipo_lesion);
+    DECLARE lesion_count INT;
+
+    -- Verificar si el tipo de lesión ya existe
+    SELECT COUNT(*) INTO lesion_count
+    FROM tipos_lesiones
+    WHERE tipo_lesion = p_tipo_lesion;
+
+    -- Si existe un duplicado de tipo de lesión, generar un error
+    IF lesion_count > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El tipo de lesión ya existe';
+    ELSE
+        INSERT INTO tipos_lesiones (tipo_lesion)
+        VALUES (p_tipo_lesion);
+    END IF;
 END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS actualizar_tipo_lesion;
+DELIMITER //
 
 CREATE PROCEDURE actualizar_tipo_lesion(IN p_id_tipo_lesion INT, IN p_tipo_lesion VARCHAR(50))
 BEGIN
-    UPDATE tipos_lesiones
-    SET tipo_lesion = p_tipo_lesion
-    WHERE id_tipo_lesion = p_id_tipo_lesion;
+    DECLARE lesion_count INT;
+
+    -- Verificar si el tipo de lesión ya existe para otro registro
+    SELECT COUNT(*) INTO lesion_count
+    FROM tipos_lesiones
+    WHERE tipo_lesion = p_tipo_lesion
+    AND id_tipo_lesion != p_id_tipo_lesion;
+
+    -- Si existe un duplicado de tipo de lesión, generar un error
+    IF lesion_count > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El tipo de lesión ya existe';
+    ELSE
+        UPDATE tipos_lesiones
+        SET tipo_lesion = p_tipo_lesion
+        WHERE id_tipo_lesion = p_id_tipo_lesion;
+    END IF;
 END //
+DELIMITER ;
+
+DELIMITER //
 
 CREATE PROCEDURE eliminar_tipo_lesion(IN p_id_tipo_lesion INT)
 BEGIN
