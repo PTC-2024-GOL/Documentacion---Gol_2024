@@ -432,6 +432,7 @@ $$
 
 DROP PROCEDURE IF EXISTS insertar_tecnico_validado;
 DELIMITER $$
+
 CREATE PROCEDURE insertar_tecnico_validado(
    IN p_nombre_tecnico VARCHAR(50),
    IN p_apellido_tecnico VARCHAR(50),
@@ -444,11 +445,33 @@ CREATE PROCEDURE insertar_tecnico_validado(
 )
 BEGIN
     DECLARE p_alias_tecnico VARCHAR(25);
+    DECLARE email_count INT;
+    DECLARE dui_count INT;
+
+    -- Validar formato de correo
     IF p_correo_tecnico REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
-        -- Generar el alias utilizando la función, suponiendo que la función generar_alias_tecnico existe
-        SET p_alias_tecnico = generar_alias_tecnico(p_nombre_tecnico, p_apellido_tecnico, NOW());
-        INSERT INTO tecnicos (nombre_tecnico, apellido_tecnico, clave_tecnico, correo_tecnico, telefono_tecnico, dui_tecnico, fecha_nacimiento_tecnico, alias_tecnico, foto_tecnico)
-        VALUES(p_nombre_tecnico, p_apellido_tecnico, p_clave_tecnico, p_correo_tecnico, p_telefono_tecnico, p_dui_tecnico, p_fecha_nacimiento_tecnico, p_alias_tecnico, p_foto_tecnico);
+        
+        -- Verificar si el correo ya existe
+        SELECT COUNT(*) INTO email_count
+        FROM tecnicos
+        WHERE correo_tecnico = p_correo_tecnico;
+        
+        -- Verificar si el DUI ya existe
+        SELECT COUNT(*) INTO dui_count
+        FROM tecnicos
+        WHERE dui_tecnico = p_dui_tecnico;
+
+        -- Si existe un duplicado de correo o DUI, generar un error
+        IF email_count > 0 THEN
+            SIGNAL SQLSTATE '45001' SET MESSAGE_TEXT = 'Correo electrónico ya existe';
+        ELSEIF dui_count > 0 THEN
+            SIGNAL SQLSTATE '45002' SET MESSAGE_TEXT = 'DUI ya existe';
+        ELSE
+            -- Generar el alias utilizando la función
+            SET p_alias_tecnico = generar_alias_tecnico(p_nombre_tecnico, p_apellido_tecnico, NOW());
+            INSERT INTO tecnicos (nombre_tecnico, apellido_tecnico, clave_tecnico, correo_tecnico, telefono_tecnico, dui_tecnico, fecha_nacimiento_tecnico, alias_tecnico, foto_tecnico)
+            VALUES(p_nombre_tecnico, p_apellido_tecnico, p_clave_tecnico, p_correo_tecnico, p_telefono_tecnico, p_dui_tecnico, p_fecha_nacimiento_tecnico, p_alias_tecnico, p_foto_tecnico);
+        END IF;
     ELSE
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Formato de correo electrónico no válido';
     END IF;
@@ -456,8 +479,10 @@ END;
 $$
 DELIMITER ;
 
+
 DROP PROCEDURE IF EXISTS actualizar_tecnico_validado;
 DELIMITER $$
+
 CREATE PROCEDURE actualizar_tecnico_validado(
    IN p_id_tecnico INT,
    IN p_nombre_tecnico VARCHAR(50),
@@ -469,22 +494,48 @@ CREATE PROCEDURE actualizar_tecnico_validado(
    IN p_foto_tecnico VARCHAR(50)
 )
 BEGIN
+    DECLARE email_count INT;
+    DECLARE dui_count INT;
+
+    -- Validar formato de correo
     IF p_correo_tecnico REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
-        UPDATE tecnicos SET 
-            nombre_tecnico = p_nombre_tecnico, 
-            apellido_tecnico = p_apellido_tecnico, 
-            correo_tecnico = p_correo_tecnico,
-            telefono_tecnico = p_telefono_tecnico, 
-            dui_tecnico = p_dui_tecnico, 
-            fecha_nacimiento_tecnico = p_fecha_nacimiento_tecnico,
-            foto_tecnico = p_foto_tecnico
-        WHERE id_tecnico = p_id_tecnico;
+        
+        -- Verificar si el correo ya existe para otro técnico
+        SELECT COUNT(*) INTO email_count
+        FROM tecnicos
+        WHERE correo_tecnico = p_correo_tecnico
+        AND id_tecnico <> p_id_tecnico;
+        
+        -- Verificar si el DUI ya existe para otro técnico
+        SELECT COUNT(*) INTO dui_count
+        FROM tecnicos
+        WHERE dui_tecnico = p_dui_tecnico
+        AND id_tecnico <> p_id_tecnico;
+
+        -- Si existe un duplicado de correo o DUI, generar un error
+        IF email_count > 0 THEN
+            SIGNAL SQLSTATE '45001' SET MESSAGE_TEXT = 'Correo electrónico ya existe';
+        ELSEIF dui_count > 0 THEN
+            SIGNAL SQLSTATE '45002' SET MESSAGE_TEXT = 'DUI ya existe';
+        ELSE
+            -- Actualizar el registro del técnico
+            UPDATE tecnicos SET 
+                nombre_tecnico = p_nombre_tecnico, 
+                apellido_tecnico = p_apellido_tecnico, 
+                correo_tecnico = p_correo_tecnico,
+                telefono_tecnico = p_telefono_tecnico, 
+                dui_tecnico = p_dui_tecnico, 
+                fecha_nacimiento_tecnico = p_fecha_nacimiento_tecnico,
+                foto_tecnico = p_foto_tecnico
+            WHERE id_tecnico = p_id_tecnico;
+        END IF;
     ELSE
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Formato de correo electrónico no válido';
     END IF;
 END;
 $$
 DELIMITER ;
+
 
 DROP PROCEDURE IF EXISTS eliminar_tecnico;
 DELIMITER $$
