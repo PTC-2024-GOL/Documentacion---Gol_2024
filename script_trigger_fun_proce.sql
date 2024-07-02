@@ -2172,31 +2172,30 @@ FROM
 
 -- -----------------------------------VISTA PARA CARACTERISTICAS ANALISIS -------------------------------------------------------------------------
 DROP VIEW IF EXISTS vista_caracteristicas_analisis;
+
 CREATE VIEW vista_caracteristicas_analisis AS
 SELECT 
-    ca.id_caracteristica_analisis AS IDA,
-    CASE 
-        WHEN ca.id_caracteristica_analisis IS NULL THEN 0
-        ELSE ca.nota_caracteristica_analisis
-    END AS NOTA,
     j.id_jugador AS IDJ,
     CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS JUGADOR,
+    CASE 
+        WHEN ca.nota_caracteristica_analisis IS NULL THEN 0
+        ELSE ca.nota_caracteristica_analisis
+    END AS NOTA,
     cj.id_caracteristica_jugador AS IDC,
     cj.nombre_caracteristica_jugador AS CARACTERISTICA,
     cj.clasificacion_caracteristica_jugador AS TIPO,
-    ca.id_entrenamiento AS IDE
+    COALESCE(ca.id_entrenamiento, a.id_entrenamiento) AS IDE,
+    a.asistencia AS ASISTENCIA
 FROM 
     jugadores j
 LEFT JOIN 
-    caracteristicas_analisis ca ON j.id_jugador = ca.id_jugador
+    asistencias a ON j.id_jugador = a.id_jugador
 LEFT JOIN 
-    caracteristicas_jugadores cj ON ca.id_caracteristica_jugador = cj.id_caracteristica_jugador;
-
-SELECT JUGADOR, AVG(NOTA) AS PROMEDIO
-FROM vista_caracteristicas_analisis
-WHERE IDE = 1
-GROUP BY JUGADOR;
-
+    caracteristicas_analisis ca ON j.id_jugador = ca.id_jugador AND a.id_entrenamiento = ca.id_entrenamiento
+LEFT JOIN 
+    caracteristicas_jugadores cj ON ca.id_caracteristica_jugador = cj.id_caracteristica_jugador
+WHERE
+    a.asistencia = 'Asistencia';
 
 DROP PROCEDURE IF EXISTS insertarCaracteristicasYDetallesRemodelado;
 DELIMITER $$
