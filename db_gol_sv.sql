@@ -1,4 +1,4 @@
-DROP DATABASE if EXISTS db_gol_sv;
+-- DROP DATABASE if EXISTS db_gol_sv;
 CREATE DATABASE db_gol_sv;
 USE db_gol_sv;
 
@@ -69,7 +69,7 @@ CREATE TABLE categorias(
   CONSTRAINT uq_nombre_categoria_unico UNIQUE(nombre_categoria), 
   edad_minima_permitida INT NOT NULL, 
   edad_maxima_permitida INT NOT NULL, 
-  CONSTRAINT chk_validacion_de_edades CHECK(edad_minima_permitida < edad_maxima_permitida), 
+  CONSTRAINT chk_validacion_de_edades CHECK(edad_minima_permitida <= edad_maxima_permitida),
   id_temporada INT NOT NULL, 
   CONSTRAINT fk_temporada_de_la_categoria FOREIGN KEY (id_temporada) REFERENCES temporadas(id_temporada)
 );
@@ -243,6 +243,9 @@ CREATE TABLE asistencias(
   id_entrenamiento BIGINT NOT NULL, 
   CONSTRAINT fk_asistencias_del_entrenamiento FOREIGN KEY (id_entrenamiento) REFERENCES entrenamientos(id_entrenamiento)
 );
+
+ALTER TABLE asistencias DROP CONSTRAINT fk_jugador_asistencia;
+ALTER TABLE asistencias ADD CONSTRAINT fk_jugador_asistencia FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador);
 
 CREATE TABLE temas_contenidos(
   id_tema_contenido INT AUTO_INCREMENT PRIMARY KEY,
