@@ -1240,7 +1240,10 @@ END //
 DELIMITER ;
 
 -- Procedimientos para la tabla plantillas_equipos
+
+DROP PROCEDURE IF EXISTS sp_insertar_plantilla_equipo;
 DELIMITER //
+
 CREATE PROCEDURE sp_insertar_plantilla_equipo (
     IN p_id_plantilla INT, 
     IN p_id_jugador INT, 
@@ -1248,12 +1251,29 @@ CREATE PROCEDURE sp_insertar_plantilla_equipo (
     IN p_id_equipo INT
 )
 BEGIN
-    INSERT INTO plantillas_equipos(id_plantilla, id_jugador, id_temporada, id_equipo)
-    VALUES (p_id_plantilla, p_id_jugador, p_id_temporada, p_id_equipo);
+    DECLARE record_count INT;
+
+    -- Verificar si el registro ya existe
+    SELECT COUNT(*) INTO record_count
+    FROM plantillas_equipos
+    WHERE id_plantilla = p_id_plantilla 
+      AND id_jugador = p_id_jugador 
+      AND id_temporada = p_id_temporada 
+      AND id_equipo = p_id_equipo;
+
+    -- Si existe un duplicado, generar un error
+    IF record_count > 0 THEN
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'El registro ya existe';
+    ELSE
+        INSERT INTO plantillas_equipos (id_plantilla, id_jugador, id_temporada, id_equipo)
+        VALUES (p_id_plantilla, p_id_jugador, p_id_temporada, p_id_equipo);
+    END IF;
 END //
+DELIMITER ;
 
 DROP PROCEDURE IF EXISTS sp_actualizar_plantilla_equipo;
 DELIMITER //
+
 CREATE PROCEDURE sp_actualizar_plantilla_equipo (
     IN p_id_plantilla_equipo INT, 
     IN p_id_plantilla INT, 
@@ -1262,10 +1282,30 @@ CREATE PROCEDURE sp_actualizar_plantilla_equipo (
     IN p_id_equipo INT
 )
 BEGIN
-    UPDATE plantillas_equipos 
-    SET id_plantilla = p_id_plantilla, id_jugador = p_id_jugador, id_temporada = p_id_temporada, id_equipo = p_id_equipo
-    WHERE id_plantilla_equipo = p_id_plantilla_equipo;
+    DECLARE record_count INT;
+
+    -- Verificar si el registro ya existe para otro plantilla equipo
+    SELECT COUNT(*) INTO record_count
+    FROM plantillas_equipos
+    WHERE id_plantilla = p_id_plantilla 
+      AND id_jugador = p_id_jugador 
+      AND id_temporada = p_id_temporada 
+      AND id_equipo = p_id_equipo
+      AND id_plantilla_equipo <> p_id_plantilla_equipo;
+
+    -- Si existe un duplicado, generar un error
+    IF record_count > 0 THEN
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'El registro ya existe';
+    ELSE
+        UPDATE plantillas_equipos 
+        SET id_plantilla = p_id_plantilla, 
+            id_jugador = p_id_jugador, 
+            id_temporada = p_id_temporada, 
+            id_equipo = p_id_equipo
+        WHERE id_plantilla_equipo = p_id_plantilla_equipo;
+    END IF;
 END //
+DELIMITER ;
 
 DROP PROCEDURE IF EXISTS sp_eliminar_plantilla_equipo;
 DELIMITER //
