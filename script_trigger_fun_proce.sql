@@ -2503,7 +2503,7 @@ BEGIN
     SELECT
         pj.id_jugador,
         pj.id_equipo,
-        cj.nombre_caracteristica_jugador AS caracteristica,
+        cj.clasificacion_caracteristica_jugador AS caracteristica,
         ROUND(AVG(C.nota_caracteristica_analisis), 2) AS promedio
     FROM plantillas_equipos pj
         INNER JOIN caracteristicas_analisis c ON pj.id_plantilla_equipo = c.id_jugador
