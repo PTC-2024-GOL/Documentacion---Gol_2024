@@ -265,6 +265,8 @@ CREATE TABLE tareas(
   nombre_tarea VARCHAR(60) NOT NULL
 );
 
+ALTER TABLE tareas MODIFY COLUMN nombre_tarea VARCHAR(60) NOT NULL UNIQUE;
+
 CREATE TABLE detalles_contenidos(
   id_detalle_contenido INT AUTO_INCREMENT PRIMARY KEY, 
   id_tarea INT NULL, 
