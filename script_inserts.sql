@@ -115,6 +115,16 @@ INSERT INTO jugadores (dorsal_jugador, nombre_jugador, apellido_jugador, estatus
 (6, 'Virgil', 'van Dijk', 'Baja temporal', '1991-07-08', 'Masculino', 'Diestro', 'Beca completa', 13, 14, 'Big', 'virgil6', 'default.jpg','2000-01-01');
 
 SELECT * FROM jugadores;
+
+-- 9. estado fisico jugador
+INSERT INTO estados_fisicos_jugadores (id_jugador, altura_jugador, peso_jugador, indice_masa_corporal) VALUES
+(1, 180, 165, 23.1),
+(2, 175, 172, 25.5),
+(3, 182, 176, 24.2),
+(4, 178, 170, 24.3),
+(5, 185, 187, 24.8);
+
+
 -- 10. caracteristicas_jugadores
 INSERT INTO caracteristicas_jugadores (nombre_caracteristica_jugador, clasificacion_caracteristica_jugador) VALUES
 ('PASE CORTO', 'Técnicos'),
@@ -146,6 +156,29 @@ INSERT INTO plantillas_equipos (id_plantilla, id_jugador, id_temporada, id_equip
 
 SELECT * FROM plantillas;
 
+-- 18. jornadas
+INSERT INTO jornadas(nombre_jornada, numero_jornada, id_plantilla , fecha_inicio_jornada, fecha_fin_jornada) VALUES
+('Jornada 1', 1, 1, '2024-01-01', '2024-01-31'),
+('Jornada 2', 2, 1, '2024-02-01', '2024-02-29'),
+('Jornada 3', 3, 1, '2024-03-01', '2024-03-31'),
+('Jornada 4', 4, 1, '2024-04-01', '2024-04-30'),
+('Jornada 5', 5, 1, '2024-05-01', '2024-05-31'),
+('Jornada 6', 6, 1, '2024-06-01', '2024-06-30'),
+('Jornada 7', 7, 1, '2024-07-01', '2024-07-31'),
+('Jornada 8', 8, 1, '2024-08-01', '2024-08-31'),
+('Jornada 9', 9, 1, '2024-09-01', '2024-09-30'),
+('Jornada 10', 10, 1, '2024-10-01', '2024-11-13');
+
+
+-- 19. entrenamientos
+INSERT INTO entrenamientos (fecha_entrenamiento, sesion, id_jornada, id_equipo, id_categoria, id_horario) VALUES
+(2023-05-12,'Sesion 1', 1, 1,1,1),
+(2023-05-12, 'Sesion 2', 1, 1,1,2),
+(2023-05-12, 'Sesion 3', 1, 1,1,3),
+(2023-05-12, 'Sesion 1', 1, 1,1,4);
+SELECT * FROM entrenamientos;
+
+
 -- 12 caracteristicas
 INSERT INTO caracteristicas_analisis (nota_caracteristica_analisis, id_jugador, id_caracteristica_jugador) VALUES
 (9.5, 1, 1),
@@ -158,23 +191,6 @@ INSERT INTO caracteristicas_analisis (nota_caracteristica_analisis, id_jugador, 
 (3.5, 8, 8),
 (7.9, 9, 9),
 (5.6, 10, 10);
-
-SELECT * FROM caracteristicas_jugadores;
-SELECT * FROM caracteristicas_analisis;
-SELECT * FROM plantillas_equipos;
-
--- 13. asistencias
-INSERT INTO asistencias (id_jugador, id_horario, asistencia, observacion_asistencia) VALUES
-(1, 1, 'Asistencia', 'Te quiero pepe'),
-(2, 2, 'Asistencia', 'Arboles de sandia con forma de enrredaderas moradas'),
-(3, 3, 'Enfermedad', 'El jugador está enfermo con fiebre alta'),
-(4, 2, 'Estudio', 'Preparándose para un examen importante'),
-(5, 3, 'Trabajo', 'Horario laboral coincide con el entrenamiento'),
-(6, 3, 'Viaje', 'Fuera de la ciudad por asuntos familiares'),
-(7, 4, 'Permiso', 'Autorización del entrenador para no asistir'),
-(8, 4, 'Falta', 'No se ha presentado ninguna razón para la ausencia'),
-(9, 5, 'Lesion', 'Lesión en la rodilla, se está recuperando'),
-(10, 5, 'Otro', 'Asunto personal, se comunicará con el entrenador luego');
 
 -- 14. temas_contenidos
 INSERT INTO temas_contenidos (nombre_tema_contenido) VALUES
@@ -217,72 +233,28 @@ INSERT INTO tareas(nombre_tarea) VALUES
 ('Evaluación física y seguimiento de progreso');
 
 -- 17. detalles_contenidos
-INSERT INTO detalles_contenidos(id_tarea, id_sub_tema_contenido, minutos_contenido, minutos_tarea) VALUES
-(1, 1, 25, 30),
-(2, 2, 20, 35),
-(3, 3, 30, 40),
-(4, 4, 35, 25),
-(5, 5, 40, 20),
-(6, 6, 25, 30),
-(7, 7, 30, 35),
-(8, 8, 20, 40),
-(9, 9, 35, 25),
-(10, 10, 40, 20);
+CALL insertarDetalleContenido (1, 25, 1, 30, 1, 1);
+CALL insertarDetalleContenido (2, 20, 1, 35, 2, 1);
+CALL insertarDetalleContenido (3, 30, 1, 40, 3, 1);
+CALL insertarDetalleContenido (4, 35, 1, 25, 4, 1);
+CALL insertarDetalleContenido (5, 40, 1, 20, 5, 1);
 
--- 18. jornadas
-INSERT INTO jornadas(nombre_jornada, numero_jornada, id_plantilla , fecha_inicio_jornada, fecha_fin_jornada) VALUES
-('Jornada 1', 1, 1, '2024-01-01', '2024-01-31'),
-('Jornada 2', 2, 1, '2024-02-01', '2024-02-29'),
-('Jornada 3', 3, 1, '2024-03-01', '2024-03-31'),
-('Jornada 4', 4, 1, '2024-04-01', '2024-04-30'),
-('Jornada 5', 5, 1, '2024-05-01', '2024-05-31'),
-('Jornada 6', 6, 1, '2024-06-01', '2024-06-30'),
-('Jornada 7', 7, 1, '2024-07-01', '2024-07-31'),
-('Jornada 8', 8, 1, '2024-08-01', '2024-08-31'),
-('Jornada 9', 9, 1, '2024-09-01', '2024-09-30'),
-('Jornada 10', 10, 1, '2024-10-01', '2024-11-13');
+-- 19. asistencias
+CALL Asistencia (1, 1, 1, 'Asistencia', 'El jugador se porto mal en el entreno', 0, 0);
+CALL Asistencia (1, 1, 1, 'Enfermedad', 'Al jugador se le cayó una uña', 0, 0);
+CALL Asistencia (1, 1, 1, 'Trabajo', NULL, 0, 0);
+CALL Asistencia (1, 1, 1, 'Viaje', NULL, 0, 0);
+CALL Asistencia (1, 1, 1, 'Asistencia', NULL, 0, 0);
+CALL Asistencia (1, 1, 1, 'Asistencia', NULL, 0, 0);
 
-
--- 19. entrenamientos
-INSERT INTO entrenamientos(fecha_entrenamiento, sesion, id_jornada, id_equipo, id_categoria, id_horario) VALUES
-(2023-05-12,'Sesion 1', 1, 1,1,1),
-(2023-05-12, 'Sesion 2', 1, 1,2,2),
-(2023-05-12, 'Sesion 3', 1, 1,3,3),
-(2023-05-12, 'Sesion 1', 1, 1,4,4),
-(2023-05-12, 'Sesion 2', 1, 1,1,5),
-(2023-05-12, 'Sesion 3', 1, 1,2,6),
-(2023-05-12, 'Sesion 1', 1, 1,3,7),
-(2023-05-12, 'Sesion 2', 1, 1,4,8),
-(2023-05-12, 'Sesion 3', 1, 1,1,9),
-(2023-05-12, 'Sesion 1', 1, 1,2,10);
-SELECT * FROM entrenamientos;
--- 19 detalle entrenamientos
-INSERT INTO detalle_entrenamiento(id_entrenamiento, id_asistencia, id_caracteristica_analisis, id_detalle_contenido, id_jugador) VALUES
-(1, NULL, NULL, 1, 1),
-(1, NULL, NULL, 2, 2),
-(1, NULL, NULL, 3, 3),
-(1, NULL, NULL, 4, 4),
-(1, NULL, NULL, 5, 5),
-(2, NULL, NULL, 6, 1),
-(3, NULL, NULL, 7, 2),
-(4, NULL, NULL, 8, 3),
-(5, NULL, NULL, 9, 7),
-(6, NULL, NULL, 10, 8);
-
-SELECT * FROM detalle_entrenamiento;
 -- 20. partidos
-INSERT INTO partidos (id_jornada, id_equipo, id_rival, fecha_partido, cancha_partido, resultado_partido, localidad_partido, tipo_resultado_partido) VALUES
-(1, 1, 1, 2023-05-12, 'San Benito', '3-4', 'Localidad', 'Victoria'),
-(2, 2, 1, 2023-05-15, 'Mejicanos', '2-1', 'Visitante', 'Victoria'),
-(3, 3, 1, 2023-05-18, 'San Jacinto', '1-1', 'Localidad', 'Empate'),
-(4, 4, 1, 2023-05-21, 'Soyapango', '0-2', 'Visitante', 'Derrota'),
-(5, 1, 1, 2023-05-24, 'San Salvador', '4-0', 'Localidad', 'Victoria'),
-(6, 2, 1, 2023-05-27, 'Santa Ana', '2 - 3', 'Visitante', 'Derrota'),
-(7, 3, 1, 2023-05-30, 'Chalatenango', '3-1', 'Localidad', 'Victoria'),
-(8, 4, 1, 2023-06-02, 'San Miguel', '1-0', 'Visitante', 'Victoria'),
-(9, 1, 1, 2023-06-05, 'Usulután', '2-2', 'Localidad', 'Empate'),
-(10, 2, 1, 2023-06-08, 'Ahuachapán', '0-0', 'Visitante', 'Pendiente');
+CALL insertarPartido (1, 1, 'San Benito',  '3-4', 'Localidad', 'Victoria', 1, 2024-05-12);
+CALL insertarPartido (1, 2, 'Mejicanos', '2-1', 'Visitante', 'Victoria', 1, 2024-05-15);
+CALL insertarPartido (1, 3, 'San Jacinto',  '1-1', 'Localidad', 'Empate', 1, 2024-05-18);
+CALL insertarPartido (1, 4, 'Soyapango', '0-0', 'Visitante', 'Pendiente', 1, 2024-05-21);
+CALL insertarPartido (1, 5, 'San Salvador',  '4-0', 'Localidad', 'Victoria', 1, 2024-05-24);
 SELECT * FROM partidos;
+
 -- 21. tipos_jugadas
 INSERT INTO tipos_jugadas (id_tipo_jugada, nombre_tipo_juego) VALUES
 (1, 'Tiro libre'),
