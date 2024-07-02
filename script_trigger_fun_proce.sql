@@ -1291,8 +1291,8 @@ BEGIN
     SELECT COUNT(*) INTO record_count
     FROM detalles_cuerpos_tecnicos
     WHERE id_cuerpo_tecnico = p_id_cuerpo_tecnico 
-      AND id_tecnico = p_id_tecnico 
-      AND id_rol_tecnico = p_id_rol_tecnico;
+      AND (id_tecnico = p_id_tecnico 
+      OR id_rol_tecnico = p_id_rol_tecnico);
 
     -- Si existe un duplicado, generar un error
     IF record_count > 0 THEN
@@ -1320,8 +1320,8 @@ BEGIN
     SELECT COUNT(*) INTO record_count
     FROM detalles_cuerpos_tecnicos
     WHERE id_cuerpo_tecnico = p_id_cuerpo_tecnico 
-      AND id_tecnico = p_id_tecnico 
-      AND id_rol_tecnico = p_id_rol_tecnico
+      AND (id_tecnico = p_id_tecnico 
+      OR id_rol_tecnico = p_id_rol_tecnico)
       AND id_detalle_cuerpo_tecnico <> p_id_detalle_cuerpo_tecnico;
 
     -- Si existe un duplicado, generar un error
