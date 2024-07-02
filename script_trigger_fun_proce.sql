@@ -2328,31 +2328,26 @@ DELIMITER ;
 
 -- ---Vista para ver las asistecias y los jugadores
 -- -Vista cuando se sabe que existen registros en asistencias
+-- Vista principal de asistencias
 CREATE VIEW vista_asistencias AS
-SELECT 
-    j.nombre_jugador AS jugador,
-    j.id_jugador AS id,
-    e.id_entrenamiento,
+SELECT
+    CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS jugador,
+    pe.id_jugador AS id,
+    a.id_entrenamiento,
     a.asistencia AS asistencia,
     a.observacion_asistencia AS observacion,
     a.id_asistencia AS id_asistencia
 FROM 
-    entrenamientos e
+    asistencias a
 JOIN 
-    equipos eq ON e.id_equipo = eq.id_equipo
+    plantillas_equipos pe ON a.id_jugador = pe.id_plantilla_equipo
 JOIN 
-    plantillas_equipos pe ON eq.id_equipo = pe.id_equipo
-JOIN 
-    jugadores j ON pe.id_jugador = j.id_jugador
-JOIN 
-    asistencias a ON e.id_entrenamiento = a.id_entrenamiento
-WHERE 
-    pe.id_equipo = e.id_equipo;
+    jugadores j ON pe.id_jugador = j.id_jugador;
 
 -- Vista cuando se sabe que no hay registros
 CREATE VIEW vista_asistencias_default AS
 SELECT 
-    j.nombre_jugador AS jugador,
+    CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS jugador,
     j.id_jugador AS id,
     e.id_entrenamiento,
     'Asistencia' AS asistencia,
@@ -2368,8 +2363,7 @@ JOIN
     jugadores j ON pe.id_jugador = j.id_jugador
 WHERE 
     pe.id_equipo = e.id_equipo
-GROUP BY 
-    j.id_jugador, e.id_entrenamiento;
+
 
 
 SELECT * FROM plantillas_equipos;
