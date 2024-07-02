@@ -1276,17 +1276,36 @@ END //
 DELIMITER ;
 
 -- Procedimientos para la tabla detalles_cuerpos_tecnicos
-
+DROP PROCEDURE IF EXISTS sp_insertar_detalle_cuerpo_tecnico;
 DELIMITER //
+
 CREATE PROCEDURE sp_insertar_detalle_cuerpo_tecnico (
     IN p_id_cuerpo_tecnico INT, 
     IN p_id_tecnico INT, 
     IN p_id_rol_tecnico INT
 )
 BEGIN
-    INSERT INTO detalles_cuerpos_tecnicos(id_cuerpo_tecnico, id_tecnico, id_rol_tecnico)
-    VALUES (p_id_cuerpo_tecnico, p_id_tecnico, p_id_rol_tecnico);
+    DECLARE record_count INT;
+
+    -- Verificar si el registro ya existe
+    SELECT COUNT(*) INTO record_count
+    FROM detalles_cuerpos_tecnicos
+    WHERE id_cuerpo_tecnico = p_id_cuerpo_tecnico 
+      AND id_tecnico = p_id_tecnico 
+      AND id_rol_tecnico = p_id_rol_tecnico;
+
+    -- Si existe un duplicado, generar un error
+    IF record_count > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El registro ya existe';
+    ELSE
+        INSERT INTO detalles_cuerpos_tecnicos (id_cuerpo_tecnico, id_tecnico, id_rol_tecnico)
+        VALUES (p_id_cuerpo_tecnico, p_id_tecnico, p_id_rol_tecnico);
+    END IF;
 END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_actualizar_detalle_cuerpo_tecnico;
+DELIMITER //
 
 CREATE PROCEDURE sp_actualizar_detalle_cuerpo_tecnico (
     IN p_id_detalle_cuerpo_tecnico INT, 
@@ -1295,18 +1314,36 @@ CREATE PROCEDURE sp_actualizar_detalle_cuerpo_tecnico (
     IN p_id_rol_tecnico INT
 )
 BEGIN
-    UPDATE detalles_cuerpos_tecnicos 
-    SET id_cuerpo_tecnico = p_id_cuerpo_tecnico, id_tecnico = p_id_tecnico, id_rol_tecnico = p_id_rol_tecnico
-    WHERE id_detalle_cuerpo_tecnico = p_id_detalle_cuerpo_tecnico;
-END //
+    DECLARE record_count INT;
 
+    -- Verificar si el registro ya existe para otro detalle
+    SELECT COUNT(*) INTO record_count
+    FROM detalles_cuerpos_tecnicos
+    WHERE id_cuerpo_tecnico = p_id_cuerpo_tecnico 
+      AND id_tecnico = p_id_tecnico 
+      AND id_rol_tecnico = p_id_rol_tecnico
+      AND id_detalle_cuerpo_tecnico <> p_id_detalle_cuerpo_tecnico;
+
+    -- Si existe un duplicado, generar un error
+    IF record_count > 0 THEN
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'El registro ya existe';
+    ELSE
+        UPDATE detalles_cuerpos_tecnicos 
+        SET id_cuerpo_tecnico = p_id_cuerpo_tecnico, 
+            id_tecnico = p_id_tecnico, 
+            id_rol_tecnico = p_id_rol_tecnico
+        WHERE id_detalle_cuerpo_tecnico = p_id_detalle_cuerpo_tecnico;
+    END IF;
+END //
+DELIMITER ;
+
+DELIMITER //
 CREATE PROCEDURE sp_eliminar_detalle_cuerpo_tecnico (IN p_id_detalle_cuerpo_tecnico INT)
 BEGIN
     DELETE FROM detalles_cuerpos_tecnicos WHERE id_detalle_cuerpo_tecnico = p_id_detalle_cuerpo_tecnico;
 END //
 
 DELIMITER ;
-
 
 -- VISTA
 
