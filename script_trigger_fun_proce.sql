@@ -880,20 +880,53 @@ DELIMITER ;
 
 -- Tabla rol_tecnico
 
+DROP PROCEDURE IF EXISTS insertar_rol_tecnico;
 DELIMITER //
 
 CREATE PROCEDURE insertar_rol_tecnico(IN p_nombre_rol_tecnico VARCHAR(60))
 BEGIN
-    INSERT INTO rol_tecnico (nombre_rol_tecnico)
-    VALUES (p_nombre_rol_tecnico);
+    DECLARE rol_count INT;
+
+    -- Verificar si el nombre del rol técnico ya existe
+    SELECT COUNT(*) INTO rol_count
+    FROM rol_tecnico
+    WHERE nombre_rol_tecnico = p_nombre_rol_tecnico;
+
+    -- Si existe un duplicado de nombre de rol técnico, generar un error
+    IF rol_count > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El nombre del rol técnico ya existe';
+    ELSE
+        INSERT INTO rol_tecnico (nombre_rol_tecnico)
+        VALUES (p_nombre_rol_tecnico);
+    END IF;
 END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS actualizar_rol_tecnico;
+DELIMITER //
 
 CREATE PROCEDURE actualizar_rol_tecnico(IN p_id_rol_tecnico INT, IN p_nombre_rol_tecnico VARCHAR(60))
 BEGIN
-    UPDATE rol_tecnico
-    SET nombre_rol_tecnico = p_nombre_rol_tecnico
-    WHERE id_rol_tecnico = p_id_rol_tecnico;
+    DECLARE rol_count INT;
+
+    -- Verificar si el nombre del rol técnico ya existe para otro registro
+    SELECT COUNT(*) INTO rol_count
+    FROM rol_tecnico
+    WHERE nombre_rol_tecnico = p_nombre_rol_tecnico
+    AND id_rol_tecnico != p_id_rol_tecnico;
+
+    -- Si existe un duplicado de nombre de rol técnico, generar un error
+    IF rol_count > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El nombre del rol técnico ya existe';
+    ELSE
+        UPDATE rol_tecnico
+        SET nombre_rol_tecnico = p_nombre_rol_tecnico
+        WHERE id_rol_tecnico = p_id_rol_tecnico;
+    END IF;
 END //
+DELIMITER ;
+
+DELIMITER //
 
 CREATE PROCEDURE eliminar_rol_tecnico(IN p_id_rol_tecnico INT)
 BEGIN
