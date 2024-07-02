@@ -1888,29 +1888,57 @@ $$
 DELIMITER ;
 
 -- ------------------------------------------------------------------------RIVALES----------------------------------------------------------------
-
+DROP PROCEDURE IF EXISTS sp_insertar_rival;
 DELIMITER //
+
 CREATE PROCEDURE sp_insertar_rival (
     IN p_nombre_rival VARCHAR(50), 
     IN p_logo_rival VARCHAR(50)
 )
 BEGIN
-    INSERT INTO rivales (nombre_rival, logo_rival)
-    VALUES (p_nombre_rival, p_logo_rival);
+    DECLARE rival_count INT;
+
+    -- Verificar si el nombre del rival ya existe
+    SELECT COUNT(*) INTO rival_count
+    FROM rivales
+    WHERE nombre_rival = p_nombre_rival;
+
+    -- Si existe un duplicado de nombre de rival, generar un error
+    IF rival_count > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El nombre del rival ya existe';
+    ELSE
+        INSERT INTO rivales (nombre_rival, logo_rival)
+        VALUES (p_nombre_rival, p_logo_rival);
+    END IF;
 END //
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_actualizar_rival;
 DELIMITER //
+
 CREATE PROCEDURE sp_actualizar_rival (
     IN p_id_rival INT, 
     IN p_nombre_rival VARCHAR(50), 
     IN p_logo_rival VARCHAR(50)
 )
 BEGIN
-    UPDATE rivales
-    SET nombre_rival = p_nombre_rival, 
-        logo_rival = p_logo_rival
-    WHERE id_rival = p_id_rival;
+    DECLARE rival_count INT;
+
+    -- Verificar si el nombre del rival ya existe para otro registro
+    SELECT COUNT(*) INTO rival_count
+    FROM rivales
+    WHERE nombre_rival = p_nombre_rival
+    AND id_rival != p_id_rival;
+
+    -- Si existe un duplicado de nombre de rival, generar un error
+    IF rival_count > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El nombre del rival ya existe';
+    ELSE
+        UPDATE rivales
+        SET nombre_rival = p_nombre_rival, 
+            logo_rival = p_logo_rival
+        WHERE id_rival = p_id_rival;
+    END IF;
 END //
 DELIMITER ;
 
