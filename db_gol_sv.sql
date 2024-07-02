@@ -295,6 +295,8 @@ CREATE TABLE rivales (
     CONSTRAINT chk_logo_rival CHECK (logo_rival LIKE '%.jpg' OR logo_rival LIKE '%.png' OR logo_rival LIKE '%.jpeg')
 );
 
+ALTER TABLE rivales MODIFY COLUMN nombre_rival VARCHAR(60) NOT NULL UNIQUE;
+
 CREATE TABLE partidos(
   id_partido INT AUTO_INCREMENT PRIMARY KEY, 
   id_jornada INT NOT NULL, 
