@@ -747,22 +747,46 @@ DROP PROCEDURE IF EXISTS insertar_tarea;
 DELIMITER //
 CREATE PROCEDURE insertar_tarea(IN p_nombre_tarea VARCHAR(60))
 BEGIN
-    INSERT INTO tareas (nombre_tarea)
-    VALUES (p_nombre_tarea);
-END //
+    DECLARE task_count INT;
 
+    -- Verificar si el nombre de la tarea ya existe
+    SELECT COUNT(*) INTO task_count
+    FROM tareas
+    WHERE nombre_tarea = p_nombre_tarea;
+
+    -- Si existe un duplicado de nombre de tarea, generar un error
+    IF task_count > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El nombre de la tarea ya existe';
+    ELSE
+        INSERT INTO tareas (nombre_tarea)
+        VALUES (p_nombre_tarea);
+    END IF;
+END //
 DELIMITER ;
 
 DROP PROCEDURE IF EXISTS actualizar_tarea;
 DELIMITER //
 CREATE PROCEDURE actualizar_tarea(IN p_id_tarea INT, IN p_nombre_tarea VARCHAR(60))
 BEGIN
-    UPDATE tareas
-    SET nombre_tarea = p_nombre_tarea
-    WHERE id_tarea = p_id_tarea;
-END //
+    DECLARE task_count INT;
 
+    -- Verificar si el nombre de la tarea ya existe para otra tarea
+    SELECT COUNT(*) INTO task_count
+    FROM tareas
+    WHERE nombre_tarea = p_nombre_tarea
+    AND id_tarea != p_id_tarea;
+
+    -- Si existe un duplicado de nombre de tarea, generar un error
+    IF task_count > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El nombre de la tarea ya existe';
+    ELSE
+        UPDATE tareas
+        SET nombre_tarea = p_nombre_tarea
+        WHERE id_tarea = p_id_tarea;
+    END IF;
+END //
 DELIMITER ;
+
 
 DROP PROCEDURE IF EXISTS eliminar_tarea;
 DELIMITER //
