@@ -1465,7 +1465,8 @@ SELECT p.id_pago AS 'ID',
 		CASE
 			WHEN p.pago_tardio = 1 THEN 'Si'
            		WHEN p.pago_tardio = 0 THEN 'No'
-		END AS 'TARDIO'
+		END AS 'TARDIO',
+        ROUND(P.cantidad_pago + P.mora_pago, 2) AS 'TOTAL'
 FROM pagos p
 INNER JOIN jugadores j ON p.id_jugador = j.id_jugador;
 $$
