@@ -2386,6 +2386,7 @@ UPDATE entrenameientos SET fecha_entrenamiento = ?, sesion = ?, id_jornada ?, id
 CREATE VIEW vista_entrenamientos_contenidos AS
 SELECT 
     e.id_entrenamiento,
+    stc.sub_tema_contenido,
     CONCAT(tc.nombre_tema_contenido, ' - ', stc.sub_tema_contenido) AS contenidos
 FROM 
     entrenamientos e
