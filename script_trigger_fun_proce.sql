@@ -2520,6 +2520,7 @@ DELIMITER ;
 CREATE VIEW vista_asistencias_entrenamiento AS
 SELECT 
     e.id_entrenamiento,
+    e.fecha_entrenamiento,
     e.id_horario,
     CASE 
         WHEN COUNT(de.id_entrenamiento > 0) > 0 THEN 1 
