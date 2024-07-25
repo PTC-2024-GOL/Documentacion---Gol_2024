@@ -2574,7 +2574,7 @@ DELIMITER ;
 -- -Vista cuando se sabe que existen registros en asistencias
 -- Vista principal de asistencias
 DROP VIEW IF EXISTS vista_asistencias;
-ALTER VIEW vista_asistencias AS
+CREATE VIEW vista_asistencias AS
 SELECT
     CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS jugador,
     pe.id_jugador AS id,
@@ -2621,3 +2621,4 @@ SELECT * FROM equipos;
 SELECT * FROM asistencias;
 
  SELECT * FROM vista_asistencias WHERE id_entrenamiento=11;
+
