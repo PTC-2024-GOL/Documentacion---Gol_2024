@@ -1046,39 +1046,78 @@ BEGIN
     DELETE FROM jornadas WHERE id_jornada = p_id_jornada;
 END //
 
--- Procedimiento para insertar un nuevo horario
+-- Procedimiento para insertar un nuevo horario con validación de duplicados
+DROP PROCEDURE IF EXISTS sp_insertar_horario;
+DELIMITER //
+
 CREATE PROCEDURE sp_insertar_horario (
     IN p_nombre_horario VARCHAR(60),
-    IN p_dia ENUM('Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'),
+    IN p_dia ENUM('Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'),
     IN p_hora_inicial TIME,
     IN p_hora_final TIME,
     IN p_campo_de_entrenamiento VARCHAR(100)
 )
 BEGIN
-    INSERT INTO horarios (nombre_horario, dia, hora_inicial, hora_final, campo_de_entrenamiento)
-    VALUES (p_nombre_horario, p_dia, p_hora_inicial, p_hora_final, p_campo_de_entrenamiento);
-END //
+    DECLARE record_count INT;
 
--- Procedimiento para actualizar un horario existente
+    -- Verificar si el registro ya existe
+    SELECT COUNT(*) INTO record_count
+    FROM horarios
+    WHERE nombre_horario = p_nombre_horario
+      AND dia = p_dia
+      AND hora_inicial = p_hora_inicial
+      AND hora_final = p_hora_final
+      AND campo_de_entrenamiento = p_campo_de_entrenamiento;
+
+    -- Si existe un duplicado, generar un error
+    IF record_count > 0 THEN
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'El registro ya existe';
+    ELSE
+        INSERT INTO horarios (nombre_horario, dia, hora_inicial, hora_final, campo_de_entrenamiento)
+        VALUES (p_nombre_horario, p_dia, p_hora_inicial, p_hora_final, p_campo_de_entrenamiento);
+    END IF;
+END //
+DELIMITER ;
+
+-- Procedimiento para actualizar un horario existente con validación de duplicados
 DROP PROCEDURE IF EXISTS sp_actualizar_horario;
 DELIMITER //
+
 CREATE PROCEDURE sp_actualizar_horario (
     IN p_id_horario INT,
     IN p_nombre_horario VARCHAR(60),
-    IN p_dia ENUM('Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'),
+    IN p_dia ENUM('Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'),
     IN p_hora_inicial TIME,
     IN p_hora_final TIME,
     IN p_campo_de_entrenamiento VARCHAR(100)
 )
 BEGIN
-    UPDATE horarios
-    SET nombre_horario = p_nombre_horario,
-        dia = p_dia,
-        hora_inicial = p_hora_inicial,
-        hora_final = p_hora_final,
-        campo_de_entrenamiento = p_campo_de_entrenamiento
-    WHERE id_horario = p_id_horario;
+    DECLARE record_count INT;
+
+    -- Verificar si el registro ya existe para otro horario
+    SELECT COUNT(*) INTO record_count
+    FROM horarios
+    WHERE nombre_horario = p_nombre_horario
+      AND dia = p_dia
+      AND hora_inicial = p_hora_inicial
+      AND hora_final = p_hora_final
+      AND campo_de_entrenamiento = p_campo_de_entrenamiento
+      AND id_horario <> p_id_horario;
+
+    -- Si existe un duplicado, generar un error
+    IF record_count > 0 THEN
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'El registro ya existe';
+    ELSE
+        UPDATE horarios
+        SET nombre_horario = p_nombre_horario,
+            dia = p_dia,
+            hora_inicial = p_hora_inicial,
+            hora_final = p_hora_final,
+            campo_de_entrenamiento = p_campo_de_entrenamiento
+        WHERE id_horario = p_id_horario;
+    END IF;
 END //
+DELIMITER ;
 
 -- Procedimiento para eliminar un horario
 DROP PROCEDURE IF EXISTS sp_eliminar_horario;
@@ -1465,7 +1504,8 @@ SELECT p.id_pago AS 'ID',
 		CASE
 			WHEN p.pago_tardio = 1 THEN 'Si'
            		WHEN p.pago_tardio = 0 THEN 'No'
-		END AS 'TARDIO'
+		END AS 'TARDIO',
+        ROUND(P.cantidad_pago + P.mora_pago, 2) AS 'TOTAL'
 FROM pagos p
 INNER JOIN jugadores j ON p.id_jugador = j.id_jugador;
 $$
@@ -2385,6 +2425,7 @@ UPDATE entrenameientos SET fecha_entrenamiento = ?, sesion = ?, id_jornada ?, id
 CREATE VIEW vista_entrenamientos_contenidos AS
 SELECT 
     e.id_entrenamiento,
+    stc.sub_tema_contenido,
     CONCAT(tc.nombre_tema_contenido, ' - ', stc.sub_tema_contenido) AS contenidos
 FROM 
     entrenamientos e
@@ -2519,6 +2560,7 @@ DELIMITER ;
 CREATE VIEW vista_asistencias_entrenamiento AS
 SELECT 
     e.id_entrenamiento,
+    e.fecha_entrenamiento,
     e.id_horario,
     CASE 
         WHEN COUNT(de.id_entrenamiento > 0) > 0 THEN 1 
