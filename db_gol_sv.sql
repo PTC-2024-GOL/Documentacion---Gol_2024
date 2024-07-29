@@ -206,12 +206,36 @@ CREATE TABLE entrenamientos(
   CONSTRAINT fk_identificador_de_jornada_entrenamiento FOREIGN KEY (id_jornada) REFERENCES jornadas(id_jornada),
   id_equipo INT NOT NULL,
   CONSTRAINT fk_identificador_de_equipo_entrenamiento FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
-  id_categoria INT NOT NULL,
-  CONSTRAINT fk_identificador_de_categoria_entrenamiento FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria),
-  id_horario INT NOT NULL,
-  CONSTRAINT fk_identificador_de_horario_entrenamiento FOREIGN KEY (id_horario) REFERENCES horarios(id_horario)
+  id_horario_categoria INT NOT NULL,
+  CONSTRAINT fk_identificador_de_horario_categoria_entrenamiento FOREIGN KEY (id_horario_categoria) REFERENCES horarios_categorias(id_horario_categoria)
 );
 
+-- Scripts para eliminar id_categoria y id_horario de entrenamientos y agregar id_horario_categoria
+-- DROPS
+ALTER TABLE entrenamientos
+DROP FOREIGN KEY fk_identificador_de_categoria_entrenamiento;
+
+ALTER TABLE entrenamientos
+DROP FOREIGN KEY fk_identificador_de_horario_entrenamiento;
+
+ALTER TABLE entrenamientos
+DROP COLUMN id_categoria;
+
+ALTER TABLE entrenamientos
+DROP COLUMN id_horario;
+
+-- ADD FOREIGN KEY
+ALTER TABLE entrenamientos
+ADD COLUMN id_horario_categoria INT NOT NULL;
+
+ALTER TABLE entrenamientos
+ADD CONSTRAINT fk_identificador_de_horario_categoria_entrenamiento FOREIGN KEY (id_horario_categoria) 
+REFERENCES horarios_categorias(id_horario_categoria);
+
+-- Si el alter les da error ejecutar lo de abajo, el error da porque cuando agregamos el campo, este permanece en 0
+-- y como debemos relacionarlo con la tabla, la tabla no tiene registros con id 0, entonces debemos acutalizar entrenamientos
+-- A un campo que si llo contenga la tabla horarios_categorias.
+UPDATE entrenamientos SET id_horario_categoria = 1 WHERE id_horario_categoria = 0;
 
 CREATE TABLE caracteristicas_jugadores(
   id_caracteristica_jugador INT AUTO_INCREMENT PRIMARY KEY,

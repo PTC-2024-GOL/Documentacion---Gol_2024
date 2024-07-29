@@ -1941,7 +1941,9 @@ SELECT
 FROM 
   entrenamientos e
 INNER JOIN 
-  horarios h ON e.id_horario = h.id_horario;
+  horarios_categorias r ON e.id_horario_categoria = r.id_horario_categoria
+INNER JOIN 
+  horarios h ON r.id_horario = h.id_horario;
 
 -- Vista para el GET de detalles contenidos
 CREATE VIEW vista_detalle_entrenamiento AS
@@ -2456,6 +2458,18 @@ SELECT
 FROM 
     jornadas;
 
+-- Vista para ver las categorias y los horarios de la tabla horarios_categorias
+CREATE VIEW vista_entrenamientos_horario_categorias AS
+SELECT 
+    e.id_horario_categoria AS id_categoria,
+    CONCAT(dc.nombre_categoria, ' - ', de.nombre_horario) AS nombre_categoria
+FROM 
+    horarios_categorias e
+JOIN 
+    horarios de ON e.id_horario = de.id_horario
+JOIN 
+    categorias dc ON e.id_categoria = dc.id_categoria;
+
 -- -----------------------------------VISTA PARA CARACTERISTICAS ANALISIS -------------------------------------------------------------------------
 DROP VIEW IF EXISTS vista_caracteristicas_analisis;
 
@@ -2557,11 +2571,11 @@ DELIMITER ;
 -- ----------------------------------------------------ASISTENCIAS PROCEDIMIENTOS Y VISTAS--------------------------------------------------------------------------
 
 -- -Vista para saber si un regisro de id entrenamiento tiene asistencias o no, tambien entrega datos generales que la asistencia necesitará, como el id_horario
-CREATE VIEW vista_asistencias_entrenamiento AS
+ALTER VIEW vista_asistencias_entrenamiento AS
 SELECT 
     e.id_entrenamiento,
     e.fecha_entrenamiento,
-    e.id_horario,
+    h.id_horario,
     CASE 
         WHEN COUNT(de.id_entrenamiento > 0) > 0 THEN 1 
         ELSE 0 
@@ -2570,6 +2584,8 @@ FROM
     entrenamientos e
 LEFT JOIN 
     asistencias de ON e.id_entrenamiento = de.id_entrenamiento
+INNER JOIN 
+	horarios_categorias h ON e.id_horario_categoria = h.id_horario_categoria
 GROUP BY 
     e.id_entrenamiento;
 
