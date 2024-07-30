@@ -143,13 +143,13 @@ INSERT INTO jornadas (nombre_jornada, numero_jornada, id_plantilla, fecha_inicio
 ('Jornada 6', 6, 6, '2024-02-05', '2024-02-11');
 
 -- Entrenamientos
-INSERT INTO entrenamientos (fecha_entrenamiento, sesion, id_jornada, id_equipo, id_categoria, id_horario) VALUES
-('2024-01-02', 'Sesion 1', 1, 1, 1, 1),
-('2024-01-09', 'Sesion 2', 2, 2, 2, 2),
-('2024-01-16', 'Sesion 3', 3, 3, 3, 3),
-('2024-01-23', 'Sesion 4', 4, 4, 4, 4),
-('2024-01-30', 'Sesion 5', 5, 5, 5, 5),
-('2024-02-06', 'Sesion 6', 6, 6, 6, 6);
+INSERT INTO entrenamientos (fecha_entrenamiento, sesion, id_jornada, id_equipo, id_horario_categoria) VALUES
+('2024-01-02', 'Sesion 1', 1, 1, 1),
+('2024-01-09', 'Sesion 2', 2, 2, 2),
+('2024-01-16', 'Sesion 3', 3, 3, 3),
+('2024-01-23', 'Sesion 4', 4, 4, 4),
+('2024-01-30', 'Sesion 5', 5, 5, 5),
+('2024-02-06', 'Sesion 6', 6, 6, 6);
 
 -- Características_Jugadores
 INSERT INTO caracteristicas_jugadores (nombre_caracteristica_jugador, clasificacion_caracteristica_jugador) VALUES
