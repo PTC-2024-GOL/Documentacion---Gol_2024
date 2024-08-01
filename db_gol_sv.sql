@@ -454,3 +454,11 @@ CREATE TABLE pagos(
   id_jugador INT NOT NULL, 
   CONSTRAINT fk_jugador_pago FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador)
 );
+
+CREATE TABLE calendario(
+    id_calendario INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(50) NOT NULL,
+    fecha_inicio DATETIME NOT NULL,
+    fecha_final DATETIME NOT NULL ,
+    color VARCHAR(50)
+);
