@@ -2571,7 +2571,7 @@ DELIMITER ;
 -- ----------------------------------------------------ASISTENCIAS PROCEDIMIENTOS Y VISTAS--------------------------------------------------------------------------
 
 -- -Vista para saber si un regisro de id entrenamiento tiene asistencias o no, tambien entrega datos generales que la asistencia necesitará, como el id_horario
-ALTER VIEW vista_asistencias_entrenamiento AS
+CREATE VIEW vista_asistencias_entrenamiento AS
 SELECT 
     e.id_entrenamiento,
     e.fecha_entrenamiento,
@@ -2633,7 +2633,7 @@ DELIMITER ;
 -- Vista principal de asistencias
 DROP VIEW IF EXISTS vista_asistencias;
 CREATE VIEW vista_asistencias AS
-SELECT
+SELECT DISTINCT
     CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS jugador,
     pe.id_jugador AS id,
     a.id_entrenamiento,
@@ -2678,5 +2678,5 @@ SELECT * FROM jugadores;
 SELECT * FROM equipos;
 SELECT * FROM asistencias;
 
- SELECT * FROM vista_asistencias WHERE id_entrenamiento=11;
+ SELECT * FROM vista_asistencias WHERE id_entrenamiento=14;
 
