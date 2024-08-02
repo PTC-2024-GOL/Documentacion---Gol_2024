@@ -89,4 +89,32 @@ JOIN
 INNER JOIN
 	detalles_cuerpos_tecnicos d ON e.id_cuerpo_tecnico = d.id_cuerpo_tecnico;
 
-SELECT * FROM vista_equipos_categorias_tecnico WHERE id_tecnico = 7;
+
+ALTER VIEW vista_horarios_equipos_movil AS
+SELECT 
+  e.id_equipo,
+  e.id_entrenamiento,
+  e.fecha_entrenamiento,
+  CONCAT(h.dia, DATE_FORMAT(e.fecha_entrenamiento, ' %d de %M'), ' de ', TIME_FORMAT(h.hora_inicial, '%H:%i'), ' A ', TIME_FORMAT(h.hora_final, '%H:%i')) AS horario
+FROM 
+  entrenamientos e
+INNER JOIN 
+  horarios_categorias r ON e.id_horario_categoria = r.id_horario_categoria
+INNER JOIN 
+  horarios h ON r.id_horario = h.id_horario;
+SELECT * FROM vista_horarios_equipos_movil WHERE id_equipo = 4;
+SELECT 
+                id_entrenamiento,
+                horario,
+                fecha_entrenamiento,
+                id_equipo
+                FROM vista_horarios_equipos_movil vhem
+                WHERE vhem.id_equipo = 4
+                AND NOT EXISTS (
+                SELECT 1
+                FROM asistencias a
+                WHERE a.id_entrenamiento = vhem.id_entrenamiento
+                )
+                ORDER BY fecha_entrenamiento DESC;
+
+SELECT * FROM equipos;
