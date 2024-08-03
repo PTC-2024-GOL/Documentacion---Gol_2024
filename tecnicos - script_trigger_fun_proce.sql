@@ -89,12 +89,13 @@ JOIN
 INNER JOIN
 	detalles_cuerpos_tecnicos d ON e.id_cuerpo_tecnico = d.id_cuerpo_tecnico;
 
-
-ALTER VIEW vista_horarios_equipos_movil AS
+-- Vista para el combobox de técnicos en movil
+CREATE VIEW vista_horarios_equipos_movil AS
 SELECT 
   e.id_equipo,
   e.id_entrenamiento,
   e.fecha_entrenamiento,
+  h.id_horario,
   CONCAT(h.dia, DATE_FORMAT(e.fecha_entrenamiento, ' %d de %M'), ' de ', TIME_FORMAT(h.hora_inicial, '%H:%i'), ' A ', TIME_FORMAT(h.hora_final, '%H:%i')) AS horario
 FROM 
   entrenamientos e
@@ -102,19 +103,30 @@ INNER JOIN
   horarios_categorias r ON e.id_horario_categoria = r.id_horario_categoria
 INNER JOIN 
   horarios h ON r.id_horario = h.id_horario;
-SELECT * FROM vista_horarios_equipos_movil WHERE id_equipo = 4;
-SELECT 
-                id_entrenamiento,
-                horario,
-                fecha_entrenamiento,
-                id_equipo
-                FROM vista_horarios_equipos_movil vhem
-                WHERE vhem.id_equipo = 4
-                AND NOT EXISTS (
-                SELECT 1
-                FROM asistencias a
-                WHERE a.id_entrenamiento = vhem.id_entrenamiento
-                )
-                ORDER BY fecha_entrenamiento DESC;
+  
+-- Vista para ver las asistencias poor jugador en movik técnicos
+CREATE VIEW asistencias_por_jugador AS
+ 	SELECT
+ 	e.id_jugador,
+ 	e.observacion_asistencia,
+ 	e.asistencia,
+ 	e.fecha_asistencia,
+	 DATE_FORMAT(e.fecha_asistencia, '%e de %M del %Y') AS fecha
+FROM asistencias e;
 
-SELECT * FROM equipos;
+-- Vista para movil de tecnicos para ver datos por jugador relacionados a estadisticas
+CREATE VIEW vista_asistencias_por_jugador AS
+SELECT 
+    id_jugador,
+    SUM(asistencia = 'Asistencia') AS cantidad_asistencia,
+    (SUM(asistencia = 'Asistencia') / COUNT(*)) * 100 AS porcentaje_asistencia,
+    SUM(asistencia = 'Ausencia injustificada') AS cantidad_ausencia_injustificada,
+    (SUM(asistencia = 'Ausencia injustificada') / COUNT(*)) * 100 AS porcentaje_ausencia_injustificada,
+    SUM(asistencia = 'Enfermedad') AS cantidad_enfermedad,
+    (SUM(asistencia = 'Enfermedad') / COUNT(*)) * 100 AS porcentaje_enfermedad,
+    SUM(asistencia = 'Otro') AS cantidad_otro,
+    (SUM(asistencia = 'Otro') / COUNT(*)) * 100 AS porcentaje_otro
+FROM asistencias
+GROUP BY id_jugador;
+
+SELECT * FROM vista_asistencias_por_jugador WHERE id_jugador = 2;
