@@ -2253,7 +2253,8 @@ CREATE VIEW vista_jugadores_por_equipo AS
         j.id_posicion_principal,
         p.posicion,
         p.area_de_juego,
-        t.nombre_temporada
+        t.nombre_temporada,
+        j.estatus_jugador
 FROM plantillas_equipos pe
 INNER JOIN
     jugadores j ON pe.id_jugador = j.id_jugador
