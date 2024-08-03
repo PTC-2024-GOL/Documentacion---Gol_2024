@@ -1896,6 +1896,7 @@ INNER JOIN
     categorias c ON e.id_categoria = c.id_categoria;
 
 -- VISTA PARA VER EL CUERPO TECNICO DE UN EQUIPO
+DROP VIEW IF EXISTS vista_tecnicos_equipos;
 CREATE VIEW vista_tecnicos_equipos AS
     SELECT
         e.id_equipo AS ID,
@@ -1907,7 +1908,8 @@ CREATE VIEW vista_tecnicos_equipos AS
         dt.id_rol_tecnico,
         rt.nombre_rol_tecnico,
         t.foto_tecnico,
-        t.correo_tecnico
+        t.correo_tecnico,
+        t.telefono_tecnico
 FROM equipos e
 INNER JOIN
     detalles_cuerpos_tecnicos dt ON e.id_cuerpo_tecnico = dt.id_cuerpo_tecnico
@@ -1931,7 +1933,7 @@ JOIN
  
 -- Vista para conocer los horarios de un equipo en especifico, se usa en detalles contenidos - elegir horarios 
 SELECT * FROM entrenamientos;
-SELECT * FROM horarios;   
+SELECT * FROM horarios;
 CREATE VIEW vista_horarios_equipos AS
 SELECT 
   e.id_equipo,
