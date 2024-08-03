@@ -125,7 +125,8 @@ SELECT
     SUM(asistencia = 'Enfermedad') AS cantidad_enfermedad,
     (SUM(asistencia = 'Enfermedad') / COUNT(*)) * 100 AS porcentaje_enfermedad,
     SUM(asistencia = 'Otro') AS cantidad_otro,
-    (SUM(asistencia = 'Otro') / COUNT(*)) * 100 AS porcentaje_otro
+    (SUM(asistencia = 'Otro') / COUNT(*)) * 100 AS porcentaje_otro,
+    SUM(asistencia = 'Estudio') AS cantidad_estudio
 FROM asistencias
 GROUP BY id_jugador;
 
