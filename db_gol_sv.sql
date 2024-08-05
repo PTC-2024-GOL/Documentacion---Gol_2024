@@ -45,6 +45,7 @@ CREATE TABLE tecnicos(
   estado_tecnico BOOLEAN NOT NULL DEFAULT 1,
   fecha_nacimiento_tecnico DATE NOT NULL,
   fecha_creacion DATETIME NULL DEFAULT NOW(),
+  fecha_clave DATETIME NULL DEFAULT NOW(),
   foto_tecnico VARCHAR(50) NULL, 
   CONSTRAINT chk_url_foto_administrador CHECK (foto_tecnico LIKE '%.jpg' OR foto_tecnico LIKE '%.png' OR foto_tecnico LIKE '%.jpeg' OR foto_tecnico LIKE '%.gif')
 );
