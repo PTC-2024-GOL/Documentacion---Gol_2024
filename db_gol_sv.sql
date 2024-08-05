@@ -26,6 +26,9 @@ foto_administrador VARCHAR(50) NULL,
 CONSTRAINT chk_url_foto_administrador CHECK (foto_administrador LIKE '%.jpg' OR foto_administrador LIKE '%.png' OR foto_administrador LIKE '%.jpeg' OR foto_administrador LIKE '%.gif')
 );
 
+ALTER TABLE administradores
+ADD COLUMN recovery_code VARCHAR(80) DEFAULT '0000';
+
 CREATE TABLE tecnicos(
   id_tecnico INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_tecnico VARCHAR(50) NOT NULL, 
@@ -45,6 +48,9 @@ CREATE TABLE tecnicos(
   foto_tecnico VARCHAR(50) NULL, 
   CONSTRAINT chk_url_foto_administrador CHECK (foto_tecnico LIKE '%.jpg' OR foto_tecnico LIKE '%.png' OR foto_tecnico LIKE '%.jpeg' OR foto_tecnico LIKE '%.gif')
 );
+
+ALTER TABLE tecnicos
+ADD COLUMN recovery_code VARCHAR(80) DEFAULT '0000';
 
 CREATE TABLE temporadas(
   id_temporada INT AUTO_INCREMENT PRIMARY KEY, 
@@ -153,6 +159,17 @@ MODIFY COLUMN fecha_creacion DATE NULL DEFAULT NOW();
 ALTER TABLE jugadores
 MODIFY COLUMN foto_jugador VARCHAR(50) DEFAULT 'default.png';
 
+-- Agregar la columna recovery_code con valor por defecto '0000'
+ALTER TABLE jugadores
+ADD COLUMN recovery_code VARCHAR(80) DEFAULT '0000';
+
+-- Agregar la columna correo_jugador con valor por defecto 'example@gmail.com'
+ALTER TABLE jugadores
+ADD COLUMN correo_jugador VARCHAR(50) DEFAULT 'example@gmail.com';
+
+-- Agregar la restricción de formato para correo_jugador
+ALTER TABLE jugadores
+ADD CONSTRAINT chk_correo_jugador_formato CHECK (correo_jugador REGEXP '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$');
 
 CREATE TABLE estados_fisicos_jugadores(
   id_estado_fisico_jugador INT AUTO_INCREMENT PRIMARY KEY,

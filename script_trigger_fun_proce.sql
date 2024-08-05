@@ -2675,15 +2675,14 @@ WHERE
 
 
 
-SELECT * FROM plantillas_equipos;
-SELECT * FROM entrenamientos;
-SELECT * FROM horarios;
-SELECT * FROM detalle_entrenamiento;
-SELECT * FROM jugadores;
-SELECT * FROM equipos;
-SELECT * FROM asistencias;
-
- SELECT * FROM vista_asistencias WHERE id_entrenamiento=14;
-
+CREATE VIEW notas_por_jugador AS
+    SELECT
+        c.id_jugador,
+        cj.clasificacion_caracteristica_jugador,
+        ROUND(AVG(c.nota_caracteristica_analisis), 1) AS nota_por_area,
+        c.id_caracteristica_jugador
+FROM caracteristicas_analisis c
+INNER JOIN caracteristicas_jugadores cj ON c.id_caracteristica_jugador = cj.id_caracteristica_jugador
+GROUP BY c.id_jugador, cj.clasificacion_caracteristica_jugador;
 
 SELECT * FROM vista_jugadores_por_equipo WHERE nombre_jugador = 'Ana Maria' AND id_equipo = 4;
