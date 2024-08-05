@@ -1684,6 +1684,7 @@ CREATE VIEW vista_jugadores AS
         j.apellido_jugador,
         j.estatus_jugador,
         j.fecha_nacimiento_jugador,
+        DATE_FORMAT(j.fecha_nacimiento_jugador, '%e de %M del %Y') AS nacimiento,
         j.genero_jugador,
         j.perfil_jugador,
         j.becado,
@@ -1693,6 +1694,7 @@ CREATE VIEW vista_jugadores AS
         j.clave_jugador,
         j.foto_jugador,
         j.fecha_creacion,
+        DATE_FORMAT(j.fecha_creacion, '%e de %M del %Y') AS registoJugador,
         p1.posicion AS posicionPrincipal,
         p2.posicion AS posicionSecundaria
 FROM jugadores j
@@ -2683,3 +2685,5 @@ SELECT * FROM asistencias;
 
  SELECT * FROM vista_asistencias WHERE id_entrenamiento=14;
 
+
+SELECT * FROM vista_jugadores_por_equipo WHERE nombre_jugador = 'Ana Maria' AND id_equipo = 4;

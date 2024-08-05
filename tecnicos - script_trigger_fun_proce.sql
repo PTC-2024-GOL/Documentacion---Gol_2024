@@ -130,35 +130,14 @@ SELECT
 FROM asistencias
 GROUP BY id_jugador;
 
-SELECT * FROM vista_asistencias_por_jugador WHERE id_jugador = 2;
-
-ALTER VIEW vista_informacion_jugador AS
+CREATE VIEW notas_por_jugador AS
     SELECT
-        j.id_jugador,
-        CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS NOMBRE_COMPLETO,
-        j.nombre_jugador,
-        j.apellido_jugador,
-        j.dorsal_jugador,
-        DATE_FORMAT(j.fecha_nacimiento_jugador, '%e de %M del %Y') AS nacimiento,
-        j.perfil_jugador,
-        j.id_posicion_principal,
-        j.id_posicion_secundaria,
-        j.alias_jugador,
-        j.foto_jugador,
-        DATE_FORMAT(j.fecha_creacion, '%e de %M del %Y') AS registoJugador,
-        p1.posicion AS posicionPrincipal,
-        p2.posicion AS posicionSecundaria,
-        ef.altura_jugador,
-        ef.peso_jugador,
-        ef.indice_masa_corporal,
-        DATE_FORMAT(ef.fecha_creacion, '%e de %M del %Y') AS registroFisico
-FROM jugadores j
-INNER JOIN
-    posiciones p1 ON j.id_posicion_principal = p1.id_posicion
-INNER JOIN
-    posiciones p2 ON j.id_posicion_secundaria = p2.id_posicion
-INNER JOIN
-    estados_fisicos_jugadores ef ON j.id_jugador = ef.id_jugador;
+        c.id_jugador,
+        cj.clasificacion_caracteristica_jugador,
+        ROUND(AVG(c.nota_caracteristica_analisis), 1) AS nota_por_area,
+        c.id_caracteristica_jugador
+FROM caracteristicas_analisis c
+INNER JOIN caracteristicas_jugadores cj ON c.id_caracteristica_jugador = cj.id_caracteristica_jugador
+GROUP BY c.id_jugador, cj.clasificacion_caracteristica_jugador;
 
-SELECT * FROM vista_informacion_jugador
-                WHERE id_jugador= 4 ORDER BY registroFisico DESC LIMIT 1
+
