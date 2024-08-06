@@ -140,7 +140,7 @@ FROM caracteristicas_analisis c
 INNER JOIN caracteristicas_jugadores cj ON c.id_caracteristica_jugador = cj.id_caracteristica_jugador
 GROUP BY c.id_jugador, cj.clasificacion_caracteristica_jugador;
 
---Vista para movil tecnicos para ver los jugadores en entrenamiento 
+-- Vista para movil tecnicos para ver los jugadores en entrenamiento 
 DROP VIEW IF EXISTS vista_jugadores_equipo_movil;
 CREATE VIEW vista_jugadores_equipo_movil AS 
 SELECT 
@@ -152,5 +152,3 @@ JOIN
 	equipos e ON e.id_equipo = pe.id_equipo
 JOIN
     jugadores j ON j.id_jugador = pe.id_jugador;
-
-
