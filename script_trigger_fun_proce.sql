@@ -2686,3 +2686,14 @@ INNER JOIN caracteristicas_jugadores cj ON c.id_caracteristica_jugador = cj.id_c
 GROUP BY c.id_jugador, cj.clasificacion_caracteristica_jugador;
 
 SELECT * FROM vista_jugadores_por_equipo WHERE nombre_jugador = 'Ana Maria' AND id_equipo = 4;
+SELECT * FROM asistencias;
+
+CREATE VIEW vista_ultimos_entrenamientos AS
+SELECT DISTINCT
+    SUM(CASE WHEN a.asistencia = 'Asistencia' THEN 1 ELSE 0 END) AS asistencia,
+    DATE_FORMAT(a.fecha_asistencia, '%e de %M') AS fecha,
+    e.id_equipo
+FROM asistencias a
+INNER JOIN entrenamientos e ON a.id_entrenamiento = e.id_entrenamiento
+GROUP BY a.fecha_asistencia, e.id_equipo;
+SELECT asistencia, fecha FROM vista_ultimos_entrenamientos WHERE id_equipo = 1;
