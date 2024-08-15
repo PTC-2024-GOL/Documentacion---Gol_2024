@@ -1,4 +1,4 @@
--- DROP DATABASE if EXISTS db_gol_sv;
+DROP DATABASE if EXISTS db_gol_sv;
 CREATE DATABASE db_gol_sv;
 USE db_gol_sv;
 
@@ -53,6 +53,14 @@ CREATE TABLE tecnicos(
 ALTER TABLE tecnicos
 ADD COLUMN recovery_code VARCHAR(80) DEFAULT '0000';
 
+CREATE TABLE documentos_tecnicos(
+  id_documento INT AUTO_INCREMENT PRIMARY KEY, 
+  nombre_archivo VARCHAR(50) NOT NULL, 
+  id_tecnico INT NOT NULL, 
+  CONSTRAINT fk_documento_del_tecnico FOREIGN KEY (id_tecnico) REFERENCES tecnicos(id_tecnico),
+  archivo_adjunto VARCHAR(50) NULL
+  );
+
 CREATE TABLE temporadas(
   id_temporada INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_temporada VARCHAR(50) NOT NULL,
@@ -76,10 +84,37 @@ CREATE TABLE categorias(
   CONSTRAINT uq_nombre_categoria_unico UNIQUE(nombre_categoria), 
   edad_minima_permitida INT NOT NULL, 
   edad_maxima_permitida INT NOT NULL, 
-  CONSTRAINT chk_validacion_de_edades CHECK(edad_minima_permitida <= edad_maxima_permitida),
-  id_temporada INT NOT NULL, 
-  CONSTRAINT fk_temporada_de_la_categoria FOREIGN KEY (id_temporada) REFERENCES temporadas(id_temporada)
+  CONSTRAINT chk_validacion_de_edades CHECK(edad_minima_permitida <= edad_maxima_permitida)
 );
+
+SET @fk_name := (SELECT CONSTRAINT_NAME 
+                 FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 
+                 WHERE TABLE_NAME = 'categorias' 
+                 AND COLUMN_NAME = 'id_temporada' 
+                 LIMIT 1);
+
+SET @drop_fk := IF(@fk_name IS NOT NULL, 
+                   CONCAT('ALTER TABLE categorias DROP FOREIGN KEY ', @fk_name, ';'), 
+                   'SELECT ''La clave foranea no existe xd'';');
+                   
+PREPARE stmt1 FROM @drop_fk;
+EXECUTE stmt1;
+DEALLOCATE PREPARE stmt1;
+
+SET @drop_column := IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+     WHERE TABLE_NAME = 'categorias' 
+     AND COLUMN_NAME = 'id_temporada' 
+     AND TABLE_SCHEMA = DATABASE()) = 1,
+    'ALTER TABLE categorias DROP COLUMN id_temporada;',
+    'SELECT ''La columna de por si no existe jsjsjskjs'';'
+);
+
+PREPARE stmt2 FROM @drop_column;
+EXECUTE stmt2;
+DEALLOCATE PREPARE stmt2;
+
+SELECT * FROM categorias;
 
 CREATE TABLE horarios_categorias(
   id_horario_categoria INT AUTO_INCREMENT PRIMARY KEY,
@@ -151,7 +186,11 @@ CREATE TABLE jugadores(
   clave_jugador VARCHAR(100) NOT NULL, 
   foto_jugador VARCHAR(36) NULL,
   fecha_creacion DATETIME NULL DEFAULT NOW(),
-  CONSTRAINT chk_url_foto_jugador CHECK (foto_jugador LIKE '%.jpg' OR foto_jugador LIKE '%.png' OR foto_jugador LIKE '%.jpeg' OR foto_jugador LIKE '%.gif')
+  CONSTRAINT chk_url_foto_jugador CHECK (foto_jugador LIKE '%.jpg' OR foto_jugador LIKE '%.png' OR foto_jugador LIKE '%.jpeg' OR foto_jugador LIKE '%.gif'),
+  telefono VARCHAR(15) NOT NULL DEFAULT '0000-0000',
+  telefono_de_emergencia VARCHAR(15) NOT NULL DEFAULT '0000-0000',
+  observacion_medica VARCHAR(2000) NULL,
+  tipo_sangre ENUM('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-') NULL DEFAULT 'O+'
 );
 
 ALTER TABLE jugadores
@@ -171,6 +210,60 @@ ADD COLUMN correo_jugador VARCHAR(50) DEFAULT 'example@gmail.com';
 -- Agregar la restricción de formato para correo_jugador
 ALTER TABLE jugadores
 ADD CONSTRAINT chk_correo_jugador_formato CHECK (correo_jugador REGEXP '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$');
+
+SET @sql := IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+     WHERE TABLE_NAME = 'jugadores' 
+     AND COLUMN_NAME = 'telefono' 
+     AND TABLE_SCHEMA = DATABASE()) = 0,
+    'ALTER TABLE jugadores ADD COLUMN telefono VARCHAR(15) NOT NULL DEFAULT ''0000-0000'';',
+    'SELECT ''La columna ya existe.'';'
+);
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql := IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+     WHERE TABLE_NAME = 'jugadores' 
+     AND COLUMN_NAME = 'telefono_de_emergencia' 
+     AND TABLE_SCHEMA = DATABASE()) = 0,
+    'ALTER TABLE jugadores ADD COLUMN telefono_de_emergencia VARCHAR(15) NOT NULL DEFAULT ''0000-0000'';',
+    'SELECT ''La columna ya existe.'';'
+);
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql := IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+     WHERE TABLE_NAME = 'jugadores' 
+     AND COLUMN_NAME = 'observacion_medica' 
+     AND TABLE_SCHEMA = DATABASE()) = 0,
+    'ALTER TABLE jugadores ADD COLUMN observacion_medica VARCHAR(2000) NULL;',
+    'SELECT ''La columna ya existe.'';'
+);
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql := IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+     WHERE TABLE_NAME = 'jugadores' 
+     AND COLUMN_NAME = 'tipo_sangre' 
+     AND TABLE_SCHEMA = DATABASE()) = 0,
+    'ALTER TABLE jugadores ADD COLUMN tipo_sangre ENUM(''A+'', ''A-'', ''B+'', ''B-'', ''AB+'', ''AB-'', ''O+'', ''O-'') DEFAULT ''O+'';',
+    'SELECT ''La columna ya existe.'';'
+);
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SELECT * FROM jugadores;
 
 CREATE TABLE estados_fisicos_jugadores(
   id_estado_fisico_jugador INT AUTO_INCREMENT PRIMARY KEY,
@@ -227,33 +320,10 @@ CREATE TABLE entrenamientos(
   id_horario_categoria INT NOT NULL,
   CONSTRAINT fk_identificador_de_horario_categoria_entrenamiento FOREIGN KEY (id_horario_categoria) REFERENCES horarios_categorias(id_horario_categoria)
 );
-
--- Scripts para eliminar id_categoria y id_horario de entrenamientos y agregar id_horario_categoria
--- DROPS
-ALTER TABLE entrenamientos
-DROP FOREIGN KEY fk_identificador_de_categoria_entrenamiento;
-
-ALTER TABLE entrenamientos
-DROP FOREIGN KEY fk_identificador_de_horario_entrenamiento;
-
-ALTER TABLE entrenamientos
-DROP COLUMN id_categoria;
-
-ALTER TABLE entrenamientos
-DROP COLUMN id_horario;
-
--- ADD FOREIGN KEY
-ALTER TABLE entrenamientos
-ADD COLUMN id_horario_categoria INT NOT NULL;
-
-ALTER TABLE entrenamientos
-ADD CONSTRAINT fk_identificador_de_horario_categoria_entrenamiento FOREIGN KEY (id_horario_categoria) 
-REFERENCES horarios_categorias(id_horario_categoria);
-
 -- Si el alter les da error ejecutar lo de abajo, el error da porque cuando agregamos el campo, este permanece en 0
 -- y como debemos relacionarlo con la tabla, la tabla no tiene registros con id 0, entonces debemos acutalizar entrenamientos
 -- A un campo que si llo contenga la tabla horarios_categorias.
-UPDATE entrenamientos SET id_horario_categoria = 1 WHERE id_horario_categoria = 0;
+-- UPDATE entrenamientos SET id_horario_categoria = 1 WHERE id_horario_categoria = 0;
 
 CREATE TABLE caracteristicas_jugadores(
   id_caracteristica_jugador INT AUTO_INCREMENT PRIMARY KEY,
@@ -292,8 +362,37 @@ ALTER TABLE asistencias ADD CONSTRAINT fk_jugador_asistencia FOREIGN KEY (id_jug
 CREATE TABLE temas_contenidos(
   id_tema_contenido INT AUTO_INCREMENT PRIMARY KEY,
   nombre_tema_contenido VARCHAR(60) NOT NULL,
-  CONSTRAINT uq_tema_contenido_unico UNIQUE(nombre_tema_contenido)
+  CONSTRAINT uq_tema_contenido_unico UNIQUE(nombre_tema_contenido),
+  momento_juego ENUM('Ofensivo', 'Defensivo', 'Transición defensiva', 'Transición ofensiva', 'Balón parado ofensivo', 'Balón parado defensivo') NOT NULL,
+  zona_campo ENUM('') NOT NULL
 );
+
+SET @add_momento_juego := IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+     WHERE TABLE_NAME = 'temas_contenidos' 
+     AND COLUMN_NAME = 'momento_juego' 
+     AND TABLE_SCHEMA = DATABASE()) = 0,
+    'ALTER TABLE temas_contenidos ADD COLUMN momento_juego ENUM(''Ofensivo'', ''Defensivo'', ''Transición defensiva'', ''Transición ofensiva'', ''Balón parado ofensivo'', ''Balón parado defensivo'') NOT NULL;',
+    'SELECT ''La columan momento_juego ya existe.'';'
+);
+
+PREPARE stmt1 FROM @add_momento_juego;
+EXECUTE stmt1;
+DEALLOCATE PREPARE stmt1;
+
+SET @add_zona_campo := IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+     WHERE TABLE_NAME = 'temas_contenidos' 
+     AND COLUMN_NAME = 'zona_campo' 
+     AND TABLE_SCHEMA = DATABASE()) = 0,
+    'ALTER TABLE temas_contenidos ADD COLUMN zona_campo ENUM(''Zona 1'', ''Zona 2'', ''Zona 3'') NOT NULL;',
+    'SELECT ''La columna zona_campo ya existe.'';'
+);
+
+PREPARE stmt2 FROM @add_zona_campo;
+EXECUTE stmt2;
+DEALLOCATE PREPARE stmt2;
+
 
 CREATE TABLE sub_temas_contenidos(
   id_sub_tema_contenido INT AUTO_INCREMENT PRIMARY KEY,
@@ -385,15 +484,6 @@ CREATE TABLE participaciones_partidos(
   ) NULL DEFAULT 'Normal',
   puntuacion DECIMAL(5,2) UNSIGNED NULL DEFAULT 0
 );
-
--- ------------------------------------------
-
-ALTER TABLE participaciones_partidos
-ADD id_posicion INT;
-
-ALTER TABLE participaciones_partidos
-ADD  CONSTRAINT fk_partido_posiciones FOREIGN KEY(id_posicion) REFERENCES posiciones(id_posicion);
-
 -- ------------------------------------------
 
 CREATE TABLE detalles_goles (
