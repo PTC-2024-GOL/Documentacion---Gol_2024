@@ -53,13 +53,28 @@ CREATE TABLE tecnicos(
 ALTER TABLE tecnicos
 ADD COLUMN recovery_code VARCHAR(80) DEFAULT '0000';
 
+
 CREATE TABLE documentos_tecnicos(
   id_documento INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_archivo VARCHAR(50) NOT NULL, 
   id_tecnico INT NOT NULL, 
   CONSTRAINT fk_documento_del_tecnico FOREIGN KEY (id_tecnico) REFERENCES tecnicos(id_tecnico),
-  archivo_adjunto VARCHAR(50) NULL
+  archivo_adjunto VARCHAR(50) NULL,
+  fecha_registro DATE NULL DEFAULT NOW()
   );
+
+SET @sql := IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+     WHERE TABLE_NAME = 'documentos_tecnicos' 
+     AND COLUMN_NAME = 'fecha_registro' 
+     AND TABLE_SCHEMA = DATABASE()) = 0,
+    'ALTER TABLE documentos_tecnicos ADD COLUMN fecha_registro DATE NULL DEFAULT NOW();',
+    'SELECT ''La columna ya existe.'';'
+);
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 CREATE TABLE temporadas(
   id_temporada INT AUTO_INCREMENT PRIMARY KEY, 
