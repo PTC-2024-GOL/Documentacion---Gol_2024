@@ -16,6 +16,27 @@ INSERT INTO tecnicos (nombre_tecnico, apellido_tecnico, alias_tecnico, clave_tec
 ('Laura', 'Garcia', 'lgarcia', '$2y$10$DF/lklVm9Ggo56L90lglUzTiHvvM7L7yVzL9/qPQSZyzGTEQsM2u', 'laura.garcia@example.com', '7845-4528', '10002311-4', '1991-11-27', 'default.png'),
 ('Sofia', 'Reyes', 'sreyes', '$2y$10$EF/mnlWo0Hhp67M01mhmUzUjHwWQ8M9yWzM0/rRSZAzHTFUsN3u', 'sofia.reyes@example.com', '7845-4529', '11012312-3', '1993-01-31', 'default.png');
 
+SELECT 
+        j.id_jornada AS ID,
+        j.nombre_jornada AS NOMBRE,
+        j.numero_jornada AS NUMERO,
+        p.nombre_plantilla AS PLANTILLA,
+        j.id_plantilla AS ID_PLANTILLA,
+        j.fecha_inicio_jornada AS FECHA_INICIO,
+        j.fecha_fin_jornada AS FECHA_FIN
+        FROM 
+        jornadas j
+        INNER JOIN 
+        plantillas p ON j.id_plantilla = p.id_plantilla
+        INNER JOIN 
+        plantillas_equipos pe ON p.id_plantilla = pe.id_plantilla
+        INNER JOIN 
+        equipos e ON pe.id_equipo = e.id_equipo
+        INNER JOIN 
+        detalles_cuerpos_tecnicos dct ON e.id_cuerpo_tecnico = dct.id_cuerpo_tecnico
+        WHERE 
+        dct.id_tecnico = 1 
+        ORDER BY NOMBRE;
 -- Temporadas
 INSERT INTO temporadas (nombre_temporada) VALUES
 ('Temporada 2024'),
@@ -35,13 +56,13 @@ INSERT INTO horarios (nombre_horario, dia, hora_inicial, hora_final, campo_de_en
 ('Entrenamiento Sabado', 'Sabado', '18:00:00', '20:00:00', 'Campo F');
 
 -- Categorías
-INSERT INTO categorias (nombre_categoria, edad_minima_permitida, edad_maxima_permitida, id_temporada) VALUES
-('Sub-18', 15, 18, 1),
-('Sub-16', 13, 16, 2),
-('Sub-14', 11, 14, 3),
-('Sub-12', 9, 12, 4),
-('Sub-10', 7, 10, 5),
-('Sub-8', 5, 8, 6);
+INSERT INTO categorias (nombre_categoria, edad_minima_permitida, edad_maxima_permitida) VALUES
+('Sub-18', 15, 18),
+('Sub-16', 13, 16),
+('Sub-14', 11, 14),
+('Sub-12', 9, 12),
+('Sub-10', 7, 10),
+('Sub-8', 5, 8);
 
 
 -- Horarios_Categorias
