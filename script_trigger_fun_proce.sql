@@ -2697,3 +2697,98 @@ FROM asistencias a
 INNER JOIN entrenamientos e ON a.id_entrenamiento = e.id_entrenamiento
 GROUP BY a.fecha_asistencia, e.id_equipo;
 SELECT asistencia, fecha FROM vista_ultimos_entrenamientos WHERE id_equipo = 1;
+
+  
+-- --------------------- Documentos técnicos -------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_insertar_documento_tecnico;
+DELIMITER $$
+
+CREATE PROCEDURE sp_insertar_documento_tecnico (
+    IN p_nombre_archivo VARCHAR(50), 
+    IN p_id_tecnico INT, 
+    IN p_archivo_adjunto VARCHAR(50)
+)
+BEGIN
+    DECLARE doc_count INT;
+
+    -- Verificar si el nombre del archivo ya existe para el mismo técnico
+    SELECT COUNT(*) INTO doc_count
+    FROM documentos_tecnicos
+    WHERE nombre_archivo = p_nombre_archivo
+    AND id_tecnico = p_id_tecnico;
+
+    -- Si existe un duplicado de nombre de archivo para el técnico, generar un error
+    IF doc_count > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El nombre del archivo ya existe para este técnico';
+    ELSE
+        INSERT INTO documentos_tecnicos (nombre_archivo, id_tecnico, archivo_adjunto, fecha_registro)
+        VALUES (p_nombre_archivo, p_id_tecnico, p_archivo_adjunto, NOW());
+    END IF;
+END $$
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_actualizar_documento_tecnico;
+DELIMITER $$
+
+CREATE PROCEDURE sp_actualizar_documento_tecnico (
+    IN p_id_documento INT,
+    IN p_nombre_archivo VARCHAR(50), 
+    IN p_id_tecnico INT, 
+    IN p_archivo_adjunto VARCHAR(50)
+)
+BEGIN
+    DECLARE doc_count INT;
+
+    -- Verificar si el nombre del archivo ya existe para otro registro del mismo técnico
+    SELECT COUNT(*) INTO doc_count
+    FROM documentos_tecnicos
+    WHERE nombre_archivo = p_nombre_archivo
+    AND id_tecnico = p_id_tecnico
+    AND id_documento != p_id_documento;
+
+    -- Si existe un duplicado de nombre de archivo para el técnico, generar un error
+    IF doc_count > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El nombre del archivo ya existe para este técnico';
+    ELSE
+        UPDATE documentos_tecnicos
+        SET nombre_archivo = p_nombre_archivo, 
+            id_tecnico = p_id_tecnico, 
+            archivo_adjunto = p_archivo_adjunto,
+            fecha_registro = NOW()
+        WHERE id_documento = p_id_documento;
+    END IF;
+END $$
+
+DELIMITER ;
+
+
+DROP PROCEDURE IF EXISTS sp_eliminar_documento_tecnico;
+DELIMITER $$
+
+CREATE PROCEDURE sp_eliminar_documento_tecnico (
+    IN p_id_documento INT
+)
+BEGIN
+    DELETE FROM documentos_tecnicos
+    WHERE id_documento = p_id_documento;
+END $$
+
+DELIMITER ;
+
+
+
+DELIMITER $$
+
+CREATE VIEW vista_documentos_tecnicos AS
+SELECT 
+    id_documento AS 'ID',
+    nombre_archivo AS 'NOMBRE',
+    id_tecnico AS 'IDT',
+    archivo_adjunto AS 'ARCHIVO',
+    fecha_registro AS 'FECHA'
+FROM documentos_tecnicos;
+$$
+
+DELIMITER ;
