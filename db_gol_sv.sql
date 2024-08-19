@@ -379,7 +379,7 @@ CREATE TABLE temas_contenidos(
   nombre_tema_contenido VARCHAR(60) NOT NULL,
   CONSTRAINT uq_tema_contenido_unico UNIQUE(nombre_tema_contenido),
   momento_juego ENUM('Ofensivo', 'Defensivo', 'Transición defensiva', 'Transición ofensiva', 'Balón parado ofensivo', 'Balón parado defensivo') NOT NULL,
-  zona_campo ENUM('') NOT NULL
+  zona_campo ENUM('Zona 1', 'Zona 2', 'Zona 3') NOT NULL
 );
 
 SET @add_momento_juego := IF(
