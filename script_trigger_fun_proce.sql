@@ -2792,3 +2792,26 @@ FROM documentos_tecnicos;
 $$
 
 DELIMITER ;
+
+
+-- ------ Vista gráficos detalles contenidos ----------------
+CREATE VIEW vista_grafico_contenidos_entrenamiento AS
+SELECT
+    de.id_entrenamiento,
+    stc.sub_tema_contenido,
+    MAX(dc.minutos_contenido) AS minutos_maximos_subtema,
+    t.nombre_tarea,
+    MAX(dc.minutos_tarea) AS minutos_maximos_tarea
+FROM
+    detalle_entrenamiento de
+JOIN
+    detalles_contenidos dc ON de.id_detalle_contenido = dc.id_detalle_contenido
+JOIN
+    sub_temas_contenidos stc ON dc.id_sub_tema_contenido = stc.id_sub_tema_contenido
+JOIN
+    tareas t ON dc.id_tarea = t.id_tarea
+GROUP BY
+    de.id_entrenamiento,
+    stc.sub_tema_contenido,
+    t.nombre_tarea;
+SELECT * FROM vista_grafico_contenidos_entrenamiento WHERE id_entrenamiento = 13;
