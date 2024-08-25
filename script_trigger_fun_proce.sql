@@ -1173,7 +1173,7 @@ CREATE PROCEDURE sp_insertar_categoria (
     IN p_id_temporada INT
 )
 BEGIN
-    INSERT INTO categorias(nombre_categoria, edad_minima_permitida, edad_maxima_permitida, id_temporada)
+    INSERT INTO categorias(nombre_categoria, edad_minima_permitida, edad_maxima_permitida)
     VALUES (p_nombre_categoria, p_edad_minima_permitida, p_edad_maxima_permitida, p_id_temporada);
 END //
 DELIMITER ;
@@ -1184,12 +1184,11 @@ CREATE PROCEDURE sp_actualizar_categoria (
     IN p_id_categoria INT, 
     IN p_nombre_categoria VARCHAR(80), 
     IN p_edad_minima_permitida INT, 
-    IN p_edad_maxima_permitida INT, 
-    IN p_id_temporada INT
+    IN p_edad_maxima_permitida INT
 )
 BEGIN
     UPDATE categorias 
-    SET nombre_categoria = p_nombre_categoria, edad_minima_permitida = p_edad_minima_permitida, edad_maxima_permitida = p_edad_maxima_permitida, id_temporada = p_id_temporada
+    SET nombre_categoria = p_nombre_categoria, edad_minima_permitida = p_edad_minima_permitida, edad_maxima_permitida = p_edad_maxima_permitida
     WHERE id_categoria = p_id_categoria;
 END //
 DELIMITER ;
@@ -2368,13 +2367,9 @@ SELECT
     c.id_categoria,
     c.nombre_categoria,
     c.edad_minima_permitida,
-    c.edad_maxima_permitida,
-    c.id_temporada,
-    t.nombre_temporada
+    c.edad_maxima_permitida
 FROM 
-    categorias c
-INNER JOIN 
-    temporadas t ON c.id_temporada = t.id_temporada;
+    categorias c;
     
 -- Vista de horarios_categorias
 DROP VIEW IF EXISTS vista_horarios_categorias;
@@ -2815,3 +2810,23 @@ GROUP BY
     stc.sub_tema_contenido,
     t.nombre_tarea;
 SELECT * FROM vista_grafico_contenidos_entrenamiento WHERE id_entrenamiento = 13;
+
+-- Vista para reportes en participaciones partido
+CREATE VIEW vista_reporte_participacion_partido AS
+    SELECT
+        p.id_participacion,
+        j.nombre_jugador,
+        j.apellido_jugador,
+        p.id_partido,
+        p.titular,
+        p.sustitucion,
+        p.minutos_jugados,
+        p.goles,
+        p.asistencias,
+        p.estado_animo,
+        p.puntuacion,
+        po.posicion
+FROM participaciones_partidos p
+INNER JOIN jugadores j on p.id_jugador = j.id_jugador
+INNER JOIN posiciones po on p.id_posicion = po.id_posicion;
+
