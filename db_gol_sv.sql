@@ -290,9 +290,9 @@ CREATE TABLE estados_fisicos_jugadores(
   fecha_creacion DATETIME NULL DEFAULT NOW()
 );
 
-# Ejecutar en caso de que se haya creado la base antes del día martes 18 de junio del 2024 
-#ALTER TABLE estados_fisicos_jugadores MODIFY COLUMN altura_jugador DECIMAL(5, 2) UNSIGNED NOT NULL;
-#ALTER TABLE estados_fisicos_jugadores ADD COLUMN fecha_creacion DATETIME NULL DEFAULT NOW();
+# Ejecutar en caso de que se haya creado la base antes del día domingo 25 de agosto del 2024 
+#ALTER TABLE estados_fisicos_jugadores MODIFY COLUMN altura_jugador INT UNSIGNED NOT NULL;
+#ALTER TABLE estados_fisicos_jugadores MODIFY COLUMN peso_jugador INT UNSIGNED NOT NULL;
 
 CREATE TABLE plantillas(
   id_plantilla INT AUTO_INCREMENT PRIMARY KEY,

@@ -1169,12 +1169,11 @@ DELIMITER //
 CREATE PROCEDURE sp_insertar_categoria (
     IN p_nombre_categoria VARCHAR(80), 
     IN p_edad_minima_permitida INT, 
-    IN p_edad_maxima_permitida INT, 
-    IN p_id_temporada INT
+    IN p_edad_maxima_permitida INT
 )
 BEGIN
     INSERT INTO categorias(nombre_categoria, edad_minima_permitida, edad_maxima_permitida)
-    VALUES (p_nombre_categoria, p_edad_minima_permitida, p_edad_maxima_permitida, p_id_temporada);
+    VALUES (p_nombre_categoria, p_edad_minima_permitida, p_edad_maxima_permitida);
 END //
 DELIMITER ;
 
@@ -1473,7 +1472,6 @@ SELECT id_caracteristica_jugador AS 'ID',
        clasificacion_caracteristica_jugador AS 'CLASIFICACION'
 FROM caracteristicas_jugadores;
 $$
-
 -- VISTA para tabla cuerpo cuerpo técnico
 DROP VIEW IF EXISTS vista_cuerpos_tecnicos;
 DELIMITER $$
@@ -2427,6 +2425,8 @@ UPDATE entrenameientos SET fecha_entrenamiento = ?, sesion = ?, id_jornada ?, id
 CREATE VIEW vista_entrenamientos_contenidos AS
 SELECT 
     e.id_entrenamiento,
+    e.id_equipo,
+    e.fecha_entrenamiento,
     stc.sub_tema_contenido,
     CONCAT(tc.nombre_tema_contenido, ' - ', stc.sub_tema_contenido) AS contenidos
 FROM 
@@ -2496,6 +2496,13 @@ LEFT JOIN
     caracteristicas_jugadores cj ON ca.id_caracteristica_jugador = cj.id_caracteristica_jugador
 WHERE
     a.asistencia = 'Asistencia';
+SELECT * FROM asistencias WHERE id_entrenamiento = 23;
+SELECT * FROM caracteristicas_analisis;
+SELECT * FROM caracteristicas_jugadores;
+SELECT IDJ ,JUGADOR, IDE,
+        ROUND(AVG(NOTA), 2) AS PROMEDIO 
+        FROM vista_caracteristicas_analisis
+        WHERE IDE = 23 GROUP BY IDJ, JUGADOR;
 
 DROP PROCEDURE IF EXISTS insertarCaracteristicasYDetallesRemodelado;
 DELIMITER $$
@@ -2550,23 +2557,23 @@ DELIMITER ;
 
 
 -- PROCEDIMIENTO PARA SACAR EL PROMEDIO PARA CADA AREA DE ENTRENAMIENTO DE UN EQUIPO
-DELIMITER $$
-CREATE PROCEDURE analisisEntrenamientos(
-    IN p_id_equipo INT
-)
-BEGIN
-    SELECT
-        pj.id_jugador,
-        pj.id_equipo,
-        cj.clasificacion_caracteristica_jugador AS caracteristica,
-        ROUND(AVG(C.nota_caracteristica_analisis), 2) AS promedio
-    FROM plantillas_equipos pj
-        INNER JOIN caracteristicas_analisis c ON pj.id_plantilla_equipo = c.id_jugador
-        INNER JOIN caracteristicas_jugadores cj ON c.id_caracteristica_jugador = cj.id_caracteristica_jugador
-    WHERE id_equipo = p_id_equipo GROUP BY cj.clasificacion_caracteristica_jugador;
-
-END$$
-DELIMITER ;
+	DELIMITER $$
+	CREATE PROCEDURE analisisEntrenamientos(
+	    IN p_id_equipo INT
+	)
+	BEGIN
+	    SELECT
+	        pj.id_jugador,
+	        pj.id_equipo,
+	        cj.clasificacion_caracteristica_jugador AS caracteristica,
+	        ROUND(AVG(C.nota_caracteristica_analisis), 2) AS promedio
+	    FROM plantillas_equipos pj
+	        INNER JOIN caracteristicas_analisis c ON pj.id_plantilla_equipo = c.id_jugador
+	        INNER JOIN caracteristicas_jugadores cj ON c.id_caracteristica_jugador = cj.id_caracteristica_jugador
+	    WHERE id_equipo = p_id_equipo GROUP BY cj.clasificacion_caracteristica_jugador;
+	
+	END$$
+	DELIMITER ;
 
 -- ----------------------------------------------------ASISTENCIAS PROCEDIMIENTOS Y VISTAS--------------------------------------------------------------------------
 
@@ -2646,14 +2653,14 @@ JOIN
     plantillas_equipos pe ON a.id_jugador = pe.id_jugador
 JOIN
     jugadores j ON pe.id_jugador = j.id_jugador;
-
+SELECT * FROM vista_asistencias_default WHERE id_entrenamiento = 24;
 -- Vista cuando se sabe que no hay registros
 DROP VIEW IF EXISTS vista_asistencias_default;
 CREATE VIEW vista_asistencias_default AS
-SELECT
+SELECT DISTINCT
     CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS jugador,
     j.id_jugador AS id,
-    e.id_entrenamiento,
+    e.id_entrenamiento,                         
     'Asistencia' AS asistencia,
     NULL AS observacion,
     0 AS id_asistencia
@@ -2792,24 +2799,44 @@ DELIMITER ;
 -- ------ Vista gráficos detalles contenidos ----------------
 CREATE VIEW vista_grafico_contenidos_entrenamiento AS
 SELECT
-    de.id_entrenamiento,
-    stc.sub_tema_contenido,
-    MAX(dc.minutos_contenido) AS minutos_maximos_subtema,
-    t.nombre_tarea,
-    MAX(dc.minutos_tarea) AS minutos_maximos_tarea
-FROM
-    detalle_entrenamiento de
-JOIN
-    detalles_contenidos dc ON de.id_detalle_contenido = dc.id_detalle_contenido
-JOIN
-    sub_temas_contenidos stc ON dc.id_sub_tema_contenido = stc.id_sub_tema_contenido
-JOIN
-    tareas t ON dc.id_tarea = t.id_tarea
-GROUP BY
-    de.id_entrenamiento,
-    stc.sub_tema_contenido,
-    t.nombre_tarea;
-SELECT * FROM vista_grafico_contenidos_entrenamiento WHERE id_entrenamiento = 13;
+    id_entrenamiento,
+    sub_tema_contenido,
+    minutos_maximos_subtema
+FROM (
+    SELECT
+        de.id_entrenamiento,
+        stc.sub_tema_contenido,
+        MAX(dc.minutos_contenido) OVER (PARTITION BY de.id_entrenamiento, dc.id_sub_tema_contenido) AS minutos_maximos_subtema,
+        ROW_NUMBER() OVER (PARTITION BY de.id_entrenamiento, dc.id_sub_tema_contenido ORDER BY dc.minutos_contenido DESC) AS rn_subtema
+    FROM
+        detalle_entrenamiento de
+    JOIN
+        detalles_contenidos dc ON de.id_detalle_contenido = dc.id_detalle_contenido
+    LEFT JOIN
+        sub_temas_contenidos stc ON dc.id_sub_tema_contenido = stc.id_sub_tema_contenido
+) AS subquery
+WHERE rn_subtema = 1;
+
+
+CREATE VIEW vista_grafico_tareas_entrenamiento AS
+SELECT
+    id_entrenamiento,
+    nombre_tarea,
+    minutos_maximos_tarea
+FROM (
+    SELECT
+        de.id_entrenamiento,
+        t.nombre_tarea,
+        MAX(dc.minutos_tarea) OVER (PARTITION BY de.id_entrenamiento, dc.id_tarea) AS minutos_maximos_tarea,
+        ROW_NUMBER() OVER (PARTITION BY de.id_entrenamiento, dc.id_tarea ORDER BY dc.minutos_tarea DESC) AS rn_tarea
+    FROM
+        detalle_entrenamiento de
+    JOIN
+        detalles_contenidos dc ON de.id_detalle_contenido = dc.id_detalle_contenido
+    LEFT JOIN
+        tareas t ON dc.id_tarea = t.id_tarea
+) AS subquery
+WHERE rn_tarea = 1;
 
 -- Vista para reportes en participaciones partido
 CREATE VIEW vista_reporte_participacion_partido AS
@@ -2830,20 +2857,59 @@ FROM participaciones_partidos p
 INNER JOIN jugadores j on p.id_jugador = j.id_jugador
 INNER JOIN posiciones po on p.id_posicion = po.id_posicion;
 
-CREATE VIEW proyectiva_registro_medico AS
-    SELECT
-    rm.dias_lesionado,
-    rm.id_lesion,
-    rm.fecha_lesion,
-    DATEDIFF(rm.retorno_entreno, rm.fecha_lesion) AS dias_recuperacion,
-    l.id_tipo_lesion,
-    tl.tipo_lesion
-    FROM registros_medicos rm
-    INNER JOIN lesiones l on rm.id_lesion = l.id_lesion
-    INNER JOIN tipos_lesiones tl on l.id_tipo_lesion = tl.id_tipo_lesion
-    WHERE fecha_lesion IS NOT NULL;
 
-SELECT * FROM proyectiva_registro_medico;
+-- --------------------------------------Vistas para reporte predictivo "PROXIMO PARTIDO"--------------------------------------
+CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS nombre_completo_jugador,
+-- 1. Marcador de los últimos partidos del rival en este estilo: [1-0]
+SELECT resultado_partido FROM partidos WHERE id_rival = 1 AND tipo_resultado_partido <> 'Pendiente';
+-- 2. Marcador de victorias o derrotas {[victoria, local], [empate, visitante], [derrota, local]} y si eran local o visitante
+SELECT CONCAT(localidad_partido, ', ', tipo_resultado_partido) AS resultado FROM partidos WHERE id_rival = 1; 
+-- 3. Marcador de los últimos partidos del equipo gol en este estilo [1,0]
+SELECT resultado_partido FROM partidos WHERE id_equipo = 1 AND tipo_resultado_partido <> 'Pendiente';
+-- 4. Marcador de victorias o derrotas {[victoria, local], [empate, visitante], [derrota, local]} y si eran local o visitante
+SELECT CONCAT(localidad_partido, ', ', tipo_resultado_partido) AS resultado FROM partidos WHERE id_equipo = 1;
+-- 5. Contenidos vistos en el último 2 mes, nombre del contenido y frecuencia
+SELECT sub_tema_contenido, COUNT(sub_tema_contenido) AS frecuencia FROM vista_entrenamientos_contenidos 
+WHERE fecha_entrenamiento >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH) GROUP BY sub_tema_contenido;
+-- 6. Cantidad de entrenamientos en el 2 mes
+SELECT COUNT(id_entrenamiento) AS frecuencia_entrenamientos FROM entrenamientos WHERE fecha_entrenamiento >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH);
+-- 7. Logo, nombre del equipo y lo mismo del rival
+SELECT logo_rival, nombre_rival, logo_equipo, logo_rival FROM vista_detalle_partidos;
+-- 8. Nota pruebas promedio en cada area en el 2 último mes
+CREATE VIEW vista_caracteristicas_analisis_2 AS
+SELECT 
+    j.id_jugador AS IDJ,
+    CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS JUGADOR,
+    CASE 
+        WHEN ca.nota_caracteristica_analisis IS NULL THEN 0
+        ELSE ca.nota_caracteristica_analisis
+    END AS NOTA,
+    cj.id_caracteristica_jugador AS IDC,
+    cj.nombre_caracteristica_jugador AS CARACTERISTICA,
+    cj.clasificacion_caracteristica_jugador AS TIPO,
+    COALESCE(ca.id_entrenamiento, a.id_entrenamiento) AS IDE,
+    a.asistencia AS ASISTENCIA,
+    en.fecha_entrenamiento
+FROM 
+    jugadores j
+LEFT JOIN 
+    asistencias a ON j.id_jugador = a.id_jugador
+LEFT JOIN
+	entrenamientos en ON a.id_entrenamiento = en.id_entrenamiento
+LEFT JOIN 
+    caracteristicas_analisis ca ON j.id_jugador = ca.id_jugador AND a.id_entrenamiento = ca.id_entrenamiento
+LEFT JOIN 
+    caracteristicas_jugadores cj ON ca.id_caracteristica_jugador = cj.id_caracteristica_jugador
+WHERE
+    a.asistencia = 'Asistencia';
 
+SELECT IDJ, JUGADOR, ROUND(AVG(NOTA), 2) AS PROMEDIO, fecha_entrenamiento FROM vista_caracteristicas_analisis_2
+WHERE fecha_entrenamiento >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH) GROUP BY IDJ, JUGADOR
+HAVING PROMEDIO > 0;
 
+SELECT IDJ ,JUGADOR, 
+        ROUND(AVG(NOTA), 2) AS PROMEDIO 
+        FROM vista_caracteristicas_analisis
+        WHERE IDE = 16 GROUP BY IDJ, JUGADOR;
 
+-- 9. Nota de la última evaluación de los delanteros (sum), cantidad de asistencias de los últimos 2 meses (count)
