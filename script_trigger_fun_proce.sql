@@ -2792,24 +2792,44 @@ DELIMITER ;
 -- ------ Vista gráficos detalles contenidos ----------------
 CREATE VIEW vista_grafico_contenidos_entrenamiento AS
 SELECT
-    de.id_entrenamiento,
-    stc.sub_tema_contenido,
-    MAX(dc.minutos_contenido) AS minutos_maximos_subtema,
-    t.nombre_tarea,
-    MAX(dc.minutos_tarea) AS minutos_maximos_tarea
-FROM
-    detalle_entrenamiento de
-JOIN
-    detalles_contenidos dc ON de.id_detalle_contenido = dc.id_detalle_contenido
-JOIN
-    sub_temas_contenidos stc ON dc.id_sub_tema_contenido = stc.id_sub_tema_contenido
-JOIN
-    tareas t ON dc.id_tarea = t.id_tarea
-GROUP BY
-    de.id_entrenamiento,
-    stc.sub_tema_contenido,
-    t.nombre_tarea;
-SELECT * FROM vista_grafico_contenidos_entrenamiento WHERE id_entrenamiento = 13;
+    id_entrenamiento,
+    sub_tema_contenido,
+    minutos_maximos_subtema
+FROM (
+    SELECT
+        de.id_entrenamiento,
+        stc.sub_tema_contenido,
+        MAX(dc.minutos_contenido) OVER (PARTITION BY de.id_entrenamiento, dc.id_sub_tema_contenido) AS minutos_maximos_subtema,
+        ROW_NUMBER() OVER (PARTITION BY de.id_entrenamiento, dc.id_sub_tema_contenido ORDER BY dc.minutos_contenido DESC) AS rn_subtema
+    FROM
+        detalle_entrenamiento de
+    JOIN
+        detalles_contenidos dc ON de.id_detalle_contenido = dc.id_detalle_contenido
+    LEFT JOIN
+        sub_temas_contenidos stc ON dc.id_sub_tema_contenido = stc.id_sub_tema_contenido
+) AS subquery
+WHERE rn_subtema = 1;
+
+
+CREATE VIEW vista_grafico_tareas_entrenamiento AS
+SELECT
+    id_entrenamiento,
+    nombre_tarea,
+    minutos_maximos_tarea
+FROM (
+    SELECT
+        de.id_entrenamiento,
+        t.nombre_tarea,
+        MAX(dc.minutos_tarea) OVER (PARTITION BY de.id_entrenamiento, dc.id_tarea) AS minutos_maximos_tarea,
+        ROW_NUMBER() OVER (PARTITION BY de.id_entrenamiento, dc.id_tarea ORDER BY dc.minutos_tarea DESC) AS rn_tarea
+    FROM
+        detalle_entrenamiento de
+    JOIN
+        detalles_contenidos dc ON de.id_detalle_contenido = dc.id_detalle_contenido
+    LEFT JOIN
+        tareas t ON dc.id_tarea = t.id_tarea
+) AS subquery
+WHERE rn_tarea = 1;
 
 -- Vista para reportes en participaciones partido
 CREATE VIEW vista_reporte_participacion_partido AS
