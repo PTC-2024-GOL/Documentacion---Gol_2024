@@ -1169,12 +1169,11 @@ DELIMITER //
 CREATE PROCEDURE sp_insertar_categoria (
     IN p_nombre_categoria VARCHAR(80), 
     IN p_edad_minima_permitida INT, 
-    IN p_edad_maxima_permitida INT, 
-    IN p_id_temporada INT
+    IN p_edad_maxima_permitida INT
 )
 BEGIN
     INSERT INTO categorias(nombre_categoria, edad_minima_permitida, edad_maxima_permitida)
-    VALUES (p_nombre_categoria, p_edad_minima_permitida, p_edad_maxima_permitida, p_id_temporada);
+    VALUES (p_nombre_categoria, p_edad_minima_permitida, p_edad_maxima_permitida);
 END //
 DELIMITER ;
 
