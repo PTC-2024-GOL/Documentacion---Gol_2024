@@ -2857,25 +2857,6 @@ FROM participaciones_partidos p
 INNER JOIN jugadores j on p.id_jugador = j.id_jugador
 INNER JOIN posiciones po on p.id_posicion = po.id_posicion;
 
-
--- --------------------------------------Vistas para reporte predictivo "PROXIMO PARTIDO"--------------------------------------
-CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS nombre_completo_jugador,
--- 1. Marcador de los últimos partidos del rival en este estilo: [1-0]
-SELECT resultado_partido FROM partidos WHERE id_rival = 1 AND tipo_resultado_partido <> 'Pendiente';
--- 2. Marcador de victorias o derrotas {[victoria, local], [empate, visitante], [derrota, local]} y si eran local o visitante
-SELECT CONCAT(localidad_partido, ', ', tipo_resultado_partido) AS resultado FROM partidos WHERE id_rival = 1; 
--- 3. Marcador de los últimos partidos del equipo gol en este estilo [1,0]
-SELECT resultado_partido FROM partidos WHERE id_equipo = 1 AND tipo_resultado_partido <> 'Pendiente';
--- 4. Marcador de victorias o derrotas {[victoria, local], [empate, visitante], [derrota, local]} y si eran local o visitante
-SELECT CONCAT(localidad_partido, ', ', tipo_resultado_partido) AS resultado FROM partidos WHERE id_equipo = 1;
--- 5. Contenidos vistos en el último 2 mes, nombre del contenido y frecuencia
-SELECT sub_tema_contenido, COUNT(sub_tema_contenido) AS frecuencia FROM vista_entrenamientos_contenidos 
-WHERE fecha_entrenamiento >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH) GROUP BY sub_tema_contenido;
--- 6. Cantidad de entrenamientos en el 2 mes
-SELECT COUNT(id_entrenamiento) AS frecuencia_entrenamientos FROM entrenamientos WHERE fecha_entrenamiento >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH);
--- 7. Logo, nombre del equipo y lo mismo del rival
-SELECT logo_rival, nombre_rival, logo_equipo, logo_rival FROM vista_detalle_partidos;
--- 8. Nota pruebas promedio en cada area en el 2 último mes
 CREATE VIEW vista_caracteristicas_analisis_2 AS
 SELECT 
     j.id_jugador AS IDJ,
@@ -2903,13 +2884,63 @@ LEFT JOIN
 WHERE
     a.asistencia = 'Asistencia';
 
+
+
+CREATE VIEW delantero_asistencias_evaluaciones AS
+SELECT
+    p.id_partido,
+    p.id_equipo,
+    j.id_jugador,
+    COUNT(DISTINCT a.id_asistencia) AS frecuencia,
+    MAX(a.fecha_asistencia) AS fecha,
+    ROUND(AVG(
+        CASE 
+            WHEN ca.nota_caracteristica_analisis IS NULL THEN 0
+            ELSE ca.nota_caracteristica_analisis
+        END
+    ), 2) AS promedio
+FROM 
+    partidos p
+JOIN
+    equipos eq ON eq.id_equipo = p.id_equipo
+JOIN
+    plantillas_equipos pq ON pq.id_equipo = eq.id_equipo 
+JOIN
+    jugadores j ON j.id_jugador = pq.id_jugador
+JOIN 
+    posiciones ps ON ps.id_posicion = j.id_posicion_principal 
+    AND ps.area_de_juego = 'Ofensiva'
+JOIN 
+    asistencias a ON a.id_jugador = j.id_jugador
+LEFT JOIN
+    caracteristicas_analisis ca ON j.id_jugador = ca.id_jugador 
+    AND a.id_entrenamiento = ca.id_entrenamiento
+WHERE 
+    a.fecha_asistencia >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH)
+GROUP BY 
+    p.id_partido, p.id_equipo, j.id_jugador
+HAVING 
+    promedio > 0;
+
+-- --------------------------------------Vistas para reporte predictivo "PROXIMO PARTIDO"--------------------------------------
+-- 1. Marcador de los últimos partidos del rival en este estilo: [1-0]
+SELECT resultado_partido FROM partidos WHERE id_rival = 1 AND tipo_resultado_partido <> 'Pendiente';
+-- 2. Marcador de victorias o derrotas {[victoria, local], [empate, visitante], [derrota, local]} y si eran local o visitante
+SELECT CONCAT(localidad_partido, ', ', tipo_resultado_partido) AS resultado FROM partidos WHERE id_rival = 1; 
+-- 3. Marcador de los últimos partidos del equipo gol en este estilo [1,0]
+SELECT resultado_partido FROM partidos WHERE id_equipo = 1 AND tipo_resultado_partido <> 'Pendiente';
+-- 4. Marcador de victorias o derrotas {[victoria, local], [empate, visitante], [derrota, local]} y si eran local o visitante
+SELECT CONCAT(localidad_partido, ', ', tipo_resultado_partido) AS resultado FROM partidos WHERE id_equipo = 1;
+-- 5. Contenidos vistos en el último 2 mes, nombre del contenido y frecuencia
+SELECT sub_tema_contenido, id_equipo, COUNT(sub_tema_contenido) AS frecuencia FROM vista_entrenamientos_contenidos 
+WHERE id_equipo = 1 AND fecha_entrenamiento >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH) GROUP BY sub_tema_contenido;
+-- 6. Cantidad de entrenamientos en el 2 mes
+SELECT COUNT(id_entrenamiento) AS frecuencia_entrenamientos FROM entrenamientos WHERE id_equipo = 1 AND fecha_entrenamiento >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH);
+-- 7. Logo, nombre del equipo y lo mismo del rival
+SELECT logo_rival, nombre_rival, logo_equipo, logo_rival FROM vista_detalle_partidos WHERE id_partido = 1;
+-- 8. Nota pruebas promedio en cada area en el 2 último mes
 SELECT IDJ, JUGADOR, ROUND(AVG(NOTA), 2) AS PROMEDIO, fecha_entrenamiento FROM vista_caracteristicas_analisis_2
 WHERE fecha_entrenamiento >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH) GROUP BY IDJ, JUGADOR
 HAVING PROMEDIO > 0;
-
-SELECT IDJ ,JUGADOR, 
-        ROUND(AVG(NOTA), 2) AS PROMEDIO 
-        FROM vista_caracteristicas_analisis
-        WHERE IDE = 16 GROUP BY IDJ, JUGADOR;
-
 -- 9. Nota de la última evaluación de los delanteros (sum), cantidad de asistencias de los últimos 2 meses (count)
+SELECT DISTINCT frecuencia, id_jugador, promedio FROM delantero_asistencias_evaluaciones;
