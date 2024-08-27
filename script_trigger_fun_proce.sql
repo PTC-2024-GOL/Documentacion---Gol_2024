@@ -2958,3 +2958,31 @@ SELECT IDJ, JUGADOR, ROUND(AVG(NOTA), 2) AS PROMEDIO, fecha_entrenamiento FROM v
 WHERE fecha_entrenamiento >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH) GROUP BY IDJ, JUGADOR
 HAVING PROMEDIO > 0;
 -- 9. Nota de la última evaluación de los delanteros (sum), cantidad de asistencias de los últimos 2 meses (count)
+
+-- ------ Vista para gráfica predictiva de progresión
+DROP VIEW IF EXISTS vista_predictiva_progresion;
+CREATE VIEW vista_predictiva_progresion AS
+SELECT DISTINCT
+    j.id_jugador AS IDJ,
+    CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS JUGADOR,
+    ca.nota_caracteristica_analisis AS NOTA,
+    cj.id_caracteristica_jugador AS IDC,
+    cj.nombre_caracteristica_jugador AS CARACTERISTICA,
+    cj.clasificacion_caracteristica_jugador AS TIPO,
+    COALESCE(ca.id_entrenamiento, a.id_entrenamiento) AS IDE,
+    e.fecha_entrenamiento AS FECHA,
+    a.asistencia AS ASISTENCIA
+FROM 
+    jugadores j
+LEFT JOIN 
+    asistencias a ON j.id_jugador = a.id_jugador
+LEFT JOIN 
+    entrenamientos e ON e.id_entrenamiento = a.id_entrenamiento
+LEFT JOIN 
+    caracteristicas_analisis ca ON j.id_jugador = ca.id_jugador AND a.id_entrenamiento = ca.id_entrenamiento
+LEFT JOIN 
+    caracteristicas_jugadores cj ON ca.id_caracteristica_jugador = cj.id_caracteristica_jugador
+WHERE
+    a.asistencia = 'Asistencia'
+    AND ca.nota_caracteristica_analisis IS NOT NULL;
+    
