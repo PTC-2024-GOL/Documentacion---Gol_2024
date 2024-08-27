@@ -171,11 +171,11 @@ BEGIN
         INSERT INTO jornadas (nombre_jornada, numero_jornada, id_plantilla, fecha_inicio_jornada, fecha_fin_jornada)
         VALUES (nombre_jornada, numero_jornada, id_plantilla, fecha_inicio, fecha_fin);
     ELSE
-        UPDATE jornadas 
-        SET nombre_jornada = nombre_jornada, 
-            numero_jornada = numero_jornada, 
-            id_plantilla = id_plantilla, 
-            fecha_inicio_jornada = fecha_inicio, 
+        UPDATE jornadas
+        SET nombre_jornada = nombre_jornada,
+            numero_jornada = numero_jornada,
+            id_plantilla = id_plantilla,
+            fecha_inicio_jornada = fecha_inicio,
             fecha_fin_jornada = fecha_fin
         WHERE id_jornada = insertOrUpdate;
     END IF;
@@ -200,7 +200,7 @@ BEGIN
     INTO contador_jornada_entrenamientos
     FROM entrenamientos
     WHERE id_jornada = p_id_jornada;
-    
+
     SELECT COUNT(*)
     INTO contador_jornada_partidos
     FROM partidos
@@ -299,7 +299,7 @@ BEGIN
     INTO contador_partido_participaciones
     FROM participaciones_partidos
     WHERE id_partido = p_id_partido;
-    
+
     SELECT COUNT(*)
     INTO contador_partido_registro_medico
     FROM registros_medicos
@@ -335,12 +335,12 @@ BEGIN
 
     -- Validar formato de correo
     IF p_correo_administrador REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
-        
+
         -- Verificar si el correo ya existe
         SELECT COUNT(*) INTO email_count
         FROM administradores
         WHERE correo_administrador = p_correo_administrador;
-        
+
         -- Verificar si el DUI ya existe
         SELECT COUNT(*) INTO dui_count
         FROM administradores
@@ -382,13 +382,13 @@ BEGIN
 
     -- Validar formato de correo
     IF p_correo_administrador REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
-        
+
         -- Verificar si el correo ya existe para otro administrador
         SELECT COUNT(*) INTO email_count
         FROM administradores
         WHERE correo_administrador = p_correo_administrador
         AND id_administrador <> p_id_administrador;
-        
+
         -- Verificar si el DUI ya existe para otro administrador
         SELECT COUNT(*) INTO dui_count
         FROM administradores
@@ -402,12 +402,12 @@ BEGIN
             SIGNAL SQLSTATE '45002' SET MESSAGE_TEXT = 'DUI ya existe';
         ELSE
             -- Actualizar el registro del administrador
-            UPDATE administradores SET 
-                nombre_administrador = p_nombre_administrador, 
-                apellido_administrador = p_apellido_administrador, 
+            UPDATE administradores SET
+                nombre_administrador = p_nombre_administrador,
+                apellido_administrador = p_apellido_administrador,
                 correo_administrador = p_correo_administrador,
-                telefono_administrador = p_telefono_administrador, 
-                dui_administrador = p_dui_administrador, 
+                telefono_administrador = p_telefono_administrador,
+                dui_administrador = p_dui_administrador,
                 fecha_nacimiento_administrador = p_fecha_nacimiento_administrador,
                 foto_administrador = p_foto_administrador
             WHERE id_administrador = p_id_administrador;
@@ -450,12 +450,12 @@ BEGIN
 
     -- Validar formato de correo
     IF p_correo_tecnico REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
-        
+
         -- Verificar si el correo ya existe
         SELECT COUNT(*) INTO email_count
         FROM tecnicos
         WHERE correo_tecnico = p_correo_tecnico;
-        
+
         -- Verificar si el DUI ya existe
         SELECT COUNT(*) INTO dui_count
         FROM tecnicos
@@ -499,13 +499,13 @@ BEGIN
 
     -- Validar formato de correo
     IF p_correo_tecnico REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
-        
+
         -- Verificar si el correo ya existe para otro técnico
         SELECT COUNT(*) INTO email_count
         FROM tecnicos
         WHERE correo_tecnico = p_correo_tecnico
         AND id_tecnico <> p_id_tecnico;
-        
+
         -- Verificar si el DUI ya existe para otro técnico
         SELECT COUNT(*) INTO dui_count
         FROM tecnicos
@@ -519,12 +519,12 @@ BEGIN
             SIGNAL SQLSTATE '45002' SET MESSAGE_TEXT = 'DUI ya existe';
         ELSE
             -- Actualizar el registro del técnico
-            UPDATE tecnicos SET 
-                nombre_tecnico = p_nombre_tecnico, 
-                apellido_tecnico = p_apellido_tecnico, 
+            UPDATE tecnicos SET
+                nombre_tecnico = p_nombre_tecnico,
+                apellido_tecnico = p_apellido_tecnico,
                 correo_tecnico = p_correo_tecnico,
-                telefono_tecnico = p_telefono_tecnico, 
-                dui_tecnico = p_dui_tecnico, 
+                telefono_tecnico = p_telefono_tecnico,
+                dui_tecnico = p_dui_tecnico,
                 fecha_nacimiento_tecnico = p_fecha_nacimiento_tecnico,
                 foto_tecnico = p_foto_tecnico
             WHERE id_tecnico = p_id_tecnico;
@@ -554,7 +554,7 @@ DROP PROCEDURE IF EXISTS insertar_caracteristica_jugador;
 DELIMITER $$
 CREATE PROCEDURE insertar_caracteristica_jugador(
     IN p_nombre_caracteristica VARCHAR(50),
-    IN p_clasificacion ENUM('Técnicos', 'Tácticos', 'Psicológicos', 'Físicos') 
+    IN p_clasificacion ENUM('Técnicos', 'Tácticos', 'Psicológicos', 'Físicos')
 )
 BEGIN
     INSERT INTO caracteristicas_jugadores (nombre_caracteristica_jugador, clasificacion_caracteristica_jugador)
@@ -568,7 +568,7 @@ DELIMITER $$
 CREATE PROCEDURE actualizar_caracteristica_jugador(
     IN p_id_caracteristica INT,
     IN p_nuevo_nombre VARCHAR(50),
-    IN p_nueva_clasificacion ENUM('Técnicos', 'Tácticos', 'Psicológicos', 'Físicos') 
+    IN p_nueva_clasificacion ENUM('Técnicos', 'Tácticos', 'Psicológicos', 'Físicos')
 )
 BEGIN
     UPDATE caracteristicas_jugadores
@@ -988,7 +988,7 @@ END //
 DELIMITER ;
 
 -- Procedimientos para la tabla jornadas
- 
+
 DROP PROCEDURE IF EXISTS insertar_jornada;
 DELIMITER //
 CREATE PROCEDURE insertar_jornada(
@@ -1133,7 +1133,7 @@ DELIMITER ;
 -- Procedimiento para insertar una nueva posición
 DELIMITER //
 CREATE PROCEDURE sp_insertar_posicion (
-    IN p_posicion VARCHAR(60), 
+    IN p_posicion VARCHAR(60),
     IN p_area_de_juego ENUM('Ofensiva', 'Defensiva', 'Ofensiva y defensiva')
 )
 BEGIN
@@ -1145,12 +1145,12 @@ DELIMITER ;
 -- Procedimiento para actualizar una posición
 DELIMITER //
 CREATE PROCEDURE sp_actualizar_posicion (
-    IN p_id_posicion INT, 
-    IN p_posicion VARCHAR(60), 
+    IN p_id_posicion INT,
+    IN p_posicion VARCHAR(60),
     IN p_area_de_juego ENUM('Ofensiva', 'Defensiva', 'Ofensiva y defensiva')
 )
 BEGIN
-    UPDATE posiciones 
+    UPDATE posiciones
     SET posicion = p_posicion, area_de_juego = p_area_de_juego
     WHERE id_posicion = p_id_posicion;
 END //
@@ -1167,8 +1167,8 @@ DELIMITER ;
 -- Procedimiento para insertar una nueva categoría
 DELIMITER //
 CREATE PROCEDURE sp_insertar_categoria (
-    IN p_nombre_categoria VARCHAR(80), 
-    IN p_edad_minima_permitida INT, 
+    IN p_nombre_categoria VARCHAR(80),
+    IN p_edad_minima_permitida INT,
     IN p_edad_maxima_permitida INT
 )
 BEGIN
@@ -1180,13 +1180,13 @@ DELIMITER ;
 -- Procedimiento para actualizar una categoría
 DELIMITER //
 CREATE PROCEDURE sp_actualizar_categoria (
-    IN p_id_categoria INT, 
-    IN p_nombre_categoria VARCHAR(80), 
-    IN p_edad_minima_permitida INT, 
+    IN p_id_categoria INT,
+    IN p_nombre_categoria VARCHAR(80),
+    IN p_edad_minima_permitida INT,
     IN p_edad_maxima_permitida INT
 )
 BEGIN
-    UPDATE categorias 
+    UPDATE categorias
     SET nombre_categoria = p_nombre_categoria, edad_minima_permitida = p_edad_minima_permitida, edad_maxima_permitida = p_edad_maxima_permitida
     WHERE id_categoria = p_id_categoria;
 END //
@@ -1203,7 +1203,7 @@ DELIMITER ;
 -- Procedimiento para insertar horarios_categorias
 DELIMITER //
 CREATE PROCEDURE sp_insertar_horario_categoria (
-    IN p_id_categoria INT, 
+    IN p_id_categoria INT,
     IN p_id_horario INT
 )
 BEGIN
@@ -1215,12 +1215,12 @@ DELIMITER ;
 -- Procedimiento para actualizar horarios_categorias
 DELIMITER //
 CREATE PROCEDURE sp_actualizar_horario_categoria (
-    IN p_id_horario_categoria INT, 
-    IN p_id_categoria INT, 
+    IN p_id_horario_categoria INT,
+    IN p_id_categoria INT,
     IN p_id_horario INT
 )
 BEGIN
-    UPDATE horarios_categorias 
+    UPDATE horarios_categorias
     SET id_categoria = p_id_categoria, id_horario = p_id_horario
     WHERE id_horario_categoria = p_id_horario_categoria;
 END //
@@ -1237,11 +1237,11 @@ DELIMITER ;
 -- Procedimiento para insertar registros_medicos
 DELIMITER //
 CREATE PROCEDURE sp_insertar_registro_medico (
-    IN p_id_jugador INT, 
+    IN p_id_jugador INT,
     IN p_fecha_lesion DATE,
-    IN p_dias_lesionado INT, 
-    IN p_id_lesion INT, 
-    IN p_retorno_entreno DATE, 
+    IN p_dias_lesionado INT,
+    IN p_id_lesion INT,
+    IN p_retorno_entreno DATE,
     IN p_retorno_partido INT
 )
 BEGIN
@@ -1253,16 +1253,16 @@ DELIMITER ;
 -- Procedimiento para actualizar registros_medicos
 DELIMITER //
 CREATE PROCEDURE sp_actualizar_registro_medico (
-    IN p_id_registro_medico INT, 
-    IN p_id_jugador INT, 
+    IN p_id_registro_medico INT,
+    IN p_id_jugador INT,
     IN p_fecha_lesion DATE,
-    IN p_dias_lesionado INT, 
-    IN p_id_lesion INT, 
-    IN p_retorno_entreno DATE, 
+    IN p_dias_lesionado INT,
+    IN p_id_lesion INT,
+    IN p_retorno_entreno DATE,
     IN p_retorno_partido INT
 )
 BEGIN
-    UPDATE registros_medicos 
+    UPDATE registros_medicos
     SET id_jugador = p_id_jugador, fecha_lesion = p_fecha_lesion, dias_lesionado = p_dias_lesionado, id_lesion = p_id_lesion, retorno_entreno = p_retorno_entreno, retorno_partido = p_retorno_partido
     WHERE id_registro_medico = p_id_registro_medico;
 END //
@@ -1282,9 +1282,9 @@ DROP PROCEDURE IF EXISTS sp_insertar_plantilla_equipo;
 DELIMITER //
 
 CREATE PROCEDURE sp_insertar_plantilla_equipo (
-    IN p_id_plantilla INT, 
-    IN p_id_jugador INT, 
-    IN p_id_temporada INT, 
+    IN p_id_plantilla INT,
+    IN p_id_jugador INT,
+    IN p_id_temporada INT,
     IN p_id_equipo INT
 )
 BEGIN
@@ -1293,9 +1293,9 @@ BEGIN
     -- Verificar si el registro ya existe
     SELECT COUNT(*) INTO record_count
     FROM plantillas_equipos
-    WHERE id_plantilla = p_id_plantilla 
-      AND id_jugador = p_id_jugador 
-      AND id_temporada = p_id_temporada 
+    WHERE id_plantilla = p_id_plantilla
+      AND id_jugador = p_id_jugador
+      AND id_temporada = p_id_temporada
       AND id_equipo = p_id_equipo;
 
     -- Si existe un duplicado, generar un error
@@ -1312,10 +1312,10 @@ DROP PROCEDURE IF EXISTS sp_actualizar_plantilla_equipo;
 DELIMITER //
 
 CREATE PROCEDURE sp_actualizar_plantilla_equipo (
-    IN p_id_plantilla_equipo INT, 
-    IN p_id_plantilla INT, 
-    IN p_id_jugador INT, 
-    IN p_id_temporada INT, 
+    IN p_id_plantilla_equipo INT,
+    IN p_id_plantilla INT,
+    IN p_id_jugador INT,
+    IN p_id_temporada INT,
     IN p_id_equipo INT
 )
 BEGIN
@@ -1324,9 +1324,9 @@ BEGIN
     -- Verificar si el registro ya existe para otro plantilla equipo
     SELECT COUNT(*) INTO record_count
     FROM plantillas_equipos
-    WHERE id_plantilla = p_id_plantilla 
-      AND id_jugador = p_id_jugador 
-      AND id_temporada = p_id_temporada 
+    WHERE id_plantilla = p_id_plantilla
+      AND id_jugador = p_id_jugador
+      AND id_temporada = p_id_temporada
       AND id_equipo = p_id_equipo
       AND id_plantilla_equipo <> p_id_plantilla_equipo;
 
@@ -1334,10 +1334,10 @@ BEGIN
     IF record_count > 0 THEN
         SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'El registro ya existe';
     ELSE
-        UPDATE plantillas_equipos 
-        SET id_plantilla = p_id_plantilla, 
-            id_jugador = p_id_jugador, 
-            id_temporada = p_id_temporada, 
+        UPDATE plantillas_equipos
+        SET id_plantilla = p_id_plantilla,
+            id_jugador = p_id_jugador,
+            id_temporada = p_id_temporada,
             id_equipo = p_id_equipo
         WHERE id_plantilla_equipo = p_id_plantilla_equipo;
     END IF;
@@ -1357,8 +1357,8 @@ DROP PROCEDURE IF EXISTS sp_insertar_detalle_cuerpo_tecnico;
 DELIMITER //
 
 CREATE PROCEDURE sp_insertar_detalle_cuerpo_tecnico (
-    IN p_id_cuerpo_tecnico INT, 
-    IN p_id_tecnico INT, 
+    IN p_id_cuerpo_tecnico INT,
+    IN p_id_tecnico INT,
     IN p_id_rol_tecnico INT
 )
 BEGIN
@@ -1367,8 +1367,8 @@ BEGIN
     -- Verificar si el registro ya existe
     SELECT COUNT(*) INTO record_count
     FROM detalles_cuerpos_tecnicos
-    WHERE id_cuerpo_tecnico = p_id_cuerpo_tecnico 
-      AND (id_tecnico = p_id_tecnico 
+    WHERE id_cuerpo_tecnico = p_id_cuerpo_tecnico
+      AND (id_tecnico = p_id_tecnico
       OR id_rol_tecnico = p_id_rol_tecnico);
 
     -- Si existe un duplicado, generar un error
@@ -1385,9 +1385,9 @@ DROP PROCEDURE IF EXISTS sp_actualizar_detalle_cuerpo_tecnico;
 DELIMITER //
 
 CREATE PROCEDURE sp_actualizar_detalle_cuerpo_tecnico (
-    IN p_id_detalle_cuerpo_tecnico INT, 
-    IN p_id_cuerpo_tecnico INT, 
-    IN p_id_tecnico INT, 
+    IN p_id_detalle_cuerpo_tecnico INT,
+    IN p_id_cuerpo_tecnico INT,
+    IN p_id_tecnico INT,
     IN p_id_rol_tecnico INT
 )
 BEGIN
@@ -1396,8 +1396,8 @@ BEGIN
     -- Verificar si el registro ya existe para otro detalle
     SELECT COUNT(*) INTO record_count
     FROM detalles_cuerpos_tecnicos
-    WHERE id_cuerpo_tecnico = p_id_cuerpo_tecnico 
-      AND (id_tecnico = p_id_tecnico 
+    WHERE id_cuerpo_tecnico = p_id_cuerpo_tecnico
+      AND (id_tecnico = p_id_tecnico
       OR id_rol_tecnico = p_id_rol_tecnico)
       AND id_detalle_cuerpo_tecnico <> p_id_detalle_cuerpo_tecnico;
 
@@ -1405,9 +1405,9 @@ BEGIN
     IF record_count > 0 THEN
         SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'El registro ya existe';
     ELSE
-        UPDATE detalles_cuerpos_tecnicos 
-        SET id_cuerpo_tecnico = p_id_cuerpo_tecnico, 
-            id_tecnico = p_id_tecnico, 
+        UPDATE detalles_cuerpos_tecnicos
+        SET id_cuerpo_tecnico = p_id_cuerpo_tecnico,
+            id_tecnico = p_id_tecnico,
             id_rol_tecnico = p_id_rol_tecnico
         WHERE id_detalle_cuerpo_tecnico = p_id_detalle_cuerpo_tecnico;
     END IF;
@@ -1429,14 +1429,14 @@ DROP VIEW IF EXISTS vista_tabla_administradores;
 DELIMITER $$
 CREATE VIEW vista_tabla_administradores AS
 SELECT id_administrador AS 'ID',
-foto_administrador AS 'IMAGEN', 
+foto_administrador AS 'IMAGEN',
 CONCAT(nombre_administrador, ' ', apellido_administrador) AS 'NOMBRE',
-correo_administrador AS 'CORREO', 
+correo_administrador AS 'CORREO',
 telefono_administrador AS 'TELÉFONO',
 dui_administrador AS 'DUI',
 fecha_nacimiento_administrador AS 'NACIMIENTO',
 alias_administrador AS 'ALIAS',
-    CASE 
+    CASE
         WHEN estado_administrador = 1 THEN 'Activo'
         WHEN estado_administrador = 0 THEN 'Bloqueado'
     END AS 'ESTADO'
@@ -1449,13 +1449,13 @@ DELIMITER $$
 CREATE VIEW vista_tabla_tecnicos AS
 SELECT id_tecnico AS 'ID',
 CONCAT(nombre_tecnico, ' ', apellido_tecnico) AS 'NOMBRE',
-foto_tecnico AS 'IMAGEN', 
-correo_tecnico AS 'CORREO', 
+foto_tecnico AS 'IMAGEN',
+correo_tecnico AS 'CORREO',
 telefono_tecnico AS 'TELÉFONO',
 dui_tecnico AS 'DUI',
 fecha_nacimiento_tecnico AS 'NACIMIENTO',
 alias_tecnico AS 'ALIAS',
-    CASE 
+    CASE
         WHEN estado_tecnico = 1 THEN 'Activo'
         WHEN estado_tecnico = 0 THEN 'Bloqueado'
     END AS 'ESTADO'
@@ -1541,50 +1541,50 @@ DELIMITER ;
 
 -- VISTA para la tabla temporadas
 CREATE VIEW vista_temporadas AS
-SELECT 
+SELECT
   id_temporada AS ID,
   nombre_temporada AS NOMBRE
-FROM 
+FROM
   temporadas;
 
 -- VISTA para la tabla tareas
 CREATE VIEW vista_tareas AS
-SELECT 
+SELECT
   id_tarea AS ID,
   nombre_tarea AS NOMBRE
-FROM 
+FROM
   tareas;
 
 -- VISTA para la tabla plantillas
 CREATE VIEW vista_plantillas AS
-SELECT 
+SELECT
   id_plantilla AS ID,
   nombre_plantilla AS NOMBRE
-FROM 
+FROM
   plantillas;
 
 -- VISTA para la tabla tipos lesiones
 CREATE VIEW vista_tipos_lesiones AS
-SELECT 
+SELECT
   id_tipo_lesion AS ID,
   tipo_lesion AS NOMBRE
-FROM 
+FROM
   tipos_lesiones;
 
 
 -- VISTA para la tabla rol tecnico
 CREATE VIEW vista_rol_tecnico AS
-SELECT 
+SELECT
   id_rol_tecnico AS ID,
   nombre_rol_tecnico AS NOMBRE
-FROM 
+FROM
   rol_tecnico;
 
 
 -- Vista para jornadas
 DROP VIEW IF EXISTS vw_jornadas;
 CREATE VIEW vw_jornadas AS
-SELECT 
+SELECT
     j.id_jornada AS ID,
     j.nombre_jornada AS NOMBRE,
     j.numero_jornada AS NUMERO,
@@ -1592,15 +1592,15 @@ SELECT
     j.id_plantilla AS ID_PLANTILLA,
     j.fecha_inicio_jornada AS FECHA_INICIO,
     j.fecha_fin_jornada AS FECHA_FIN
-FROM 
+FROM
     jornadas j
-INNER JOIN 
+INNER JOIN
     plantillas p ON j.id_plantilla = p.id_plantilla;
 
 -- Vista para plantillas_equipos
 DROP VIEW IF EXISTS vw_plantillas_equipos_agrupadas;
 CREATE VIEW vw_plantillas_equipos_agrupadas AS
-SELECT 
+SELECT
     pe.id_plantilla_equipo AS ID,
     pe.id_plantilla AS ID_PLANTILLA,
     p.nombre_plantilla AS NOMBRE_PLANTILLA,
@@ -1609,15 +1609,15 @@ SELECT
     t.nombre_temporada AS NOMBRE_TEMPORADA,
     pe.id_equipo AS ID_EQUIPO,
     e.nombre_equipo AS NOMBRE_EQUIPO
-FROM 
+FROM
     plantillas_equipos pe
-INNER JOIN 
+INNER JOIN
     plantillas p ON pe.id_plantilla = p.id_plantilla
-INNER JOIN 
+INNER JOIN
     temporadas t ON pe.id_temporada = t.id_temporada
-INNER JOIN 
+INNER JOIN
     equipos e ON pe.id_equipo = e.id_equipo
-GROUP BY 
+GROUP BY
     pe.id_plantilla,
     p.nombre_plantilla,
     pe.id_temporada,
@@ -1630,7 +1630,7 @@ SELECT * FROM vw_plantillas_equipos_agrupadas;
 -- Vista para detalles_cuerpos_tecnicos
 DROP VIEW IF EXISTS vw_detalles_cuerpos_tecnicos;
 CREATE VIEW vw_detalles_cuerpos_tecnicos AS
-SELECT 
+SELECT
     dct.id_detalle_cuerpo_tecnico AS ID,
     dct.id_cuerpo_tecnico AS ID_CUERPO_TECNICO,
     dct.id_tecnico AS ID_TECNICO,
@@ -1639,13 +1639,13 @@ SELECT
     t.foto_tecnico AS IMAGEN,
     CONCAT(t.nombre_tecnico, ' ', t.apellido_tecnico) AS TECNICO,
     rt.nombre_rol_tecnico AS ROL_TECNICO
-FROM 
+FROM
     detalles_cuerpos_tecnicos dct
-INNER JOIN 
+INNER JOIN
     cuerpos_tecnicos ct ON dct.id_cuerpo_tecnico = ct.id_cuerpo_tecnico
-INNER JOIN 
+INNER JOIN
     tecnicos t ON dct.id_tecnico = t.id_tecnico
-INNER JOIN 
+INNER JOIN
     rol_tecnico rt ON dct.id_rol_tecnico = rt.id_rol_tecnico;
 
 SELECT * FROM vw_detalles_cuerpos_tecnicos;
@@ -1920,57 +1920,57 @@ INNER JOIN
 -- ------------------------------------------------------------------------DETALLES CONTENIDOS----------------------------------------------------------------
 -- Vista para el GET de detalles contenidos- elegir horarios
 CREATE VIEW vista_equipos_categorias AS
-SELECT 
-    equipos.id_equipo, 
-    categorias.nombre_categoria, 
+SELECT
+    equipos.id_equipo,
+    categorias.nombre_categoria,
     equipos.nombre_equipo
-FROM 
+FROM
     equipos
-JOIN 
+JOIN
     categorias ON equipos.id_categoria = categorias.id_categoria;
-    
- 
--- Vista para conocer los horarios de un equipo en especifico, se usa en detalles contenidos - elegir horarios 
+
+
+-- Vista para conocer los horarios de un equipo en especifico, se usa en detalles contenidos - elegir horarios
 SELECT * FROM entrenamientos;
 SELECT * FROM horarios;
 CREATE VIEW vista_horarios_equipos AS
-SELECT 
+SELECT
   e.id_equipo,
   e.id_entrenamiento,
   e.fecha_entrenamiento,
   CONCAT(h.dia, DATE_FORMAT(e.fecha_entrenamiento, ' %d de %M'), ' de ', TIME_FORMAT(h.hora_inicial, '%H:%i'), ' A ', TIME_FORMAT(h.hora_final, '%H:%i')) AS horario
-FROM 
+FROM
   entrenamientos e
-INNER JOIN 
+INNER JOIN
   horarios_categorias r ON e.id_horario_categoria = r.id_horario_categoria
-INNER JOIN 
+INNER JOIN
   horarios h ON r.id_horario = h.id_horario;
 
 -- Vista para el GET de detalles contenidos
 CREATE VIEW vista_detalle_entrenamiento AS
-SELECT 
+SELECT
     e.id_equipo,
     e.id_entrenamiento,
     dc.id_detalle_contenido,
     j.nombre_jugador,
     stc.sub_tema_contenido AS nombre_subtema,
     t.nombre_tarea
-FROM 
+FROM
     detalle_entrenamiento de
-JOIN 
+JOIN
     entrenamientos e ON de.id_entrenamiento = e.id_entrenamiento
-JOIN 
+JOIN
     detalles_contenidos dc ON de.id_detalle_contenido = dc.id_detalle_contenido
-JOIN 
+JOIN
     jugadores j ON de.id_jugador = j.id_jugador
-JOIN 
+JOIN
     sub_temas_contenidos stc ON dc.id_sub_tema_contenido = stc.id_sub_tema_contenido
-JOIN 
+JOIN
     tareas t ON dc.id_tarea = t.id_tarea;
 
 -- Vista para el UPDATE de detalles contenidos
 CREATE VIEW vista_detalle_entrenamiento_especifico AS
-SELECT 
+SELECT
     dc.id_detalle_contenido,
     j.id_jugador,
     stc.id_sub_tema_contenido,
@@ -1978,31 +1978,31 @@ SELECT
     dc.minutos_tarea,
     t.id_tarea,
     de.id_detalle
-FROM 
+FROM
     detalle_entrenamiento de
-JOIN 
+JOIN
     detalles_contenidos dc ON de.id_detalle_contenido = dc.id_detalle_contenido
-JOIN 
+JOIN
     jugadores j ON de.id_jugador = j.id_jugador
-JOIN 
+JOIN
     sub_temas_contenidos stc ON dc.id_sub_tema_contenido = stc.id_sub_tema_contenido
-JOIN 
-    tareas t ON dc.id_tarea = t.id_tarea;    
-    
+JOIN
+    tareas t ON dc.id_tarea = t.id_tarea;
+
 SELECT * FROM vista_detalle_entrenamiento_especifico;
 
 -- Vista para conocr los jugadores de un equipo, solo se necesita saber el id equipo, se usa en detalles contenidos
 CREATE VIEW vista_equipos_jugadores AS
-SELECT 
+SELECT
     e.id_equipo,
     j.nombre_jugador AS jugadores,
     j.id_jugador AS id,
     pe.id_plantilla_equipo
-FROM 
+FROM
     equipos e
-JOIN 
+JOIN
     plantillas_equipos pe ON e.id_equipo = pe.id_equipo
-JOIN 
+JOIN
     jugadores j ON pe.id_jugador = j.id_jugador;
 
 SELECT * FROM vista_equipos_jugadores;
@@ -2024,7 +2024,7 @@ BEGIN
     -- Insertar en detalles_contenidos
     INSERT INTO detalles_contenidos (id_tarea, id_sub_tema_contenido, minutos_contenido, minutos_tarea)
     VALUES (p_tarea_id, p_subContenido_id, p_subContenido_minutos, p_tarea_minutos);
-    
+
     SET v_id_detalle_contenido = LAST_INSERT_ID();
 
     INSERT INTO detalle_entrenamiento (id_entrenamiento, id_detalle_contenido, id_jugador)
@@ -2045,14 +2045,14 @@ CREATE PROCEDURE actualizarDetalleContenido(
     IN p_id_detalle_contenido INT UNSIGNED
 )
 BEGIN
-    
+
       UPDATE detalles_contenidos
       SET id_tarea = p_tarea_id,
       id_sub_tema_contenido = p_subContenido_id,
       minutos_contenido = p_subContenido_minutos,
       minutos_tarea = p_tarea_minutos
       WHERE id_detalle_contenido = p_id_detalle_contenido;
-      
+
 END;
 $$
 
@@ -2063,7 +2063,7 @@ DROP PROCEDURE IF EXISTS sp_insertar_rival;
 DELIMITER //
 
 CREATE PROCEDURE sp_insertar_rival (
-    IN p_nombre_rival VARCHAR(50), 
+    IN p_nombre_rival VARCHAR(50),
     IN p_logo_rival VARCHAR(50)
 )
 BEGIN
@@ -2088,8 +2088,8 @@ DROP PROCEDURE IF EXISTS sp_actualizar_rival;
 DELIMITER //
 
 CREATE PROCEDURE sp_actualizar_rival (
-    IN p_id_rival INT, 
-    IN p_nombre_rival VARCHAR(50), 
+    IN p_id_rival INT,
+    IN p_nombre_rival VARCHAR(50),
     IN p_logo_rival VARCHAR(50)
 )
 BEGIN
@@ -2106,7 +2106,7 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El nombre del rival ya existe';
     ELSE
         UPDATE rivales
-        SET nombre_rival = p_nombre_rival, 
+        SET nombre_rival = p_nombre_rival,
             logo_rival = p_logo_rival
         WHERE id_rival = p_id_rival;
     END IF;
@@ -2137,7 +2137,7 @@ DELIMITER ;
 
 DELIMITER $$
 CREATE VIEW vista_rivales AS
-SELECT 
+SELECT
     id_rival AS 'ID',
     nombre_rival AS 'Nombre',
     logo_rival AS 'Logo'
@@ -2334,7 +2334,7 @@ DELIMITER ;
 
 -- Vista de registros medicos
 CREATE VIEW vista_registros_medicos AS
-SELECT 
+SELECT
     rm.id_registro_medico,
     rm.id_jugador,
     CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS nombre_completo_jugador,
@@ -2348,31 +2348,31 @@ SELECT
     rm.retorno_entreno,
     rm.retorno_partido,
     p.fecha_partido
-FROM 
+FROM
     registros_medicos rm
-INNER JOIN 
+INNER JOIN
     jugadores j ON rm.id_jugador = j.id_jugador
-INNER JOIN 
+INNER JOIN
     lesiones l ON rm.id_lesion = l.id_lesion
-INNER JOIN 
+INNER JOIN
     sub_tipologias st ON l.id_sub_tipologia = st.id_sub_tipologia
-LEFT JOIN 
+LEFT JOIN
     partidos p ON rm.retorno_partido = p.id_partido;
 
 -- Vista de categorias
 CREATE VIEW vista_categorias AS
-SELECT 
+SELECT
     c.id_categoria,
     c.nombre_categoria,
     c.edad_minima_permitida,
     c.edad_maxima_permitida
-FROM 
+FROM
     categorias c;
-    
+
 -- Vista de horarios_categorias
 DROP VIEW IF EXISTS vista_horarios_categorias;
 CREATE VIEW vista_horarios_categorias AS
-SELECT 
+SELECT
     hc.id_horario_categoria,
     hc.id_horario,
     h.nombre_horario,
@@ -2381,33 +2381,36 @@ SELECT
     h.dia,
     h.hora_inicial,
     h.hora_final
-FROM 
+FROM
     horarios_categorias hc
-INNER JOIN 
+INNER JOIN
     horarios h ON hc.id_horario = h.id_horario
-INNER JOIN 
+INNER JOIN
     categorias c ON hc.id_categoria = c.id_categoria;
 
 
 -- ---------------------------------------VISTA PARA INGRESOS----------------------------------------------------
+DROP VIEW IF EXISTS vista_ingresos;
 CREATE VIEW vista_ingresos AS
     SELECT
+        YEAR(fecha_pago) as anio,
         mes_pago AS mes,
         SUM(cantidad_pago) AS cantidad
-FROM pagos GROUP BY mes_pago;
-
+FROM pagos
+WHERE YEAR(fecha_pago) = YEAR(CURDATE())
+GROUP BY mes_pago ;
 
 -- ------------------------------------------------------------------------ENTRENAMIENTOS----------------------------------------------------------------
 -- -Vista para el read all
 CREATE VIEW vista_jornadas_entrenamientos AS
-SELECT 
-    j.id_jornada, 
+SELECT
+    j.id_jornada,
     e.id_entrenamiento,
     e.fecha_entrenamiento,
     CONCAT(DATE_FORMAT(e.fecha_entrenamiento, '%e de %M del %Y'), ' - ', e.sesion) AS detalle_entrenamiento
-FROM 
+FROM
     jornadas j
-JOIN 
+JOIN
     entrenamientos e ON j.id_jornada = e.id_jornada;
 SELECT * FROM vista_jornadas_entrenamientos WHERE id_jornada = 1;
 
@@ -2423,23 +2426,23 @@ UPDATE entrenameientos SET fecha_entrenamiento = ?, sesion = ?, id_jornada ?, id
 */
 -- Vista para ver los contenidos de un entrenamientos
 CREATE VIEW vista_entrenamientos_contenidos AS
-SELECT 
+SELECT
     e.id_entrenamiento,
     e.id_equipo,
     e.fecha_entrenamiento,
     stc.sub_tema_contenido,
     CONCAT(tc.nombre_tema_contenido, ' - ', stc.sub_tema_contenido) AS contenidos
-FROM 
+FROM
     entrenamientos e
-JOIN 
+JOIN
     detalle_entrenamiento de ON e.id_entrenamiento = de.id_entrenamiento
-JOIN 
+JOIN
     detalles_contenidos dc ON de.id_detalle_contenido = dc.id_detalle_contenido
-JOIN 
+JOIN
     sub_temas_contenidos stc ON dc.id_sub_tema_contenido = stc.id_sub_tema_contenido
-JOIN 
+JOIN
     temas_contenidos tc ON stc.id_tema_contenido = tc.id_tema_contenido
-GROUP BY 
+GROUP BY
     e.id_entrenamiento, contenidos;
 
 SELECT * FROM vista_entrenamientos_contenidos;
@@ -2447,7 +2450,7 @@ SELECT * FROM vista_entrenamientos_contenidos WHERE id_entrenamiento = 1;
 
 -- vista para el titulo de entrenamientos
 CREATE VIEW vista_jornadas AS
-SELECT 
+SELECT
     id_jornada,
     CONCAT(
         'Jornada del ',
@@ -2455,29 +2458,29 @@ SELECT
         ' - ',
         DATE_FORMAT(fecha_fin_jornada, '%e de %M')
     ) AS titulo
-FROM 
+FROM
     jornadas;
 
 -- Vista para ver las categorias y los horarios de la tabla horarios_categorias
 CREATE VIEW vista_entrenamientos_horario_categorias AS
-SELECT 
+SELECT
     e.id_horario_categoria AS id_categoria,
     CONCAT(dc.nombre_categoria, ' - ', de.nombre_horario) AS nombre_categoria
-FROM 
+FROM
     horarios_categorias e
-JOIN 
+JOIN
     horarios de ON e.id_horario = de.id_horario
-JOIN 
+JOIN
     categorias dc ON e.id_categoria = dc.id_categoria;
 
 -- -----------------------------------VISTA PARA CARACTERISTICAS ANALISIS -------------------------------------------------------------------------
 DROP VIEW IF EXISTS vista_caracteristicas_analisis;
 
 CREATE VIEW vista_caracteristicas_analisis AS
-SELECT 
+SELECT
     j.id_jugador AS IDJ,
     CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS JUGADOR,
-    CASE 
+    CASE
         WHEN ca.nota_caracteristica_analisis IS NULL THEN 0
         ELSE ca.nota_caracteristica_analisis
     END AS NOTA,
@@ -2486,13 +2489,13 @@ SELECT
     cj.clasificacion_caracteristica_jugador AS TIPO,
     COALESCE(ca.id_entrenamiento, a.id_entrenamiento) AS IDE,
     a.asistencia AS ASISTENCIA
-FROM 
+FROM
     jugadores j
-LEFT JOIN 
+LEFT JOIN
     asistencias a ON j.id_jugador = a.id_jugador
-LEFT JOIN 
+LEFT JOIN
     caracteristicas_analisis ca ON j.id_jugador = ca.id_jugador AND a.id_entrenamiento = ca.id_entrenamiento
-LEFT JOIN 
+LEFT JOIN
     caracteristicas_jugadores cj ON ca.id_caracteristica_jugador = cj.id_caracteristica_jugador
 WHERE
     a.asistencia = 'Asistencia';
@@ -2500,7 +2503,7 @@ SELECT * FROM asistencias WHERE id_entrenamiento = 23;
 SELECT * FROM caracteristicas_analisis;
 SELECT * FROM caracteristicas_jugadores;
 SELECT IDJ ,JUGADOR, IDE,
-        ROUND(AVG(NOTA), 2) AS PROMEDIO 
+        ROUND(AVG(NOTA), 2) AS PROMEDIO
         FROM vista_caracteristicas_analisis
         WHERE IDE = 23 GROUP BY IDJ, JUGADOR;
 
@@ -2571,7 +2574,7 @@ DELIMITER ;
 	        INNER JOIN caracteristicas_analisis c ON pj.id_plantilla_equipo = c.id_jugador
 	        INNER JOIN caracteristicas_jugadores cj ON c.id_caracteristica_jugador = cj.id_caracteristica_jugador
 	    WHERE id_equipo = p_id_equipo GROUP BY cj.clasificacion_caracteristica_jugador;
-	
+
 	END$$
 	DELIMITER ;
 
@@ -2579,21 +2582,21 @@ DELIMITER ;
 
 -- -Vista para saber si un regisro de id entrenamiento tiene asistencias o no, tambien entrega datos generales que la asistencia necesitará, como el id_horario
 CREATE VIEW vista_asistencias_entrenamiento AS
-SELECT 
+SELECT
     e.id_entrenamiento,
     e.fecha_entrenamiento,
     h.id_horario,
-    CASE 
-        WHEN COUNT(de.id_entrenamiento > 0) > 0 THEN 1 
-        ELSE 0 
+    CASE
+        WHEN COUNT(de.id_entrenamiento > 0) > 0 THEN 1
+        ELSE 0
     END AS asistencia
-FROM 
+FROM
     entrenamientos e
-LEFT JOIN 
+LEFT JOIN
     asistencias de ON e.id_entrenamiento = de.id_entrenamiento
-INNER JOIN 
+INNER JOIN
 	horarios_categorias h ON e.id_horario_categoria = h.id_horario_categoria
-GROUP BY 
+GROUP BY
     e.id_entrenamiento;
 
 -- -Procedimiento para agregar o actualizar una asistencia
@@ -2609,7 +2612,7 @@ CREATE PROCEDURE Asistencia(
     IN p_asistencia_bool BOOL
 )
 BEGIN
-    DECLARE v_id INT; 	
+    DECLARE v_id INT;
     DECLARE done INT DEFAULT 0;
     DECLARE v_id_asistencia INT;
     DECLARE v_exists INT;
@@ -2618,7 +2621,7 @@ BEGIN
     IF (p_asistencia_bool = 1) THEN
         -- Actualizar el registro
         UPDATE asistencias
-        SET 
+        SET
             id_horario = p_id_horario,
             id_jugador = p_id_jugador,
             asistencia = p_asistencia,
@@ -2628,7 +2631,7 @@ BEGIN
         -- Insertar un nuevo registro
         INSERT INTO asistencias (id_jugador, id_horario, asistencia, observacion_asistencia, id_entrenamiento)
         VALUES (p_id_jugador, p_id_horario, p_asistencia, p_observacion, p_id_entrenamiento);
-        
+
     END IF;
 END$$
 
@@ -2660,7 +2663,7 @@ CREATE VIEW vista_asistencias_default AS
 SELECT DISTINCT
     CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS jugador,
     j.id_jugador AS id,
-    e.id_entrenamiento,                         
+    e.id_entrenamiento,
     'Asistencia' AS asistencia,
     NULL AS observacion,
     0 AS id_asistencia
@@ -2700,15 +2703,15 @@ INNER JOIN entrenamientos e ON a.id_entrenamiento = e.id_entrenamiento
 GROUP BY a.fecha_asistencia, e.id_equipo;
 SELECT asistencia, fecha FROM vista_ultimos_entrenamientos WHERE id_equipo = 1;
 
-  
+
 -- --------------------- Documentos técnicos -------------------------------------
 
 DROP PROCEDURE IF EXISTS sp_insertar_documento_tecnico;
 DELIMITER $$
 
 CREATE PROCEDURE sp_insertar_documento_tecnico (
-    IN p_nombre_archivo VARCHAR(50), 
-    IN p_id_tecnico INT, 
+    IN p_nombre_archivo VARCHAR(50),
+    IN p_id_tecnico INT,
     IN p_archivo_adjunto VARCHAR(50)
 )
 BEGIN
@@ -2736,8 +2739,8 @@ DELIMITER $$
 
 CREATE PROCEDURE sp_actualizar_documento_tecnico (
     IN p_id_documento INT,
-    IN p_nombre_archivo VARCHAR(50), 
-    IN p_id_tecnico INT, 
+    IN p_nombre_archivo VARCHAR(50),
+    IN p_id_tecnico INT,
     IN p_archivo_adjunto VARCHAR(50)
 )
 BEGIN
@@ -2755,8 +2758,8 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El nombre del archivo ya existe para este técnico';
     ELSE
         UPDATE documentos_tecnicos
-        SET nombre_archivo = p_nombre_archivo, 
-            id_tecnico = p_id_tecnico, 
+        SET nombre_archivo = p_nombre_archivo,
+            id_tecnico = p_id_tecnico,
             archivo_adjunto = p_archivo_adjunto,
             fecha_registro = NOW()
         WHERE id_documento = p_id_documento;
@@ -2784,7 +2787,7 @@ DELIMITER ;
 DELIMITER $$
 
 CREATE VIEW vista_documentos_tecnicos AS
-SELECT 
+SELECT
     id_documento AS 'ID',
     nombre_archivo AS 'NOMBRE',
     id_tecnico AS 'IDT',
