@@ -2907,6 +2907,33 @@ GROUP BY
 HAVING
     promedio > 0;
 
+CREATE VIEW vista_caracteristicas_analisis_2 AS
+SELECT
+    j.id_jugador AS IDJ,
+    CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS JUGADOR,
+    CASE
+        WHEN ca.nota_caracteristica_analisis IS NULL THEN 0
+        ELSE ca.nota_caracteristica_analisis
+    END AS NOTA,
+    cj.id_caracteristica_jugador AS IDC,
+    cj.nombre_caracteristica_jugador AS CARACTERISTICA,
+    cj.clasificacion_caracteristica_jugador AS TIPO,
+    COALESCE(ca.id_entrenamiento, a.id_entrenamiento) AS IDE,
+    a.asistencia AS ASISTENCIA,
+    en.fecha_entrenamiento
+FROM
+    jugadores j
+LEFT JOIN
+    asistencias a ON j.id_jugador = a.id_jugador
+LEFT JOIN
+	entrenamientos en ON a.id_entrenamiento = en.id_entrenamiento
+LEFT JOIN
+    caracteristicas_analisis ca ON j.id_jugador = ca.id_jugador AND a.id_entrenamiento = ca.id_entrenamiento
+LEFT JOIN
+    caracteristicas_jugadores cj ON ca.id_caracteristica_jugador = cj.id_caracteristica_jugador
+WHERE
+    a.asistencia = 'Asistencia';
+
 -- --------------------------------------Vistas para reporte predictivo "PROXIMO PARTIDO"--------------------------------------
 -- 1. Marcador de los últimos partidos del rival en este estilo: [1-0]
 SELECT resultado_partido FROM partidos WHERE id_rival = 1 AND tipo_resultado_partido <> 'Pendiente';
