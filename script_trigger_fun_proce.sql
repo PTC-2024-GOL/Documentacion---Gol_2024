@@ -1693,7 +1693,12 @@ CREATE VIEW vista_jugadores AS
         j.fecha_creacion,
         DATE_FORMAT(j.fecha_creacion, '%e de %M del %Y') AS registoJugador,
         p1.posicion AS posicionPrincipal,
-        p2.posicion AS posicionSecundaria
+        p2.posicion AS posicionSecundaria,
+        j.observacion_medica,
+        j.tipo_sangre,
+        j.telefono,
+        j.telefono_de_emergencia,
+        j.correo_jugador
 FROM jugadores j
 INNER JOIN
     posiciones p1 ON j.id_posicion_principal = p1.id_posicion
