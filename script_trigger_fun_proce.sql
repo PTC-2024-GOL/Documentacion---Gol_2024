@@ -1703,6 +1703,7 @@ INNER JOIN
 SELECT * FROM vista_jugadores;
 
 -- Procedimiento para insertar un jugador
+DROP PROCEDURE IF EXISTS insertar_jugador;
 DELIMITER $$
 CREATE PROCEDURE insertar_jugador(
    IN p_dorsal_jugador INT UNSIGNED,
@@ -1716,19 +1717,25 @@ CREATE PROCEDURE insertar_jugador(
    IN p_id_posicion_principal INT,
    IN p_id_posicion_secundaria INT,
    IN p_clave_jugador VARCHAR(100),
-   IN p_foto_jugador VARCHAR(50)
+   IN p_foto_jugador VARCHAR(50),
+   IN telefonoJ VARCHAR(15),
+   IN telefono_emergenciaJ VARCHAR(15),
+   IN correoJ VARCHAR(50),
+   IN tipo_sangreJ VARCHAR(10),
+   IN observacion_medicaJ VARCHAR(200)
 )
 BEGIN
     DECLARE p_alias_jugador VARCHAR(25);
         -- Generar el alias utilizando la función, suponiendo que la función generar_alias_tecnico existe
         SET p_alias_jugador = generar_alias_jugador(p_nombre_jugador, p_apellido_jugador, p_perfil_jugador, NOW());
-        INSERT INTO jugadores (dorsal_jugador, nombre_jugador, apellido_jugador, estatus_jugador, fecha_nacimiento_jugador, genero_jugador, perfil_jugador, becado, id_posicion_principal, id_posicion_secundaria, clave_jugador, foto_jugador, alias_jugador)
-        VALUES(p_dorsal_jugador, p_nombre_jugador, p_apellido_jugador, p_estatus_jugador, p_fecha_nacimiento_jugador, p_genero_jugador, p_perfil_jugador, p_becado, p_id_posicion_principal, p_id_posicion_secundaria, p_clave_jugador, p_foto_jugador, p_alias_jugador);
+        INSERT INTO jugadores (dorsal_jugador, nombre_jugador, apellido_jugador, estatus_jugador, fecha_nacimiento_jugador, genero_jugador, perfil_jugador, becado, id_posicion_principal, id_posicion_secundaria, clave_jugador, foto_jugador, alias_jugador, telefono, telefono_de_emergencia, correo_jugador, tipo_sangre, observacion_medica)
+        VALUES(p_dorsal_jugador, p_nombre_jugador, p_apellido_jugador, p_estatus_jugador, p_fecha_nacimiento_jugador, p_genero_jugador, p_perfil_jugador, p_becado, p_id_posicion_principal, p_id_posicion_secundaria, p_clave_jugador, p_foto_jugador, p_alias_jugador, telefonoJ, telefono_emergenciaJ, correoJ, tipo_sangreJ, observacion_medicaJ);
 END;
 $$
 DELIMITER ;
 
 -- Procedimiento para actualizar jugador
+DROP PROCEDURE IF EXISTS actualizar_jugador;
 DELIMITER //
 CREATE PROCEDURE actualizar_jugador (
     IN id INT,
@@ -1742,13 +1749,18 @@ CREATE PROCEDURE actualizar_jugador (
     IN beca VARCHAR(50),
     IN posicionPrincipal INT,
     IN posicionSecundaria INT,
-    IN foto VARCHAR(36)
+    IN foto VARCHAR(36),
+    IN telefonoJ VARCHAR(15),
+    IN telefono_emergenciaJ VARCHAR(15),
+    IN correoJ VARCHAR(50),
+    IN tipo_sangreJ VARCHAR(10),
+    IN observacion_medicaJ VARCHAR(200)
 )
 BEGIN
     UPDATE jugadores
     SET id_jugador = id, dorsal_jugador = dorsal, nombre_jugador = nombre, apellido_jugador = apellido,
         estatus_jugador = estatus, fecha_nacimiento_jugador = nacimiento, genero_jugador = genero, perfil_jugador = perfil,
-        becado = beca, id_posicion_principal = posicionPrincipal, id_posicion_secundaria = posicionSecundaria, foto_jugador = foto
+        becado = beca, id_posicion_principal = posicionPrincipal, id_posicion_secundaria = posicionSecundaria, foto_jugador = foto, telefono = telefonoJ, telefono_de_emergencia = telefono_emergenciaJ, correo_jugador = correoJ, tipo_sangre = tipo_sangreJ, observacion_medica = observacion_medicaJ
     WHERE id_jugador = id;
 END //
 DELIMITER ;
