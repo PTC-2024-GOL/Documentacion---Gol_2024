@@ -8,7 +8,7 @@ CREATE USER 'db_sv_gol_desarrollador'@'localhost' IDENTIFIED BY '123456';
 USE db_gol_sv;
  
 -- Asignamos permisos para ver, actualizar, eliminar y crear
-GRANT SELECT, INSERT, UPDATE, DELETE ON db_gol_sv.* TO 'db_gol_sv_desarrollador'@'localhost'	;
+GRANT SELECT, INSERT, UPDATE, DELETE ON db_gol_sv.* TO 'db_gol_sv_desarrollador'@'localhost';
   
 -- Asignamos permisos para ejecutar y crear funciones, triggers, vistas y procedimientos
 GRANT EXECUTE, CREATE ROUTINE, CREATE VIEW, TRIGGER ON db_gol_sv.* TO 'db_gol_sv_desarrollador'@'localhost';

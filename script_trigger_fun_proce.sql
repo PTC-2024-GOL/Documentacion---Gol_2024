@@ -2604,6 +2604,8 @@ SELECT
     e.id_entrenamiento,
     e.fecha_entrenamiento,
     h.id_horario,
+    DATE_FORMAT(e.fecha_entrenamiento, '%e de %M del %Y') AS fecha_transformada,
+    e.sesion,
     CASE
         WHEN COUNT(de.id_entrenamiento > 0) > 0 THEN 1
         ELSE 0
@@ -3032,3 +3034,6 @@ WHERE
     a.asistencia = 'Asistencia'
     AND ca.nota_caracteristica_analisis IS NOT NULL;
     
+    
+SELECT id_asistencia, observacion, asistencia, id, jugador, id_entrenamiento 
+        FROM vista_asistencias WHERE id_entrenamiento = 25;
