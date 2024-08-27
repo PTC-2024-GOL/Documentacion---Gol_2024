@@ -2857,6 +2857,21 @@ FROM participaciones_partidos p
 INNER JOIN jugadores j on p.id_jugador = j.id_jugador
 INNER JOIN posiciones po on p.id_posicion = po.id_posicion;
 
+CREATE VIEW proyectiva_registro_medico AS
+    SELECT
+    rm.dias_lesionado,
+    rm.id_lesion,
+    rm.fecha_lesion,
+    DATEDIFF(rm.retorno_entreno, rm.fecha_lesion) AS dias_recuperacion,
+    l.id_tipo_lesion,
+    tl.tipo_lesion
+    FROM registros_medicos rm
+    INNER JOIN lesiones l on rm.id_lesion = l.id_lesion
+    INNER JOIN tipos_lesiones tl on l.id_tipo_lesion = tl.id_tipo_lesion
+    WHERE fecha_lesion IS NOT NULL;
+
+SELECT * FROM proyectiva_registro_medico;
+
 
 -- --------------------------------------Vistas para reporte predictivo "PROXIMO PARTIDO"--------------------------------------
 CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS nombre_completo_jugador,
