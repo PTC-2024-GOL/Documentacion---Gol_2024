@@ -2159,7 +2159,8 @@ SELECT
     e.nombre_equipo,
     i.nombre_rival AS nombre_rival,
     p.tipo_resultado_partido,
-    e.id_equipo
+    e.id_equipo,
+    i.id_rival
 FROM
     partidos p
 INNER JOIN
@@ -2872,6 +2873,33 @@ CREATE VIEW proyectiva_registro_medico AS
     INNER JOIN tipos_lesiones tl on l.id_tipo_lesion = tl.id_tipo_lesion
     WHERE fecha_lesion IS NOT NULL;
 
+CREATE VIEW vista_caracteristicas_analisis_2 AS
+SELECT 
+    j.id_jugador AS IDJ,
+    CONCAT(j.nombre_jugador, ' ', j.apellido_jugador) AS JUGADOR,
+    CASE 
+        WHEN ca.nota_caracteristica_analisis IS NULL THEN 0
+        ELSE ca.nota_caracteristica_analisis
+    END AS NOTA,
+    cj.id_caracteristica_jugador AS IDC,
+    cj.nombre_caracteristica_jugador AS CARACTERISTICA,
+    cj.clasificacion_caracteristica_jugador AS TIPO,
+    COALESCE(ca.id_entrenamiento, a.id_entrenamiento) AS IDE,
+    a.asistencia AS ASISTENCIA,
+    en.fecha_entrenamiento,
+    en.id_equipo
+FROM 
+    jugadores j
+LEFT JOIN 
+    asistencias a ON j.id_jugador = a.id_jugador
+LEFT JOIN
+	entrenamientos en ON a.id_entrenamiento = en.id_entrenamiento
+LEFT JOIN 
+    caracteristicas_analisis ca ON j.id_jugador = ca.id_jugador AND a.id_entrenamiento = ca.id_entrenamiento
+LEFT JOIN 
+    caracteristicas_jugadores cj ON ca.id_caracteristica_jugador = cj.id_caracteristica_jugador
+WHERE
+    a.asistencia = 'Asistencia';
 SELECT * FROM proyectiva_registro_medico;
 
 CREATE VIEW delantero_asistencias_evaluaciones AS
@@ -2879,6 +2907,7 @@ SELECT
     p.id_partido,
     p.id_equipo,
     j.id_jugador,
+    j.nombre_jugador,
     COUNT(DISTINCT a.id_asistencia) AS frecuencia,
     MAX(a.fecha_asistencia) AS fecha,
     ROUND(AVG(
@@ -2952,10 +2981,10 @@ WHERE id_equipo = 1 AND fecha_entrenamiento >= DATE_SUB(CURDATE(), INTERVAL 2 MO
 -- 6. Cantidad de entrenamientos en el 2 mes
 SELECT COUNT(id_entrenamiento) AS frecuencia_entrenamientos FROM entrenamientos WHERE id_equipo = 1 AND fecha_entrenamiento >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH);
 -- 7. Logo, nombre del equipo y lo mismo del rival
-SELECT logo_rival, nombre_rival, logo_equipo, logo_rival FROM vista_detalle_partidos WHERE id_partido = 1;
+SELECT logo_rival, nombre_rival, logo_equipo, logo_rival, id_rival, id_equipo, localidad_partido FROM vista_detalle_partidos WHERE id_partido = 1;
 -- 8. Nota pruebas promedio en cada area en el 2 último mes
 SELECT IDJ, JUGADOR, ROUND(AVG(NOTA), 2) AS PROMEDIO, fecha_entrenamiento FROM vista_caracteristicas_analisis_2
-WHERE fecha_entrenamiento >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH) GROUP BY IDJ, JUGADOR
+WHERE fecha_entrenamiento >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH) AND id_equipo = 2 GROUP BY IDJ, JUGADOR
 HAVING PROMEDIO > 0;
 -- 9. Nota de la última evaluación de los delanteros (sum), cantidad de asistencias de los últimos 2 meses (count)
 
