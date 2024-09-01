@@ -25,6 +25,7 @@ fecha_bloqueo DATETIME NULL,
 foto_administrador VARCHAR(50) NULL,
 CONSTRAINT chk_url_foto_administrador CHECK (foto_administrador LIKE '%.jpg' OR foto_administrador LIKE '%.png' OR foto_administrador LIKE '%.jpeg' OR foto_administrador LIKE '%.gif')
 );
+SELECT * FROM administradores;
 
 ALTER TABLE administradores
 ADD COLUMN recovery_code VARCHAR(80) DEFAULT '0000';
@@ -381,6 +382,13 @@ CREATE TABLE temas_contenidos(
   momento_juego ENUM('Ofensivo', 'Defensivo', 'Transición defensiva', 'Transición ofensiva', 'Balón parado ofensivo', 'Balón parado defensivo') NOT NULL,
   zona_campo ENUM('Zona 1', 'Zona 2', 'Zona 3') NOT NULL
 );
+### Ejecutar si no se tienen los campos momento:juego y zona_campo
+## ALTER TABLE temas_contenidos ADD COLUMN momento_juego ENUM('Ofensivo', 'Defensivo', 'Transición defensiva', 'Transición ofensiva', 'Balón parado ofensivo', 'Balón parado defensivo');
+##UPDATE temas_contenidos SET momento_juego = 'Ofensivo';
+##ALTER TABLE temas_contenidos MODIFY momento_juego ENUM('Ofensivo', 'Defensivo', 'Transición defensiva', 'Transición ofensiva', 'Balón parado ofensivo', 'Balón parado defensivo') NOT NULL;
+##ALTER TABLE temas_contenidos ADD COLUMN zona_campo ENUM('Zona 1', 'Zona 2', 'Zona 3');
+##UPDATE temas_contenidos SET zona_campo = 'Zona 1';
+##ALTER TABLE temas_contenidos MODIFY zona_campo ENUM('Zona 1', 'Zona 2', 'Zona 3') NOT NULL;
 
 SET @add_momento_juego := IF(
     (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
@@ -415,7 +423,7 @@ CREATE TABLE sub_temas_contenidos(
   id_tema_contenido INT NOT NULL,
   CONSTRAINT fk_tipo_contenido FOREIGN KEY (id_tema_contenido) REFERENCES temas_contenidos(id_tema_contenido)
 );
-
+SELECT * FROM sub_temas_contenidos;
 CREATE TABLE tareas(
   id_tarea INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_tarea VARCHAR(60) NOT NULL
