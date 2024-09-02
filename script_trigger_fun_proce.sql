@@ -3037,3 +3037,17 @@ WHERE
     
 SELECT id_asistencia, observacion, asistencia, id, jugador, id_entrenamiento 
         FROM vista_asistencias WHERE id_entrenamiento = 25;
+SELECT id_sub_tema_contenido, sub_tema_contenido
+                    FROM sub_temas_contenidos;
+
+-- Vista para elegir contenidos por el tipo de cancha
+CREATE VIEW subcontenidos_por_cancha AS
+SELECT 
+	sbc.id_sub_tema_contenido, 
+	sbc.sub_tema_contenido,
+	tc.zona_campo
+FROM sub_temas_contenidos sbc
+INNER JOIN
+	temas_contenidos tc ON sbc.id_tema_contenido = tc.id_tema_contenido;
+	
+SELECT id_sub_tema_contenido, sub_tema_contenido FROM	subcontenidos_por_cancha WHERE zona_campo = 'Zona 3';
