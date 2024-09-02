@@ -377,18 +377,17 @@ ALTER TABLE asistencias ADD CONSTRAINT fk_jugador_asistencia FOREIGN KEY (id_jug
 
 CREATE TABLE temas_contenidos(
   id_tema_contenido INT AUTO_INCREMENT PRIMARY KEY,
-  nombre_tema_contenido VARCHAR(60) NOT NULL,
-  CONSTRAINT uq_tema_contenido_unico UNIQUE(nombre_tema_contenido),
   momento_juego ENUM('Ofensivo', 'Defensivo', 'Transición defensiva', 'Transición ofensiva', 'Balón parado ofensivo', 'Balón parado defensivo') NOT NULL,
   zona_campo ENUM('Zona 1', 'Zona 2', 'Zona 3') NOT NULL
 );
-### Ejecutar si no se tienen los campos momento:juego y zona_campo
+### Ejecutar si no se tienen los campos momento juego, zona_campo; Y también si se tiene "nombre_tema_contenido"
 ## ALTER TABLE temas_contenidos ADD COLUMN momento_juego ENUM('Ofensivo', 'Defensivo', 'Transición defensiva', 'Transición ofensiva', 'Balón parado ofensivo', 'Balón parado defensivo');
 ##UPDATE temas_contenidos SET momento_juego = 'Ofensivo';
 ##ALTER TABLE temas_contenidos MODIFY momento_juego ENUM('Ofensivo', 'Defensivo', 'Transición defensiva', 'Transición ofensiva', 'Balón parado ofensivo', 'Balón parado defensivo') NOT NULL;
 ##ALTER TABLE temas_contenidos ADD COLUMN zona_campo ENUM('Zona 1', 'Zona 2', 'Zona 3');
 ##UPDATE temas_contenidos SET zona_campo = 'Zona 1';
 ##ALTER TABLE temas_contenidos MODIFY zona_campo ENUM('Zona 1', 'Zona 2', 'Zona 3') NOT NULL;
+##ALTER TABLE temas_contenidos DROP COLUMN nombre_tema_contenido;
 
 SET @add_momento_juego := IF(
     (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 

@@ -2449,7 +2449,7 @@ SELECT
     e.id_equipo,
     e.fecha_entrenamiento,
     stc.sub_tema_contenido,
-    CONCAT(tc.nombre_tema_contenido, ' - ', stc.sub_tema_contenido) AS contenidos
+    CONCAT(tc.momento_juego, ' - ', stc.sub_tema_contenido) AS contenidos
 FROM
     entrenamientos e
 JOIN
@@ -3041,13 +3041,16 @@ SELECT id_sub_tema_contenido, sub_tema_contenido
                     FROM sub_temas_contenidos;
 
 -- Vista para elegir contenidos por el tipo de cancha
-CREATE VIEW subcontenidos_por_cancha AS
+ALTER VIEW subcontenidos_por_cancha AS
 SELECT 
 	sbc.id_sub_tema_contenido, 
-	sbc.sub_tema_contenido,
+	CONCAT(sbc.sub_tema_contenido, ' - ', tc.momento_juego) AS sub_tema_contenido,
 	tc.zona_campo
 FROM sub_temas_contenidos sbc
 INNER JOIN
 	temas_contenidos tc ON sbc.id_tema_contenido = tc.id_tema_contenido;
 	
 SELECT id_sub_tema_contenido, sub_tema_contenido FROM	subcontenidos_por_cancha WHERE zona_campo = 'Zona 3';
+SELECT stc.*, tc.momento_juego
+                FROM sub_temas_contenidos stc
+                INNER JOIN temas_contenidos tc ON stc.id_tema_contenido = tc.id_tema_contenido;
