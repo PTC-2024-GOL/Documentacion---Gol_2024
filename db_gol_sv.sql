@@ -476,6 +476,14 @@ CREATE TABLE partidos(
   CONSTRAINT fk_rivales_partidos FOREIGN KEY (id_rival) REFERENCES rivales(id_rival)
 );
 
+CREATE TABLE convocatorias_partidos(
+  id_convocatoria BIGINT AUTO_INCREMENT PRIMARY KEY, 
+  id_partido INT NOT NULL,
+  CONSTRAINT fk_partido_convocatoria FOREIGN KEY (id_partido) REFERENCES partidos(id_partido), 
+  id_jugador INT NOT NULL,
+  CONSTRAINT fk_jugador_convocatoria FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador)
+);
+
 CREATE TABLE tipos_jugadas(
   id_tipo_jugada INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_tipo_juego VARCHAR(50) NOT NULL, 
