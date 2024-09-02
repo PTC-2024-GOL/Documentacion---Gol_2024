@@ -3054,3 +3054,35 @@ SELECT id_sub_tema_contenido, sub_tema_contenido FROM	subcontenidos_por_cancha W
 SELECT stc.*, tc.momento_juego
                 FROM sub_temas_contenidos stc
                 INNER JOIN temas_contenidos tc ON stc.id_tema_contenido = tc.id_tema_contenido;
+
+
+-- ----------- CONVOCATORIAS ---------------------
+DROP PROCEDURE IF EXISTS guardar_convocatoria;
+DELIMITER $$
+
+CREATE PROCEDURE guardar_convocatoria(
+    IN p_id_partido INT UNSIGNED,
+    IN p_id_jugador INT UNSIGNED,
+    IN p_estado_convocado BOOLEAN
+)
+BEGIN
+    DECLARE v_id_convocatoria BIGINT;
+
+    -- Verificar si ya existe una fila en convocatorias_partidos para el par (id_partido, id_jugador)
+    SELECT id_convocatoria INTO v_id_convocatoria
+    FROM convocatorias_partidos
+    WHERE id_partido = p_id_partido AND id_jugador = p_id_jugador;
+
+    IF v_id_convocatoria IS NOT NULL THEN
+        -- Actualizar la fila existente en convocatorias_partidos
+        UPDATE convocatorias_partidos
+        SET id_partido = p_id_partido, id_jugador = p_id_jugador, estado_convocado = p_estado_convocado
+        WHERE id_convocatoria = v_id_convocatoria;
+    ELSE
+        -- Insertar una nueva fila en convocatorias_partidos
+        INSERT INTO convocatorias_partidos (id_partido, id_jugador, estado_convocado)
+        VALUES (p_id_partido, p_id_jugador, p_estado_convocado);
+    END IF;
+END$$
+
+DELIMITER ;
