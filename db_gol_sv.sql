@@ -483,6 +483,19 @@ CREATE TABLE convocatorias_partidos(
   CONSTRAINT fk_jugador_convocatoria FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador)
 );
 
+SET @add_zona_campo := IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+     WHERE TABLE_NAME = 'convocatorias_partidos' 
+     AND COLUMN_NAME = 'estado_convocado' 
+     AND TABLE_SCHEMA = DATABASE()) = 0,
+    'ALTER TABLE convocatorias_partidos ADD COLUMN estado_convocado BOOLEAN NULL DEFAULT 0;',
+    'SELECT ''La columna estado_convocado ya existe.'';'
+);
+
+PREPARE stmt2 FROM @add_zona_campo;
+EXECUTE stmt2;
+DEALLOCATE PREPARE stmt2;
+
 CREATE TABLE tipos_jugadas(
   id_tipo_jugada INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_tipo_juego VARCHAR(50) NOT NULL, 
