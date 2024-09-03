@@ -2009,18 +2009,22 @@ JOIN
 SELECT * FROM vista_detalle_entrenamiento_especifico;
 
 -- Vista para conocr los jugadores de un equipo, solo se necesita saber el id equipo, se usa en detalles contenidos
+
 CREATE VIEW vista_equipos_jugadores AS
 SELECT
     e.id_equipo,
     j.nombre_jugador AS jugadores,
     j.id_jugador AS id,
-    pe.id_plantilla_equipo
+    pe.id_plantilla_equipo,
+    p.posicion
 FROM
     equipos e
 JOIN
     plantillas_equipos pe ON e.id_equipo = pe.id_equipo
 JOIN
-    jugadores j ON pe.id_jugador = j.id_jugador;
+    jugadores j ON pe.id_jugador = j.id_jugador
+JOIN 
+	posiciones p ON j.id_posicion_principal = p.id_posicion;
 
 SELECT * FROM vista_equipos_jugadores;
 SELECT * FROM plantillas_equipos;
