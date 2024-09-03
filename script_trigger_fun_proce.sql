@@ -2263,10 +2263,10 @@ JOIN
 -- VER JUGADORES POR EQUIPO
 CREATE VIEW vista_jugadores_por_equipo AS
     SELECT
-        pe.id_plantilla,
-        pe.id_jugador,
-        pe.id_equipo,
-        pe.id_temporada,
+        cp.id_convocatoria,
+        cp.id_partido,
+        cp.id_jugador,
+        cp.estado_convocado,
         j.nombre_jugador,
         j.apellido_jugador,
         j.dorsal_jugador,
@@ -2274,15 +2274,12 @@ CREATE VIEW vista_jugadores_por_equipo AS
         j.id_posicion_principal,
         p.posicion,
         p.area_de_juego,
-        t.nombre_temporada,
         j.estatus_jugador
-FROM plantillas_equipos pe
+FROM convocatorias_partidos cp
 INNER JOIN
-    jugadores j ON pe.id_jugador = j.id_jugador
+    jugadores j ON cp.id_jugador = j.id_jugador
 INNER JOIN
-    posiciones p ON j.id_posicion_principal = p.id_posicion
-INNER JOIN
-    temporadas t ON pe.id_temporada = t.id_temporada;
+    posiciones p ON j.id_posicion_principal = p.id_posicion;
 
 -- Vista para ver los tipos de goles de un jugador
 CREATE VIEW vista_detalles_goles AS
@@ -2713,9 +2710,6 @@ CREATE VIEW notas_por_jugador AS
 FROM caracteristicas_analisis c
 INNER JOIN caracteristicas_jugadores cj ON c.id_caracteristica_jugador = cj.id_caracteristica_jugador
 GROUP BY c.id_jugador, cj.clasificacion_caracteristica_jugador;
-
-SELECT * FROM vista_jugadores_por_equipo WHERE nombre_jugador = 'Ana Maria' AND id_equipo = 4;
-SELECT * FROM asistencias;
 
 CREATE VIEW vista_ultimos_entrenamientos AS
 SELECT DISTINCT
