@@ -111,23 +111,34 @@ CREATE VIEW asistencias_por_jugador AS
  	e.observacion_asistencia,
  	e.asistencia,
  	e.fecha_asistencia,
-	 DATE_FORMAT(e.fecha_asistencia, '%e de %M del %Y') AS fecha
-FROM asistencias e;
-
+	 DATE_FORMAT(e.fecha_asistencia, '%e de %M del %Y') AS fecha,
+	j.id_jornada
+FROM 
+	asistencias e
+INNER JOIN 
+	entrenamientos u ON e.id_entrenamiento = u.id_entrenamiento
+INNER JOIN
+	jornadas j ON u.id_jornada = j.id_jornada;
 -- Vista para movil de tecnicos para ver datos por jugador relacionados a estadisticas
 CREATE VIEW vista_asistencias_por_jugador AS
 SELECT 
-    id_jugador,
-    SUM(asistencia = 'Asistencia') AS cantidad_asistencia,
-    (SUM(asistencia = 'Asistencia') / COUNT(*)) * 100 AS porcentaje_asistencia,
-    SUM(asistencia = 'Ausencia injustificada') AS cantidad_ausencia_injustificada,
-    (SUM(asistencia = 'Ausencia injustificada') / COUNT(*)) * 100 AS porcentaje_ausencia_injustificada,
-    SUM(asistencia = 'Enfermedad') AS cantidad_enfermedad,
-    (SUM(asistencia = 'Enfermedad') / COUNT(*)) * 100 AS porcentaje_enfermedad,
-    SUM(asistencia = 'Otro') AS cantidad_otro,
-    (SUM(asistencia = 'Otro') / COUNT(*)) * 100 AS porcentaje_otro,
-    SUM(asistencia = 'Estudio') AS cantidad_estudio
-FROM asistencias
+    e.id_jugador,
+    SUM(e.asistencia = 'Asistencia') AS cantidad_asistencia,
+    (SUM(e.asistencia = 'Asistencia') / COUNT(*)) * 100 AS porcentaje_asistencia,
+    SUM(e.asistencia = 'Ausencia injustificada') AS cantidad_ausencia_injustificada,
+    (SUM(e.asistencia = 'Ausencia injustificada') / COUNT(*)) * 100 AS porcentaje_ausencia_injustificada,
+    SUM(e.asistencia = 'Enfermedad') AS cantidad_enfermedad,
+    (SUM(e.asistencia = 'Enfermedad') / COUNT(*)) * 100 AS porcentaje_enfermedad,
+    SUM(e.asistencia = 'Otro') AS cantidad_otro,
+    (SUM(e.asistencia = 'Otro') / COUNT(*)) * 100 AS porcentaje_otro,
+    SUM(e.asistencia = 'Estudio') AS cantidad_estudio,
+    j.id_jornada
+FROM 
+	asistencias e
+INNER JOIN 
+	entrenamientos u ON e.id_entrenamiento = u.id_entrenamiento
+INNER JOIN
+	jornadas j ON u.id_jornada = j.id_jornada
 GROUP BY id_jugador;
 
 CREATE VIEW notas_por_jugador AS
