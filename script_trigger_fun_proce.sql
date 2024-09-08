@@ -2181,13 +2181,17 @@ SELECT
     i.nombre_rival AS nombre_rival,
     p.tipo_resultado_partido,
     e.id_equipo,
-    i.id_rival
+    i.id_rival,
+    e.id_categoria,
+    c.nombre_categoria
 FROM
     partidos p
 INNER JOIN
     equipos e ON p.id_equipo = e.id_equipo
 INNER JOIN
 	rivales i ON p.id_rival = i.id_rival
+INNER JOIN
+    categorias c ON e.id_categoria = c.id_categoria
 ORDER BY p.fecha_partido DESC;
 
 SELECT * FROM vista_detalle_partidos;
