@@ -2173,6 +2173,7 @@ CREATE VIEW vista_detalle_partidos AS
 SELECT
     p.id_partido,
     DATE_FORMAT(p.fecha_partido, '%e de %M del %Y') AS fecha,
+    p.fecha_partido,
     p.localidad_partido,
     p.resultado_partido,
     i.logo_rival,
