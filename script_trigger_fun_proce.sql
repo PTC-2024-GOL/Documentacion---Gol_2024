@@ -3088,3 +3088,29 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+
+DROP VIEW IF EXISTS vista_maximos_goleadores;
+CREATE VIEW vista_maximos_goleadores AS
+SELECT pj.id_jugador AS IDJ, pj.id_equipo AS IDE,
+CONCAT(j.nombre_jugador, " ", j.apellido_jugador) AS JUGADOR,
+po.posicion AS POSICION, j.foto_jugador AS FOTO,
+COALESCE(SUM(goles), 0) AS TOTAL_GOLES
+FROM plantillas_equipos pj
+INNER JOIN participaciones_partidos p ON p.id_jugador = pj.id_jugador
+INNER JOIN jugadores j ON p.id_jugador = j.id_jugador
+INNER JOIN posiciones po ON j.id_posicion_principal = po.id_posicion
+GROUP BY JUGADOR ORDER BY TOTAL_GOLES DESC;
+
+DROP VIEW IF EXISTS vista_maximos_asistentes;
+CREATE VIEW vista_maximos_asistentes AS
+SELECT pj.id_jugador AS IDJ, pj.id_equipo AS IDE,
+CONCAT(j.nombre_jugador, " ", j.apellido_jugador) AS JUGADOR,
+po.posicion AS POSICION, j.foto_jugador AS FOTO,
+COALESCE(SUM(asistencias), 0) AS TOTAL_ASISTENCIAS
+FROM plantillas_equipos pj
+INNER JOIN participaciones_partidos p ON p.id_jugador = pj.id_jugador
+INNER JOIN jugadores j ON p.id_jugador = j.id_jugador
+INNER JOIN posiciones po ON j.id_posicion_principal = po.id_posicion
+GROUP BY JUGADOR ORDER BY TOTAL_ASISTENCIAS DESC;
+
