@@ -141,6 +141,7 @@ INNER JOIN
 	jornadas j ON u.id_jornada = j.id_jornada
 GROUP BY id_jugador;
 
+DROP VIEW IF EXISTS notas_por_jugador;
 CREATE VIEW notas_por_jugador AS
     SELECT
         c.id_jugador,
