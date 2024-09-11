@@ -2682,7 +2682,8 @@ JOIN
     plantillas_equipos pe ON a.id_jugador = pe.id_jugador
 JOIN
     jugadores j ON pe.id_jugador = j.id_jugador;
-SELECT * FROM vista_asistencias_default WHERE id_entrenamiento = 24;
+
+
 -- Vista cuando se sabe que no hay registros
 DROP VIEW IF EXISTS vista_asistencias_default;
 CREATE VIEW vista_asistencias_default AS
@@ -2895,6 +2896,7 @@ CREATE VIEW proyectiva_registro_medico AS
     INNER JOIN tipos_lesiones tl on l.id_tipo_lesion = tl.id_tipo_lesion
     WHERE fecha_lesion IS NOT NULL;
 
+DROP VIEW IF EXISTS vista_caracteristicas_analisis_2;
 CREATE VIEW vista_caracteristicas_analisis_2 AS
 SELECT 
     j.id_jugador AS IDJ,
@@ -2961,6 +2963,7 @@ GROUP BY
 HAVING
     promedio > 0;
 
+DROP VIEW IF EXISTS vista_caracteristicas_analisis_2;
 CREATE VIEW vista_caracteristicas_analisis_2 AS
 SELECT
     j.id_jugador AS IDJ,
@@ -3005,9 +3008,9 @@ SELECT COUNT(id_entrenamiento) AS frecuencia_entrenamientos FROM entrenamientos 
 -- 7. Logo, nombre del equipo y lo mismo del rival
 SELECT logo_rival, nombre_rival, logo_equipo, logo_rival, id_rival, id_equipo, localidad_partido FROM vista_detalle_partidos WHERE id_partido = 1;
 -- 8. Nota pruebas promedio en cada area en el 2 último mes
-SELECT IDJ, JUGADOR, ROUND(AVG(NOTA), 2) AS PROMEDIO, fecha_entrenamiento FROM vista_caracteristicas_analisis_2
-WHERE fecha_entrenamiento >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH) AND id_equipo = 2 GROUP BY IDJ, JUGADOR
-HAVING PROMEDIO > 0;
+-- SELECT IDJ, JUGADOR, ROUND(AVG(NOTA), 2) AS PROMEDIO, fecha_entrenamiento FROM vista_caracteristicas_analisis_2
+-- WHERE fecha_entrenamiento >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH) AND id_equipo = 2 GROUP BY IDJ, JUGADOR
+-- HAVING PROMEDIO > 0;
 -- 9. Nota de la última evaluación de los delanteros (sum), cantidad de asistencias de los últimos 2 meses (count)
 
 -- ------ Vista para gráfica predictiva de progresión
@@ -3044,7 +3047,8 @@ SELECT id_sub_tema_contenido, sub_tema_contenido
                     FROM sub_temas_contenidos;
 
 -- Vista para elegir contenidos por el tipo de cancha
-ALTER VIEW subcontenidos_por_cancha AS
+DROP VIEW IF EXISTS subcontenidos_por_cancha;
+CREATE VIEW subcontenidos_por_cancha AS
 SELECT 
 	sbc.id_sub_tema_contenido, 
 	CONCAT(sbc.sub_tema_contenido, ' - ', tc.momento_juego) AS sub_tema_contenido,
@@ -3114,4 +3118,3 @@ INNER JOIN participaciones_partidos p ON p.id_jugador = pj.id_jugador
 INNER JOIN jugadores j ON p.id_jugador = j.id_jugador
 INNER JOIN posiciones po ON j.id_posicion_principal = po.id_posicion
 GROUP BY JUGADOR ORDER BY TOTAL_ASISTENCIAS DESC;
-
