@@ -1970,6 +1970,7 @@ SELECT
     e.id_entrenamiento,
     dc.id_detalle_contenido,
     j.nombre_jugador,
+    j.dorsal_jugador,
     stc.sub_tema_contenido AS nombre_subtema,
     t.nombre_tarea
 FROM
@@ -2013,10 +2014,11 @@ SELECT * FROM vista_detalle_entrenamiento_especifico;
 CREATE VIEW vista_equipos_jugadores AS
 SELECT
     e.id_equipo,
-    j.nombre_jugador AS jugadores,
+    CONCAT('Dorsal ', j.dorsal_jugador) AS jugadores,
     j.id_jugador AS id,
     pe.id_plantilla_equipo,
-    p.posicion
+    p.posicion,
+    pDos.posicion AS posicion_secundaria
 FROM
     equipos e
 JOIN
@@ -2024,9 +2026,12 @@ JOIN
 JOIN
     jugadores j ON pe.id_jugador = j.id_jugador
 JOIN 
-	posiciones p ON j.id_posicion_principal = p.id_posicion;
+	posiciones p ON j.id_posicion_principal = p.id_posicion
+JOIN 
+	posiciones pDos ON j.id_posicion_secundaria = pDos.id_posicion;
 
 SELECT * FROM vista_equipos_jugadores;
+SELECT * FROM jugadores;
 SELECT * FROM plantillas_equipos;
 -- Procedimiento para insertar detalle contenido
 -- DROP PROCEDURE insertarDetalleContenido;
