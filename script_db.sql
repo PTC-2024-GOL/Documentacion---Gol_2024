@@ -2899,9 +2899,32 @@ JOIN
 
 
 -- ----------------------------------------------- PARTICIPACIONES  --------------------------------------------------------------------------
-DROP VIEW IF EXISTS vista_jugadores_por_equipo;
+
+DROP VIEW vista_jugadores_por_equipo;
 -- VER JUGADORES POR EQUIPO
 CREATE VIEW vista_jugadores_por_equipo AS
+    SELECT
+        cp.id_convocatoria,
+        cp.id_partido,
+        cp.id_jugador,
+        cp.estado_convocado,
+        j.nombre_jugador,
+        j.apellido_jugador,
+        j.dorsal_jugador,
+        j.foto_jugador,
+        j.id_posicion_principal,
+        p.posicion,
+        p.area_de_juego,
+        j.estatus_jugador
+FROM convocatorias_partidos cp
+INNER JOIN
+    jugadores j ON cp.id_jugador = j.id_jugador
+INNER JOIN
+    posiciones p ON j.id_posicion_principal = p.id_posicion;
+    
+DROP VIEW IF EXISTS vista_jugadores_por_equipo2;
+-- VER JUGADORES POR EQUIPO
+CREATE VIEW vista_jugadores_por_equipo2 AS
     SELECT DISTINCT
         cp.id_convocatoria,
         cp.id_partido,
@@ -2923,6 +2946,7 @@ INNER JOIN
     posiciones p ON j.id_posicion_principal = p.id_posicion
 LEFT JOIN plantillas_equipos pt ON pt.id_jugador = cp.id_jugador
 GROUP BY nombre_jugador, apellido_jugador;
+
 
 -- TRIGGER PARA INSERTAR, ACTUALIZAR O ELIMINAR GOLES EN PARTICIPACIONES PARTIDO.
 
