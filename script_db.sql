@@ -527,7 +527,6 @@ CREATE TABLE participaciones_partidos(
   ) NULL DEFAULT 'Normal',
   puntuacion DECIMAL(5,2) UNSIGNED NULL DEFAULT 0
 );
--- ------------------------------------------
 
 CREATE TABLE detalles_goles (
   id_detalle_gol INT AUTO_INCREMENT PRIMARY KEY,
@@ -614,6 +613,26 @@ CREATE TABLE calendario(
     color VARCHAR(50)
 );
 
+CREATE TABLE palmares(
+id_palmares INT AUTO_INCREMENT PRIMARY KEY,
+id_equipo INT NOT NULL,
+CONSTRAINT fk_equipo_palmares FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
+id_temporada INT NOT NULL,
+CONSTRAINT fk_temporada_palmares FOREIGN KEY (id_temporada) REFERENCES temporadas(id_temporada),
+lugar ENUM('Campeón', 'Subcampeón', 'Tercer lugar') NOT NULL
+);
+
+CREATE TABLE test(
+id_test BIGINT AUTO_INCREMENT PRIMARY KEY,
+pregunta VARCHAR(2000) NOT NULL,
+respuesta INT NOT NULL CHECK(respuesta >= 0 OR respuesta <= 10),
+id_jugador INT NOT NULL,
+CONSTRAINT fk_jugador_test FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador),
+id_partido INT NULL,
+CONSTRAINT fk_partido_test FOREIGN KEY (id_partido) REFERENCES partidos(id_partido),
+id_entrenamiento BIGINT NULL,
+CONSTRAINT fk_entrenamientos_test FOREIGN KEY (id_entrenamiento) REFERENCES entrenamientos(id_entrenamiento)
+);
 
 -- TRIGGERS, FUNCIONES Y PROCEDIMIENTOS ALMACENADOS WEB
 
