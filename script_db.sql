@@ -3709,25 +3709,33 @@ CREATE PROCEDURE guardar_convocatoria(
 )
 BEGIN
     DECLARE v_id_convocatoria BIGINT;
+    DECLARE v_tipo_resultado_partido ENUM('Victoria', 'Empate', 'Derrota', 'Pendiente');
 
-    -- Verificar si ya existe una fila en convocatorias_partidos para el par (id_partido, id_jugador)
-    SELECT id_convocatoria INTO v_id_convocatoria
-    FROM convocatorias_partidos
-    WHERE id_partido = p_id_partido AND id_jugador = p_id_jugador;
+    -- Verificar si el tipo de resultado del partido es 'Pendiente'
+    SELECT tipo_resultado_partido INTO v_tipo_resultado_partido
+    FROM partidos
+    WHERE id_partido = p_id_partido;
 
-    IF v_id_convocatoria IS NOT NULL THEN
-        -- Actualizar la fila existente en convocatorias_partidos
-        UPDATE convocatorias_partidos
-        SET id_partido = p_id_partido, id_jugador = p_id_jugador, estado_convocado = p_estado_convocado
-        WHERE id_convocatoria = v_id_convocatoria;
+    IF v_tipo_resultado_partido != 'Pendiente' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No se puede modificar la convocatoria porque el partido ya no está pendiente.';
     ELSE
-        -- Insertar una nueva fila en convocatorias_partidos
-        INSERT INTO convocatorias_partidos (id_partido, id_jugador, estado_convocado)
-        VALUES (p_id_partido, p_id_jugador, p_estado_convocado);
+        -- Verificar si ya existe una fila en convocatorias_partidos para el par (id_partido, id_jugador)
+        SELECT id_convocatoria INTO v_id_convocatoria
+        FROM convocatorias_partidos
+        WHERE id_partido = p_id_partido AND id_jugador = p_id_jugador;
+
+        IF v_id_convocatoria IS NOT NULL THEN
+            -- Actualizar la fila existente en convocatorias_partidos
+            UPDATE convocatorias_partidos
+            SET id_partido = p_id_partido, id_jugador = p_id_jugador, estado_convocado = p_estado_convocado
+            WHERE id_convocatoria = v_id_convocatoria;
+        ELSE
+            -- Insertar una nueva fila en convocatorias_partidos
+            INSERT INTO convocatorias_partidos (id_partido, id_jugador, estado_convocado)
+            VALUES (p_id_partido, p_id_jugador, p_estado_convocado);
+        END IF;
     END IF;
 END$$
-
-DELIMITER ;
 
 
 DROP VIEW IF EXISTS vista_maximos_goleadores;
