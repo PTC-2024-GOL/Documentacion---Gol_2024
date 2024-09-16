@@ -527,6 +527,7 @@ CREATE TABLE participaciones_partidos(
   ) NULL DEFAULT 'Normal',
   puntuacion DECIMAL(5,2) UNSIGNED NULL DEFAULT 0
 );
+-- ------------------------------------------
 
 CREATE TABLE detalles_goles (
   id_detalle_gol INT AUTO_INCREMENT PRIMARY KEY,
@@ -613,9 +614,7 @@ CREATE TABLE calendario(
     color VARCHAR(50)
 );
 
-DROP TABLE IF EXISTS palmares;
-DROP TABLE IF EXISTS respuesta_test;
-DROP TABLE IF EXISTS test;
+
 -- TABLAS NUEVAS DE CORRECCIONES DE REUNIÓN DEL 12/09/2024
 CREATE TABLE palmares(
 id_palmares INT AUTO_INCREMENT PRIMARY KEY,
@@ -651,7 +650,7 @@ CONSTRAINT fk_test_respuesta FOREIGN KEY (id_test) REFERENCES test(id_test)
 );
 
 
--- TRIGGERS, FUNCIONES Y PROCEDIMIENTOS ALMACENADOS WEB
+-- TRIGGERS, FUNCIONES Y PROCEDIMIENTOS ALMACENADOS
 
 USE db_gol_sv;
 
@@ -1930,7 +1929,6 @@ DELIMITER ;
 
 -- Procedimientos para la tabla plantillas_equipos
 
--- Procedimientos para la tabla plantillas_equipos
 DROP PROCEDURE IF EXISTS sp_insertar_plantilla_equipo;
 DELIMITER //
 
@@ -1942,71 +1940,21 @@ CREATE PROCEDURE sp_insertar_plantilla_equipo (
 )
 BEGIN
     DECLARE record_count INT;
-    DECLARE v_genero_jugador ENUM('Masculino', 'Femenino');
-    DECLARE v_genero_equipo ENUM('Masculino', 'Femenino');
-    DECLARE v_nombre_equipo VARCHAR(50);
-    DECLARE v_nombre_temporada VARCHAR(50);
-    DECLARE v_equipo_actual INT;
-    DECLARE v_temporada_actual INT;
-    DECLARE v_error_msg VARCHAR(255); -- Variable para almacenar el mensaje de error
 
-    -- Obtener el género del jugador
-    SELECT genero_jugador INTO v_genero_jugador
-    FROM jugadores
-    WHERE id_jugador = p_id_jugador;
+    -- Verificar si el registro ya existe
+    SELECT COUNT(*) INTO record_count
+    FROM plantillas_equipos
+    WHERE id_plantilla = p_id_plantilla
+      AND id_jugador = p_id_jugador
+      AND id_temporada = p_id_temporada
+      AND id_equipo = p_id_equipo;
 
-    -- Obtener el género del equipo
-    SELECT genero_equipo INTO v_genero_equipo FROM equipos
-    WHERE id_equipo = p_id_equipo;
-    
-    SELECT nombre_equipo INTO v_nombre_equipo FROM equipos
-    WHERE id_equipo = p_id_equipo;
-
-    -- Verificar si los géneros coinciden
-    IF v_genero_jugador != v_genero_equipo THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El género del jugador no coincide con el género del equipo';
+    -- Si existe un duplicado, generar un error
+    IF record_count > 0 THEN
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'El registro ya existe';
     ELSE
-        -- Verificar si la plantilla ya tiene un equipo y temporada asignados
-        SELECT id_equipo, id_temporada INTO v_equipo_actual, v_temporada_actual
-        FROM plantillas_equipos
-        WHERE id_plantilla = p_id_plantilla
-        LIMIT 1;
-
-        -- Si ya tiene datos, validar que el equipo y temporada coincidan
-        IF v_equipo_actual IS NOT NULL AND v_temporada_actual IS NOT NULL THEN
-            IF v_equipo_actual != p_id_equipo OR v_temporada_actual != p_id_temporada THEN
-                -- Obtener el nombre del equipo y la temporada correctos
-                SELECT nombre_equipo INTO v_nombre_equipo
-                FROM equipos
-                WHERE id_equipo = v_equipo_actual;
-
-                SELECT nombre_temporada INTO v_nombre_temporada
-                FROM temporadas
-                WHERE id_temporada = v_temporada_actual;
-
-                -- Concatenar el mensaje de error en la variable
-                SET v_error_msg = CONCAT('La plantilla ya está asignada al equipo ', v_nombre_equipo, ' en la temporada ', v_nombre_temporada);
-
-                -- Generar el error con el mensaje concatenado
-                SIGNAL SQLSTATE '45004' SET MESSAGE_TEXT = v_error_msg;
-            END IF;
-        END IF;
-
-        -- Verificar si el registro ya existe
-        SELECT COUNT(*) INTO record_count
-        FROM plantillas_equipos
-        WHERE id_plantilla = p_id_plantilla
-          AND id_jugador = p_id_jugador
-          AND id_temporada = p_id_temporada
-          AND id_equipo = p_id_equipo;
-
-        -- Si existe un duplicado, generar un error
-        IF record_count > 0 THEN
-            SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'El registro ya existe';
-        ELSE
-            INSERT INTO plantillas_equipos (id_plantilla, id_jugador, id_temporada, id_equipo)
-            VALUES (p_id_plantilla, p_id_jugador, p_id_temporada, p_id_equipo);
-        END IF;
+        INSERT INTO plantillas_equipos (id_plantilla, id_jugador, id_temporada, id_equipo)
+        VALUES (p_id_plantilla, p_id_jugador, p_id_temporada, p_id_equipo);
     END IF;
 END //
 DELIMITER ;
@@ -2023,74 +1971,26 @@ CREATE PROCEDURE sp_actualizar_plantilla_equipo (
 )
 BEGIN
     DECLARE record_count INT;
-    DECLARE v_genero_jugador ENUM('Masculino', 'Femenino');
-    DECLARE v_genero_equipo ENUM('Masculino', 'Femenino');
-    DECLARE v_nombre_equipo VARCHAR(50);
-    DECLARE v_nombre_temporada VARCHAR(50);
-    DECLARE v_equipo_actual INT;
-    DECLARE v_temporada_actual INT;
-    DECLARE v_error_msg VARCHAR(255); -- Variable para almacenar el mensaje de error
 
-    -- Obtener el género del jugador
-    SELECT genero_jugador INTO v_genero_jugador
-    FROM jugadores
-    WHERE id_jugador = p_id_jugador;
+    -- Verificar si el registro ya existe para otro plantilla equipo
+    SELECT COUNT(*) INTO record_count
+    FROM plantillas_equipos
+    WHERE id_plantilla = p_id_plantilla
+      AND id_jugador = p_id_jugador
+      AND id_temporada = p_id_temporada
+      AND id_equipo = p_id_equipo
+      AND id_plantilla_equipo <> p_id_plantilla_equipo;
 
-    -- Obtener el género del equipo y nombre
-    SELECT genero_equipo, nombre_equipo INTO v_genero_equipo, v_nombre_equipo
-    FROM equipos
-    WHERE id_equipo = p_id_equipo;
-
-    -- Verificar si los géneros coinciden
-    IF v_genero_jugador != v_genero_equipo THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El género del jugador no coincide con el género del equipo';
+    -- Si existe un duplicado, generar un error
+    IF record_count > 0 THEN
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'El registro ya existe';
     ELSE
-        -- Verificar si la plantilla ya tiene un equipo y temporada asignados
-        SELECT id_equipo, id_temporada INTO v_equipo_actual, v_temporada_actual
-        FROM plantillas_equipos
-        WHERE id_plantilla = p_id_plantilla
-        LIMIT 1;
-
-        -- Si ya tiene datos, validar que el equipo y temporada coincidan
-        IF v_equipo_actual IS NOT NULL AND v_temporada_actual IS NOT NULL THEN
-            IF v_equipo_actual != p_id_equipo OR v_temporada_actual != p_id_temporada THEN
-                -- Obtener el nombre del equipo y la temporada correctos
-                SELECT nombre_equipo INTO v_nombre_equipo
-                FROM equipos
-                WHERE id_equipo = v_equipo_actual;
-
-                SELECT nombre_temporada INTO v_nombre_temporada
-                FROM temporadas
-                WHERE id_temporada = v_temporada_actual;
-
-                -- Concatenar el mensaje de error en la variable
-                SET v_error_msg = CONCAT('La plantilla ya está asignada al equipo ', v_nombre_equipo, ' en la temporada ', v_nombre_temporada);
-
-                -- Generar el error con el mensaje concatenado
-                SIGNAL SQLSTATE '45004' SET MESSAGE_TEXT = v_error_msg;
-            END IF;
-        END IF;
-
-        -- Verificar si el registro ya existe para otro plantilla equipo
-        SELECT COUNT(*) INTO record_count
-        FROM plantillas_equipos
-        WHERE id_plantilla = p_id_plantilla
-          AND id_jugador = p_id_jugador
-          AND id_temporada = p_id_temporada
-          AND id_equipo = p_id_equipo
-          AND id_plantilla_equipo <> p_id_plantilla_equipo;
-
-        -- Si existe un duplicado, generar un error
-        IF record_count > 0 THEN
-            SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'El registro ya existe';
-        ELSE
-            UPDATE plantillas_equipos
-            SET id_plantilla = p_id_plantilla,
-                id_jugador = p_id_jugador,
-                id_temporada = p_id_temporada,
-                id_equipo = p_id_equipo
-            WHERE id_plantilla_equipo = p_id_plantilla_equipo;
-        END IF;
+        UPDATE plantillas_equipos
+        SET id_plantilla = p_id_plantilla,
+            id_jugador = p_id_jugador,
+            id_temporada = p_id_temporada,
+            id_equipo = p_id_equipo
+        WHERE id_plantilla_equipo = p_id_plantilla_equipo;
     END IF;
 END //
 DELIMITER ;
@@ -2721,6 +2621,7 @@ SELECT
     e.id_entrenamiento,
     dc.id_detalle_contenido,
     j.nombre_jugador,
+    j.dorsal_jugador,
     stc.sub_tema_contenido AS nombre_subtema,
     t.nombre_tarea
 FROM
@@ -2764,10 +2665,11 @@ SELECT * FROM vista_detalle_entrenamiento_especifico;
 CREATE VIEW vista_equipos_jugadores AS
 SELECT
     e.id_equipo,
-    j.nombre_jugador AS jugadores,
+    CONCAT('Dorsal ', j.dorsal_jugador) AS jugadores,
     j.id_jugador AS id,
     pe.id_plantilla_equipo,
-    p.posicion
+    p.posicion,
+    pDos.posicion AS posicion_secundaria
 FROM
     equipos e
 JOIN
@@ -2775,9 +2677,12 @@ JOIN
 JOIN
     jugadores j ON pe.id_jugador = j.id_jugador
 JOIN 
-	posiciones p ON j.id_posicion_principal = p.id_posicion;
+	posiciones p ON j.id_posicion_principal = p.id_posicion
+JOIN 
+	posiciones pDos ON j.id_posicion_secundaria = pDos.id_posicion;
 
 SELECT * FROM vista_equipos_jugadores;
+SELECT * FROM jugadores;
 SELECT * FROM plantillas_equipos;
 -- Procedimiento para insertar detalle contenido
 -- DROP PROCEDURE insertarDetalleContenido;
@@ -3015,8 +2920,7 @@ JOIN
 
 
 -- ----------------------------------------------- PARTICIPACIONES  --------------------------------------------------------------------------
-
-DROP VIEW vista_jugadores_por_equipo;
+-- DROP VIEW vista_jugadores_por_equipo;
 -- VER JUGADORES POR EQUIPO
 CREATE VIEW vista_jugadores_por_equipo AS
     SELECT
@@ -3037,32 +2941,18 @@ INNER JOIN
     jugadores j ON cp.id_jugador = j.id_jugador
 INNER JOIN
     posiciones p ON j.id_posicion_principal = p.id_posicion;
-    
-DROP VIEW IF EXISTS vista_jugadores_por_equipo2;
--- VER JUGADORES POR EQUIPO
-CREATE VIEW vista_jugadores_por_equipo2 AS
-    SELECT DISTINCT
-        cp.id_convocatoria,
-        cp.id_partido,
-        cp.id_jugador,
-        cp.estado_convocado,
-        pt.id_equipo,
-        j.nombre_jugador,
-        j.apellido_jugador,
-        j.dorsal_jugador,
-        j.foto_jugador,
-        j.id_posicion_principal,
-        p.posicion,
-        p.area_de_juego,
-        j.estatus_jugador
-FROM convocatorias_partidos cp
-INNER JOIN
-    jugadores j ON cp.id_jugador = j.id_jugador
-INNER JOIN
-    posiciones p ON j.id_posicion_principal = p.id_posicion
-LEFT JOIN plantillas_equipos pt ON pt.id_jugador = cp.id_jugador
-GROUP BY nombre_jugador, apellido_jugador;
 
+-- Vista para ver los tipos de goles de un jugador
+CREATE VIEW vista_detalles_goles AS
+    SELECT
+        dt.id_detalle_gol,
+        dt.id_participacion,
+        dt.cantidad_tipo_gol,
+        dt.id_tipo_gol,
+        tg.nombre_tipo_gol
+FROM detalles_goles dt
+INNER JOIN
+    tipos_goles tg ON dt.id_tipo_gol = tg.id_tipo_gol;
 
 -- TRIGGER PARA INSERTAR, ACTUALIZAR O ELIMINAR GOLES EN PARTICIPACIONES PARTIDO.
 
@@ -3451,7 +3341,6 @@ BEGIN
 END$$
 
 DELIMITER ;
-
 
 
 -- ---Vista para ver las asistecias y los jugadores
@@ -3909,7 +3798,9 @@ BEGIN
         			END IF;
         END IF;
     END IF;
-END$$
+END
+$$
+DELIMITER ;
 
 
 DROP VIEW IF EXISTS vista_maximos_goleadores;
@@ -4141,7 +4032,7 @@ SELECT * FROM vista_detalle_partidos;
 
 INSERT INTO administradores (nombre_administrador, apellido_administrador, clave_administrador, correo_administrador, telefono_administrador, dui_administrador, fecha_nacimiento_administrador, alias_administrador, foto_administrador)
 	VALUES 
-	('Joel', 'Mena', '$2y$10$Lq7h.aAUL.UMVBB1BE7dB.GBYm5EfF1v2TOLcxBBU0e83CRPV68aC', 'carlos.martinez@example.com', '12345678', '12345678-9', '1980-05-15', 'JoMe20241', 'default.png'),
+    ('Joel', 'Mena', '$2y$10$Lq7h.aAUL.UMVBB1BE7dB.GBYm5EfF1v2TOLcxBBU0e83CRPV68aC', 'carlos.martinez@example.com', '12345678', '12345678-9', '1980-05-15', 'JoMe20241', 'default.png'),
 	('María', 'Gómez', '$2y$10$Lq7h.aAUL.UMVBB1BE7dB.GBYm5EfF1v2TOLcxBBU0e83CRPV68aC', 'maria.gomez@example.com', '87654321', '98765432-1', '1985-07-20', 'MGomez', 'default.png'),
 	('Juan', 'Pérez', '$2y$10$Lq7h.aAUL.UMVBB1BE7dB.GBYm5EfF1v2TOLcxBBU0e83CRPV68aC', 'juan.perez@example.com', '12344321', '12349876-5', '1990-09-25', 'JPerez', 'default.png'),
 	('Ana', 'Hernández', '$2y$10$Lq7h.aAUL.UMVBB1BE7dB.GBYm5EfF1v2TOLcxBBU0e83CRPV68aC', 'ana.hernandez@example.com', '87651234', '54321234-7', '1992-11-30', 'AHernandez', 'default.png'),
@@ -4467,6 +4358,25 @@ INSERT INTO calendario (titulo, fecha_inicio, fecha_final, color)
 	('Reunión técnica', '2024-09-03 14:00:00', '2024-09-03 15:00:00', 'green'),
 	('Entrenamiento táctico', '2024-09-07 08:00:00', '2024-09-07 10:00:00', 'yellow'),
 	('Partido oficial', '2024-09-10 18:00:00', '2024-09-10 20:00:00', 'red');
+    
+INSERT INTO palmares (id_equipo, id_temporada, lugar) VALUES
+(1, 1, 'Campeón'),
+(2, 2, 'Subcampeón'),
+(3, 3, 'Tercer lugar'),
+(1, 4, 'Subcampeón'),
+(4, 5, 'Campeón');
+
+INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento) VALUES
+(1, '2024-01-15', 0, 1, 5),
+(2, '2024-01-16', 1, 2, 4),
+(3, '2024-01-17', 0, 3, 3),
+(4, '2024-01-18', 1, 4, 2),
+(5, '2024-01-19', 0, 5, 1);
 
 
-
+INSERT INTO respuesta_test (pregunta, respuesta, id_test) VALUES
+('¿Cuál es el capitán del equipo?', 8, 1),
+('¿Cuántos goles marcó el jugador en el último partido?', 5, 2),
+('¿Qué tácticas se utilizaron en el último entrenamiento?', 7, 3),
+('¿Qué estrategia fue la más efectiva durante la temporada?', 9, 4),
+('¿Cómo evaluaría el desempeño general del equipo?', 6, 5);
