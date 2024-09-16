@@ -613,26 +613,43 @@ CREATE TABLE calendario(
     color VARCHAR(50)
 );
 
+DROP TABLE IF EXISTS palmares;
+DROP TABLE IF EXISTS respuesta_test;
+DROP TABLE IF EXISTS test;
+-- TABLAS NUEVAS DE CORRECCIONES DE REUNIÓN DEL 12/09/2024
 CREATE TABLE palmares(
 id_palmares INT AUTO_INCREMENT PRIMARY KEY,
 id_equipo INT NOT NULL,
 CONSTRAINT fk_equipo_palmares FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
 id_temporada INT NOT NULL,
-CONSTRAINT fk_temporada_palmares FOREIGN KEY (id_temporada) REFERENCES temporadas(id_temporada),
+CONSTRAINT fk_temporada_palmares FOREIGN KEY (id_temporada) REFERENCES temporadas(id_temporada), 
 lugar ENUM('Campeón', 'Subcampeón', 'Tercer lugar') NOT NULL
 );
 
+-- Por si no entienden porque le puse así a la tabla: La real academia española 
+-- define la palabra "palmares" de las siguientes dos maneras: 
+-- 1. Lista de vencedores en una competición.
+-- 2. Historial, relación de méritos, especialmente de deportistas.
 CREATE TABLE test(
 id_test BIGINT AUTO_INCREMENT PRIMARY KEY,
-pregunta VARCHAR(2000) NOT NULL,
-respuesta INT NOT NULL CHECK(respuesta >= 0 OR respuesta <= 10),
 id_jugador INT NOT NULL,
+fecha DATE NOT NULL,
+contestado BOOLEAN DEFAULT 0,
 CONSTRAINT fk_jugador_test FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador),
 id_partido INT NULL,
 CONSTRAINT fk_partido_test FOREIGN KEY (id_partido) REFERENCES partidos(id_partido),
 id_entrenamiento BIGINT NULL,
 CONSTRAINT fk_entrenamientos_test FOREIGN KEY (id_entrenamiento) REFERENCES entrenamientos(id_entrenamiento)
 );
+
+CREATE TABLE respuesta_test(
+id_respuesta BIGINT AUTO_INCREMENT PRIMARY KEY,
+pregunta VARCHAR(2000) NOT NULL,
+respuesta INT NOT NULL,
+id_test BIGINT NOT NULL,
+CONSTRAINT fk_test_respuesta FOREIGN KEY (id_test) REFERENCES test(id_test)
+);
+
 
 -- TRIGGERS, FUNCIONES Y PROCEDIMIENTOS ALMACENADOS WEB
 
