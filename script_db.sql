@@ -1928,7 +1928,7 @@ END //
 DELIMITER ;
 
 -- Procedimientos para la tabla plantillas_equipos
-
+-- Procedimientos para la tabla plantillas_equipos
 DROP PROCEDURE IF EXISTS sp_insertar_plantilla_equipo;
 DELIMITER //
 
@@ -1940,21 +1940,71 @@ CREATE PROCEDURE sp_insertar_plantilla_equipo (
 )
 BEGIN
     DECLARE record_count INT;
+    DECLARE v_genero_jugador ENUM('Masculino', 'Femenino');
+    DECLARE v_genero_equipo ENUM('Masculino', 'Femenino');
+    DECLARE v_nombre_equipo VARCHAR(50);
+    DECLARE v_nombre_temporada VARCHAR(50);
+    DECLARE v_equipo_actual INT;
+    DECLARE v_temporada_actual INT;
+    DECLARE v_error_msg VARCHAR(255); -- Variable para almacenar el mensaje de error
 
-    -- Verificar si el registro ya existe
-    SELECT COUNT(*) INTO record_count
-    FROM plantillas_equipos
-    WHERE id_plantilla = p_id_plantilla
-      AND id_jugador = p_id_jugador
-      AND id_temporada = p_id_temporada
-      AND id_equipo = p_id_equipo;
+    -- Obtener el género del jugador
+    SELECT genero_jugador INTO v_genero_jugador
+    FROM jugadores
+    WHERE id_jugador = p_id_jugador;
 
-    -- Si existe un duplicado, generar un error
-    IF record_count > 0 THEN
-        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'El registro ya existe';
+    -- Obtener el género del equipo
+    SELECT genero_equipo INTO v_genero_equipo FROM equipos
+    WHERE id_equipo = p_id_equipo;
+    
+    SELECT nombre_equipo INTO v_nombre_equipo FROM equipos
+    WHERE id_equipo = p_id_equipo;
+
+    -- Verificar si los géneros coinciden
+    IF v_genero_jugador != v_genero_equipo THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El género del jugador no coincide con el género del equipo';
     ELSE
-        INSERT INTO plantillas_equipos (id_plantilla, id_jugador, id_temporada, id_equipo)
-        VALUES (p_id_plantilla, p_id_jugador, p_id_temporada, p_id_equipo);
+        -- Verificar si la plantilla ya tiene un equipo y temporada asignados
+        SELECT id_equipo, id_temporada INTO v_equipo_actual, v_temporada_actual
+        FROM plantillas_equipos
+        WHERE id_plantilla = p_id_plantilla
+        LIMIT 1;
+
+        -- Si ya tiene datos, validar que el equipo y temporada coincidan
+        IF v_equipo_actual IS NOT NULL AND v_temporada_actual IS NOT NULL THEN
+            IF v_equipo_actual != p_id_equipo OR v_temporada_actual != p_id_temporada THEN
+                -- Obtener el nombre del equipo y la temporada correctos
+                SELECT nombre_equipo INTO v_nombre_equipo
+                FROM equipos
+                WHERE id_equipo = v_equipo_actual;
+
+                SELECT nombre_temporada INTO v_nombre_temporada
+                FROM temporadas
+                WHERE id_temporada = v_temporada_actual;
+
+                -- Concatenar el mensaje de error en la variable
+                SET v_error_msg = CONCAT('La plantilla ya está asignada al equipo ', v_nombre_equipo, ' en la temporada ', v_nombre_temporada);
+
+                -- Generar el error con el mensaje concatenado
+                SIGNAL SQLSTATE '45004' SET MESSAGE_TEXT = v_error_msg;
+            END IF;
+        END IF;
+
+        -- Verificar si el registro ya existe
+        SELECT COUNT(*) INTO record_count
+        FROM plantillas_equipos
+        WHERE id_plantilla = p_id_plantilla
+          AND id_jugador = p_id_jugador
+          AND id_temporada = p_id_temporada
+          AND id_equipo = p_id_equipo;
+
+        -- Si existe un duplicado, generar un error
+        IF record_count > 0 THEN
+            SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'El registro ya existe';
+        ELSE
+            INSERT INTO plantillas_equipos (id_plantilla, id_jugador, id_temporada, id_equipo)
+            VALUES (p_id_plantilla, p_id_jugador, p_id_temporada, p_id_equipo);
+        END IF;
     END IF;
 END //
 DELIMITER ;
@@ -1971,26 +2021,74 @@ CREATE PROCEDURE sp_actualizar_plantilla_equipo (
 )
 BEGIN
     DECLARE record_count INT;
+    DECLARE v_genero_jugador ENUM('Masculino', 'Femenino');
+    DECLARE v_genero_equipo ENUM('Masculino', 'Femenino');
+    DECLARE v_nombre_equipo VARCHAR(50);
+    DECLARE v_nombre_temporada VARCHAR(50);
+    DECLARE v_equipo_actual INT;
+    DECLARE v_temporada_actual INT;
+    DECLARE v_error_msg VARCHAR(255); -- Variable para almacenar el mensaje de error
 
-    -- Verificar si el registro ya existe para otro plantilla equipo
-    SELECT COUNT(*) INTO record_count
-    FROM plantillas_equipos
-    WHERE id_plantilla = p_id_plantilla
-      AND id_jugador = p_id_jugador
-      AND id_temporada = p_id_temporada
-      AND id_equipo = p_id_equipo
-      AND id_plantilla_equipo <> p_id_plantilla_equipo;
+    -- Obtener el género del jugador
+    SELECT genero_jugador INTO v_genero_jugador
+    FROM jugadores
+    WHERE id_jugador = p_id_jugador;
 
-    -- Si existe un duplicado, generar un error
-    IF record_count > 0 THEN
-        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'El registro ya existe';
+    -- Obtener el género del equipo y nombre
+    SELECT genero_equipo, nombre_equipo INTO v_genero_equipo, v_nombre_equipo
+    FROM equipos
+    WHERE id_equipo = p_id_equipo;
+
+    -- Verificar si los géneros coinciden
+    IF v_genero_jugador != v_genero_equipo THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El género del jugador no coincide con el género del equipo';
     ELSE
-        UPDATE plantillas_equipos
-        SET id_plantilla = p_id_plantilla,
-            id_jugador = p_id_jugador,
-            id_temporada = p_id_temporada,
-            id_equipo = p_id_equipo
-        WHERE id_plantilla_equipo = p_id_plantilla_equipo;
+        -- Verificar si la plantilla ya tiene un equipo y temporada asignados
+        SELECT id_equipo, id_temporada INTO v_equipo_actual, v_temporada_actual
+        FROM plantillas_equipos
+        WHERE id_plantilla = p_id_plantilla
+        LIMIT 1;
+
+        -- Si ya tiene datos, validar que el equipo y temporada coincidan
+        IF v_equipo_actual IS NOT NULL AND v_temporada_actual IS NOT NULL THEN
+            IF v_equipo_actual != p_id_equipo OR v_temporada_actual != p_id_temporada THEN
+                -- Obtener el nombre del equipo y la temporada correctos
+                SELECT nombre_equipo INTO v_nombre_equipo
+                FROM equipos
+                WHERE id_equipo = v_equipo_actual;
+
+                SELECT nombre_temporada INTO v_nombre_temporada
+                FROM temporadas
+                WHERE id_temporada = v_temporada_actual;
+
+                -- Concatenar el mensaje de error en la variable
+                SET v_error_msg = CONCAT('La plantilla ya está asignada al equipo ', v_nombre_equipo, ' en la temporada ', v_nombre_temporada);
+
+                -- Generar el error con el mensaje concatenado
+                SIGNAL SQLSTATE '45004' SET MESSAGE_TEXT = v_error_msg;
+            END IF;
+        END IF;
+
+        -- Verificar si el registro ya existe para otro plantilla equipo
+        SELECT COUNT(*) INTO record_count
+        FROM plantillas_equipos
+        WHERE id_plantilla = p_id_plantilla
+          AND id_jugador = p_id_jugador
+          AND id_temporada = p_id_temporada
+          AND id_equipo = p_id_equipo
+          AND id_plantilla_equipo <> p_id_plantilla_equipo;
+
+        -- Si existe un duplicado, generar un error
+        IF record_count > 0 THEN
+            SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'El registro ya existe';
+        ELSE
+            UPDATE plantillas_equipos
+            SET id_plantilla = p_id_plantilla,
+                id_jugador = p_id_jugador,
+                id_temporada = p_id_temporada,
+                id_equipo = p_id_equipo
+            WHERE id_plantilla_equipo = p_id_plantilla_equipo;
+        END IF;
     END IF;
 END //
 DELIMITER ;
