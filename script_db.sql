@@ -30,6 +30,9 @@ SELECT * FROM administradores;
 ALTER TABLE administradores
 ADD COLUMN recovery_code VARCHAR(80) DEFAULT '0000';
 
+ALTER TABLE administradores
+ADD COLUMN codigo_autenticacion VARCHAR(100);
+
 CREATE TABLE tecnicos(
   id_tecnico INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_tecnico VARCHAR(50) NOT NULL, 
