@@ -2261,6 +2261,7 @@ DROP VIEW IF EXISTS vista_sub_tipologias;
 DELIMITER $$
 CREATE VIEW vista_sub_tipologias AS
 SELECT st.id_sub_tipologia AS 'ID',
+	   CONCAT(t.tipologia, " - ", st.nombre_sub_tipologia) AS 'COMPLETO', 
        st.nombre_sub_tipologia AS 'NOMBRE',
        t.tipologia AS 'TIPOLOGIA'
 FROM sub_tipologias st
@@ -3018,7 +3019,7 @@ JOIN
 
 -- ----------------------------------------------- PARTICIPACIONES  --------------------------------------------------------------------------
 -- DROP VIEW vista_jugadores_por_equipo;
-DROP VIEW vista_jugadores_por_equipo;
+DROP VIEW IF EXISTS vista_jugadores_por_equipo;
 -- VER JUGADORES POR EQUIPO
 CREATE VIEW vista_jugadores_por_equipo AS
     SELECT
