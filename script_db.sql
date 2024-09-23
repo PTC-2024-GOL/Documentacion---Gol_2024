@@ -4042,7 +4042,7 @@ CREATE VIEW asistencias_por_jugador AS
  	e.observacion_asistencia,
  	e.asistencia,
  	e.fecha_asistencia,
-	 DATE_FORMAT(e.fecha_asistencia, '%e de %M del %Y') AS fecha,
+	 DATE_FORMAT(e.fecha_asistencia, '%e de %M') AS fecha,
 	j.id_jornada
 FROM 
 	asistencias e
