@@ -4130,6 +4130,113 @@ ORDER BY p.fecha_partido DESC;
 
 SELECT * FROM vista_detalle_partidos;
 
+
+DROP PROCEDURE IF EXISTS sp_insertar_palmares;
+DELIMITER //
+
+CREATE PROCEDURE sp_insertar_palmares (
+    IN p_id_equipo INT,
+    IN p_id_temporada INT,
+    IN p_lugar ENUM('Campeón', 'Subcampeón', 'Tercer lugar')
+)
+BEGIN
+    DECLARE record_count INT;
+    DECLARE error_message VARCHAR(255);
+
+    -- Verificar si el palmarés ya existe para el equipo y la temporada
+    SELECT COUNT(*) INTO record_count
+    FROM palmares
+    WHERE id_equipo = p_id_equipo
+      AND id_temporada = p_id_temporada;
+
+    -- Si existe un registro, asignar el mensaje de error
+    IF record_count > 0 THEN
+        SET error_message = CONCAT('El reconocimiento ya existe para el equipo en esta temporada');
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = error_message;
+    END IF;
+
+    -- Verificar si el equipo ya obtuvo un lugar en la temporada
+    SELECT COUNT(*) INTO record_count
+    FROM palmares
+    WHERE id_equipo = p_id_equipo
+      AND id_temporada = p_id_temporada
+      AND lugar = p_lugar;
+
+    -- Si existe un duplicado, generar un error
+    IF record_count > 0 THEN
+        SET error_message = CONCAT('El equipo ya obtuvo ', p_lugar, ' en esta temporada');
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = error_message;
+    ELSE
+        -- Insertar el nuevo registro en palmarés
+        INSERT INTO palmares (id_equipo, id_temporada, lugar)
+        VALUES (p_id_equipo, p_id_temporada, p_lugar);
+    END IF;
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_actualizar_palmares;
+DELIMITER //
+
+CREATE PROCEDURE sp_actualizar_palmares (
+    IN p_id_palmares INT,
+    IN p_id_equipo INT,
+    IN p_id_temporada INT,
+    IN p_lugar ENUM('Campeón', 'Subcampeón', 'Tercer lugar')
+)
+BEGIN
+    DECLARE record_count INT;
+    DECLARE error_message VARCHAR(255);
+
+    -- Verificar si el palmarés ya existe para otro registro (diferente de p_id_palmares)
+    SELECT COUNT(*) INTO record_count
+    FROM palmares
+    WHERE id_equipo = p_id_equipo
+      AND id_temporada = p_id_temporada
+      AND id_palmares <> p_id_palmares;
+
+    -- Si existe un duplicado, generar un error
+    IF record_count > 0 THEN
+        SET error_message = 'El reconocimiento ya existe para el equipo en esta temporada';
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = error_message;
+    END IF;
+
+    -- Verificar si el equipo ya obtuvo un lugar en la temporada
+    SELECT COUNT(*) INTO record_count
+    FROM palmares
+    WHERE id_equipo = p_id_equipo
+      AND id_temporada = p_id_temporada
+      AND lugar = p_lugar
+      AND id_palmares <> p_id_palmares; -- excluyendo el registro actual
+
+    -- Si existe un duplicado, generar un error
+    IF record_count > 0 THEN
+        SET error_message = CONCAT('El equipo ya obtuvo ', p_lugar, ' en esta temporada ');
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = error_message;
+    ELSE
+        -- Actualizar el registro en palmarés
+        UPDATE palmares
+        SET id_equipo = p_id_equipo,
+            id_temporada = p_id_temporada,
+            lugar = p_lugar
+        WHERE id_palmares = p_id_palmares;
+    END IF;
+END //
+DELIMITER ;
+
+
+DROP PROCEDURE IF EXISTS sp_eliminar_palmares;
+DELIMITER //
+
+CREATE PROCEDURE sp_eliminar_palmares (
+    IN p_id_palmares INT
+)
+BEGIN
+    -- Eliminar el registro de palmarés
+    DELETE FROM palmares WHERE id_palmares = p_id_palmares;
+END //
+DELIMITER ;
+
+
 -- INSERT
 
 INSERT INTO administradores (nombre_administrador, apellido_administrador, clave_administrador, correo_administrador, telefono_administrador, dui_administrador, fecha_nacimiento_administrador, alias_administrador, foto_administrador)
