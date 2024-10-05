@@ -18,7 +18,7 @@ alias_administrador VARCHAR(25) NOT NULL,
 CONSTRAINT uq_alias_administrador_unico UNIQUE(alias_administrador),
 fecha_creacion DATETIME DEFAULT NOW(),
 intentos_administrador INT DEFAULT 0,
-estado_administrador BOOLEAN DEFAULT 1,
+estado_ BOOLEAN DEFAULT 1,
 tiempo_intento DATETIME NULL,
 fecha_clave DATETIME NULL DEFAULT NOW(),
 fecha_bloqueo DATETIME NULL,
@@ -56,6 +56,12 @@ CREATE TABLE tecnicos(
 
 ALTER TABLE tecnicos
 ADD COLUMN recovery_code VARCHAR(80) DEFAULT '0000';
+
+ALTER TABLE administradores
+MODIFY dui_administrador VARCHAR(512) NOT NULL;
+
+ALTER TABLE tecnicos
+MODIFY dui_tecnico VARCHAR(512) NOT NULL;
 
 
 CREATE TABLE documentos_tecnicos(
@@ -978,7 +984,7 @@ CREATE PROCEDURE insertar_administrador_validado(
    IN p_clave_administrador VARCHAR(100),
    IN p_correo_administrador VARCHAR(50),
    IN p_telefono_administrador VARCHAR(15),
-   IN p_dui_administrador VARCHAR(10),
+   IN p_dui_administrador VARCHAR(516),
    IN p_fecha_nacimiento_administrador DATE,
    IN p_foto_administrador VARCHAR(50)
 )
@@ -1026,7 +1032,7 @@ CREATE PROCEDURE actualizar_administrador_validado(
    IN p_apellido_administrador VARCHAR(50),
    IN p_correo_administrador VARCHAR(50),
    IN p_telefono_administrador VARCHAR(15),
-   IN p_dui_administrador VARCHAR(10),
+   IN p_dui_administrador VARCHAR(516),
    IN p_fecha_nacimiento_administrador DATE,
    IN p_foto_administrador VARCHAR(50)
 )
