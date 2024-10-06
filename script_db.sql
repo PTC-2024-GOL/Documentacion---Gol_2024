@@ -18,7 +18,7 @@ alias_administrador VARCHAR(25) NOT NULL,
 CONSTRAINT uq_alias_administrador_unico UNIQUE(alias_administrador),
 fecha_creacion DATETIME DEFAULT NOW(),
 intentos_administrador INT DEFAULT 0,
-estado_administrador BOOLEAN DEFAULT 1,
+estado_ BOOLEAN DEFAULT 1,
 tiempo_intento DATETIME NULL,
 fecha_clave DATETIME NULL DEFAULT NOW(),
 fecha_bloqueo DATETIME NULL,
@@ -56,6 +56,12 @@ CREATE TABLE tecnicos(
 
 ALTER TABLE tecnicos
 ADD COLUMN recovery_code VARCHAR(80) DEFAULT '0000';
+
+ALTER TABLE administradores
+MODIFY dui_administrador VARCHAR(10) NOT NULL;
+
+ALTER TABLE tecnicos
+MODIFY dui_tecnico VARCHAR(10) NOT NULL;
 
 
 CREATE TABLE documentos_tecnicos(
