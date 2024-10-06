@@ -648,3 +648,85 @@ respuesta INT NOT NULL CHECK(respuesta >= 0 OR respuesta <= 10),
 id_test BIGINT NOT NULL,
 CONSTRAINT fk_test_respuesta FOREIGN KEY (id_test) REFERENCES test(id_test)
 );
+
+DROP PROCEDURE IF EXISTS guardar_convocatoria;
+DELIMITER $$
+
+CREATE PROCEDURE guardar_convocatoria(
+    IN p_id_partido INT UNSIGNED,
+    IN p_id_jugador INT UNSIGNED,
+    IN p_estado_convocado BOOLEAN
+)
+BEGIN
+    DECLARE v_id_convocatoria BIGINT;
+    DECLARE v_tipo_resultado_partido ENUM('Victoria', 'Empate', 'Derrota', 'Pendiente');
+	 DECLARE v_fecha DATE;
+
+	 -- Verificar la fecha del partido por el (id_partido)
+	SELECT fecha_partido INTO v_fecha
+	FROM partidos
+	WHERE id_partido = p_id_partido;
+    -- Verificar si el tipo de resultado del partido es 'Pendiente'
+    SELECT tipo_resultado_partido INTO v_tipo_resultado_partido
+    FROM partidos
+    WHERE id_partido = p_id_partido;
+
+    IF v_tipo_resultado_partido != 'Pendiente' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No se puede modificar la convocatoria porque el partido ya no está pendiente.';
+    ELSE
+        -- Verificar si ya existe una fila en convocatorias_partidos para el par (id_partido, id_jugador)
+        SELECT id_convocatoria INTO v_id_convocatoria
+        FROM convocatorias_partidos
+        WHERE id_partido = p_id_partido AND id_jugador = p_id_jugador;
+
+        IF v_id_convocatoria IS NOT NULL THEN
+            -- Actualizar la fila existente en convocatorias_partidos
+            UPDATE convocatorias_partidos
+            SET id_partido = p_id_partido, id_jugador = p_id_jugador, estado_convocado = p_estado_convocado
+            WHERE id_convocatoria = v_id_convocatoria;
+
+            	IF p_estado_convocado = 0 THEN
+            		-- Eliminar de test si no está convocado
+            		DELETE FROM test WHERE id_jugador = p_id_jugador AND id_partido = p_id_partido;
+        			ELSE
+            		-- Insertar en test si está convocado
+            		INSERT INTO test (id_jugador, fecha, id_partido)
+            		VALUES (p_id_jugador, v_fecha, p_id_partido);
+        			END IF;
+        ELSE
+            -- Insertar una nueva fila en convocatorias_partidos
+            INSERT INTO convocatorias_partidos (id_partido, id_jugador, estado_convocado)
+            VALUES (p_id_partido, p_id_jugador, p_estado_convocado);
+        			IF p_estado_convocado = 1 THEN
+            		-- Insertar en test si está convocado
+            		INSERT INTO test (id_jugador, fecha, id_partido)
+            		VALUES (p_id_jugador, v_fecha, p_id_partido);
+        			END IF;
+        END IF;
+    END IF;
+END
+$$
+DELIMITER ;
+
+ALTER VIEW vista_detalle_entrenamiento AS
+SELECT
+    e.id_equipo,
+    dc.id_tarea,
+    e.id_entrenamiento,
+    dc.id_detalle_contenido,
+    j.nombre_jugador,
+    j.dorsal_jugador,
+    stc.sub_tema_contenido AS nombre_subtema,
+    t.nombre_tarea
+FROM
+    detalle_entrenamiento de
+JOIN
+    entrenamientos e ON de.id_entrenamiento = e.id_entrenamiento
+JOIN
+    detalles_contenidos dc ON de.id_detalle_contenido = dc.id_detalle_contenido
+JOIN
+    jugadores j ON de.id_jugador = j.id_jugador
+JOIN
+    sub_temas_contenidos stc ON dc.id_sub_tema_contenido = stc.id_sub_tema_contenido
+JOIN
+    tareas t ON dc.id_tarea = t.id_tarea;

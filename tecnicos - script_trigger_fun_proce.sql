@@ -120,6 +120,7 @@ INNER JOIN
 INNER JOIN
 	jornadas j ON u.id_jornada = j.id_jornada;
 -- Vista para movil de tecnicos para ver datos por jugador relacionados a estadisticas
+DROP VIEW vista_asistencias_por_jugador;
 CREATE VIEW vista_asistencias_por_jugador AS
 SELECT 
     e.id_jugador,

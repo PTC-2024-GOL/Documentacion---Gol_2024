@@ -1964,6 +1964,7 @@ INNER JOIN
   horarios h ON r.id_horario = h.id_horario;
 
 -- Vista para el GET de detalles contenidos
+DROP VIEW vista_detalle_entrenamiento;
 CREATE VIEW vista_detalle_entrenamiento AS
 SELECT
     e.id_equipo,
@@ -2010,7 +2011,7 @@ JOIN
 SELECT * FROM vista_detalle_entrenamiento_especifico;
 
 -- Vista para conocr los jugadores de un equipo, solo se necesita saber el id equipo, se usa en detalles contenidos
-
+DROP VIEW vista_equipos_jugadores;
 CREATE VIEW vista_equipos_jugadores AS
 SELECT
     e.id_equipo,
@@ -2598,7 +2599,7 @@ DELIMITER ;
 	        pj.id_jugador,
 	        pj.id_equipo,
 	        cj.clasificacion_caracteristica_jugador AS caracteristica,
-	        ROUND(AVG(C.nota_caracteristica_analisis), 2) AS promedio
+	        ROUND(AVG(c.nota_caracteristica_analisis), 2) AS promedio
 	    FROM plantillas_equipos pj
 	        INNER JOIN caracteristicas_analisis c ON pj.id_plantilla_equipo = c.id_jugador
 	        INNER JOIN caracteristicas_jugadores cj ON c.id_caracteristica_jugador = cj.id_caracteristica_jugador
@@ -2745,6 +2746,7 @@ FROM caracteristicas_analisis c
 INNER JOIN caracteristicas_jugadores cj ON c.id_caracteristica_jugador = cj.id_caracteristica_jugador
 GROUP BY c.id_jugador, cj.clasificacion_caracteristica_jugador;
 
+DROP VIEW vista_ultimos_entrenamientos;
 CREATE VIEW vista_ultimos_entrenamientos AS
 SELECT DISTINCT
     SUM(CASE WHEN a.asistencia = 'Asistencia' THEN 1 ELSE 0 END) AS asistencia,

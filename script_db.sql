@@ -512,6 +512,9 @@ CREATE TABLE tipos_goles(
   nombre_tipo_gol VARCHAR(60) NOT NULL
 );
 
+ALTER TABLE tipos_goles
+ADD CONSTRAINT uq_nombre_tipo_gol UNIQUE(nombre_tipo_gol);
+
 CREATE TABLE participaciones_partidos(
   id_participacion BIGINT AUTO_INCREMENT PRIMARY KEY, 
   id_partido INT NOT NULL,
