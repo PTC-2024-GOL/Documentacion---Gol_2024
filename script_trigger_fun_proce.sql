@@ -550,31 +550,53 @@ $$
 DELIMITER ;
 
 
-DROP PROCEDURE IF EXISTS insertar_caracteristica_jugador;
+DROP PROCEDURE IF EXISTS insertar_cuerpo_tecnico;
 DELIMITER $$
-CREATE PROCEDURE insertar_caracteristica_jugador(
-    IN p_nombre_caracteristica VARCHAR(50),
-    IN p_clasificacion ENUM('Técnicos', 'Tácticos', 'Psicológicos', 'Físicos')
+CREATE PROCEDURE insertar_cuerpo_tecnico(
+    IN p_nombre_cuerpo_tecnico VARCHAR(60)
 )
 BEGIN
-    INSERT INTO caracteristicas_jugadores (nombre_caracteristica_jugador, clasificacion_caracteristica_jugador)
-    VALUES (p_nombre_caracteristica, p_clasificacion);
+    DECLARE nombre_count INT;
+
+    -- Verificar si el nombre ya existe
+    SELECT COUNT(*) INTO nombre_count
+    FROM cuerpos_tecnicos
+    WHERE nombre_cuerpo_tecnico = p_nombre_cuerpo_tecnico;
+
+    -- Si existe un duplicado, generar un error
+    IF nombre_count > 0 THEN
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'nombre del cuerpo técnico ya existe';
+    ELSE
+        INSERT INTO cuerpos_tecnicos (nombre_cuerpo_tecnico)
+        VALUES (p_nombre_cuerpo_tecnico);
+    END IF;
 END;
 $$
 DELIMITER ;
 
-DROP PROCEDURE IF EXISTS actualizar_caracteristica_jugador;
+DROP PROCEDURE IF EXISTS actualizar_cuerpo_tecnico;
 DELIMITER $$
-CREATE PROCEDURE actualizar_caracteristica_jugador(
-    IN p_id_caracteristica INT,
-    IN p_nuevo_nombre VARCHAR(50),
-    IN p_nueva_clasificacion ENUM('Técnicos', 'Tácticos', 'Psicológicos', 'Físicos')
+CREATE PROCEDURE actualizar_cuerpo_tecnico(
+    IN p_id_cuerpo_tecnico INT,
+    IN p_nuevo_nombre VARCHAR(60)
 )
 BEGIN
-    UPDATE caracteristicas_jugadores
-    SET nombre_caracteristica_jugador = p_nuevo_nombre,
-        clasificacion_caracteristica_jugador = p_nueva_clasificacion
-    WHERE id_caracteristica_jugador = p_id_caracteristica;
+	DECLARE nombre_count INT;
+
+    -- Verificar si el nombre ya existe
+    SELECT COUNT(*) INTO nombre_count
+	FROM cuerpos_tecnicos
+	WHERE nombre_cuerpo_tecnico = p_nuevo_nombre
+	AND id_cuerpo_tecnico <> p_id_cuerpo_tecnico;
+
+    -- Si existe un duplicado, generar un error
+    IF nombre_count > 0 THEN
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'nombre del cuerpo técnico ya existe';
+	ELSE
+		UPDATE cuerpos_tecnicos
+		SET nombre_cuerpo_tecnico = p_nuevo_nombre
+		WHERE id_cuerpo_tecnico = p_id_cuerpo_tecnico;
+	END IF;
 END;
 $$
 DELIMITER ;
@@ -597,8 +619,20 @@ CREATE PROCEDURE insertar_cuerpo_tecnico(
     IN p_nombre_cuerpo_tecnico VARCHAR(60)
 )
 BEGIN
-    INSERT INTO cuerpos_tecnicos (nombre_cuerpo_tecnico)
-    VALUES (p_nombre_cuerpo_tecnico);
+    DECLARE nombre_count INT;
+
+    -- Verificar si el nombre ya existe
+    SELECT COUNT(*) INTO nombre_count
+    FROM cuerpos_tecnicos
+    WHERE nombre_cuerpo_tecnico = p_nombre_cuerpo_tecnico;
+
+    -- Si existe un duplicado, generar un error
+    IF nombre_count > 0 THEN
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'nombre del cuerpo técnico ya existe';
+    ELSE
+        INSERT INTO cuerpos_tecnicos (nombre_cuerpo_tecnico)
+        VALUES (p_nombre_cuerpo_tecnico);
+    END IF;
 END;
 $$
 DELIMITER ;
@@ -610,9 +644,22 @@ CREATE PROCEDURE actualizar_cuerpo_tecnico(
     IN p_nuevo_nombre VARCHAR(60)
 )
 BEGIN
-    UPDATE cuerpos_tecnicos
-    SET nombre_cuerpo_tecnico = p_nuevo_nombre
-    WHERE id_cuerpo_tecnico = p_id_cuerpo_tecnico;
+	DECLARE nombre_count INT;
+
+    -- Verificar si el nombre ya existe
+    SELECT COUNT(*) INTO nombre_count
+	FROM cuerpos_tecnicos
+	WHERE nombre_cuerpo_tecnico = p_nuevo_nombre
+	AND id_cuerpo_tecnico <> p_id_cuerpo_tecnico;
+
+    -- Si existe un duplicado, generar un error
+    IF nombre_count > 0 THEN
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'nombre del cuerpo técnico ya existe';
+	ELSE
+		UPDATE cuerpos_tecnicos
+		SET nombre_cuerpo_tecnico = p_nuevo_nombre
+		WHERE id_cuerpo_tecnico = p_id_cuerpo_tecnico;
+	END IF;
 END;
 $$
 DELIMITER ;
