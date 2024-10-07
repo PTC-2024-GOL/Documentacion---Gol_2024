@@ -1402,8 +1402,20 @@ CREATE PROCEDURE insertar_sub_tipologia(
     IN p_id_tipologia INT
 )
 BEGIN
+DECLARE nombre_count INT;
+
+    -- Verificar si el nombre ya existe
+    SELECT COUNT(*) INTO nombre_count
+    FROM sub_tipologias
+    WHERE nombre_sub_tipologia = p_nombre_sub_tipologia;
+
+    -- Si existe un duplicado, generar un error
+    IF nombre_count > 0 THEN
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'nombre de la sub tipología ya existe';
+    ELSE
     INSERT INTO sub_tipologias (nombre_sub_tipologia, id_tipologia)
     VALUES (p_nombre_sub_tipologia, p_id_tipologia);
+    END IF;
 END;
 $$
 DELIMITER ;
@@ -1416,10 +1428,23 @@ CREATE PROCEDURE actualizar_sub_tipologia(
     IN p_id_tipologia INT
 )
 BEGIN
+	DECLARE nombre_count INT;
+
+    -- Verificar si el nombre ya existe
+    SELECT COUNT(*) INTO nombre_count
+	FROM sub_tipologias
+	WHERE nombre_sub_tipologia = p_nombre_sub_tipologia
+	AND id_sub_tipologia <> p_id_sub_tipologia;
+
+    -- Si existe un duplicado, generar un error
+    IF nombre_count > 0 THEN
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'nombre de la sub tipología ya existe';
+    ELSE
     UPDATE sub_tipologias
     SET nombre_sub_tipologia = p_nombre_sub_tipologia,
         id_tipologia = p_id_tipologia
     WHERE id_sub_tipologia = p_id_sub_tipologia;
+    END IF;
 END;
 $$
 DELIMITER ;
