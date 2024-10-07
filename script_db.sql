@@ -4294,6 +4294,51 @@ END;
 
 DELIMITER ;
 
+-- TRIGGER QUE VALIDA QUE NO SE INSERTEN COMBINACIONES EXISTENTES EN PRINCIPIOS DE JUEGO:
+
+DELIMITER //
+
+CREATE TRIGGER validar_unicidad_sub_temas_contenidos
+BEFORE INSERT ON sub_temas_contenidos
+FOR EACH ROW
+BEGIN
+  -- Verifica si ya existe la combinación de momento_juego y zona_campo
+  IF EXISTS (
+    SELECT 1 FROM sub_temas_contenidos 
+    WHERE sub_tema_contenido = NEW.sub_tema_contenido
+    AND id_tema_contenido = NEW.id_tema_contenido
+  ) THEN
+    -- Lanza un error si ya existe la combinación
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'La combinación de momento de juego y principio ya existe.';
+  END IF;
+END;
+//
+
+DELIMITER ;
+
+-- TRIGGER QUE VALIDA QUE NO SE INSERTEN CCOMBINACIONES EXISTENTES EN PRINCIPIOS DE JUEGO:
+DELIMITER //
+
+CREATE TRIGGER validar_unicidad_sub_temas_contenidos_update
+BEFORE UPDATE ON sub_temas_contenidos
+FOR EACH ROW
+BEGIN
+  -- Verifica si ya existe la combinación de momento_juego y zona_campo
+ IF EXISTS (
+    SELECT 1 FROM sub_temas_contenidos 
+    WHERE id_tema_contenido = NEW.id_tema_contenido
+    AND sub_tema_contenido = NEW.sub_tema_contenido
+    AND id_sub_tema_contenido != NEW.id_sub_tema_contenido
+  ) THEN
+    -- Lanza un error si ya existe la combinación
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'La combinación de momento de juego y principio ya existe.';
+  END IF;
+END;
+//
+
+DELIMITER ;
 -- INSERT
 
 INSERT INTO administradores (nombre_administrador, apellido_administrador, clave_administrador, correo_administrador, telefono_administrador, dui_administrador, fecha_nacimiento_administrador, alias_administrador, foto_administrador)
