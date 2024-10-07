@@ -4271,6 +4271,29 @@ END;
 
 DELIMITER ;
 
+-- TRIGGER QUE VALIDA QUE NO SE INSERTEN COMBINACIONES EXISTENTES EN MOMENTOS DE JUEGO:
+DELIMITER //
+
+CREATE TRIGGER validar_unicidad_temas_contenidos_update
+BEFORE UPDATE ON temas_contenidos
+FOR EACH ROW
+BEGIN
+  -- Verifica si ya existe la combinación de momento_juego y zona_campo
+  IF EXISTS (
+    SELECT 1 FROM temas_contenidos 
+    WHERE momento_juego = NEW.momento_juego
+    AND zona_campo = NEW.zona_campo
+    AND id_tema_contenido != NEW.id_tema_contenido
+  ) THEN
+    -- Lanza un error si ya existe la combinación
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'La combinación de momento_juego y zona_campo ya existe.';
+  END IF;
+END;
+//
+
+DELIMITER ;
+
 -- INSERT
 
 INSERT INTO administradores (nombre_administrador, apellido_administrador, clave_administrador, correo_administrador, telefono_administrador, dui_administrador, fecha_nacimiento_administrador, alias_administrador, foto_administrador)
