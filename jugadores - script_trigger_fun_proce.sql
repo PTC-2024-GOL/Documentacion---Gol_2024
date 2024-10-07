@@ -30,4 +30,3 @@ INNER JOIN
     participaciones_partidos pp ON p.id_partido = pp.id_partido
 ORDER BY p.fecha_partido DESC;
 
-SELECT * FROM vista_detalle_partidos;

@@ -18,7 +18,7 @@ alias_administrador VARCHAR(25) NOT NULL,
 CONSTRAINT uq_alias_administrador_unico UNIQUE(alias_administrador),
 fecha_creacion DATETIME DEFAULT NOW(),
 intentos_administrador INT DEFAULT 0,
-estado_ BOOLEAN DEFAULT 1,
+estado_administrador BOOLEAN DEFAULT 1,
 tiempo_intento DATETIME NULL,
 fecha_clave DATETIME NULL DEFAULT NOW(),
 fecha_bloqueo DATETIME NULL,
@@ -590,6 +590,9 @@ CREATE TABLE lesiones(
   total_por_lesion INT UNSIGNED NOT NULL DEFAULT 0,
   porcentaje_por_lesion INT UNSIGNED NULL DEFAULT 0
 );
+
+ALTER TABLE lesiones
+    ADD CONSTRAINT u_sub_tipologia UNIQUE(id_sub_tipologia);
 
 CREATE TABLE registros_medicos(
   id_registro_medico INT AUTO_INCREMENT PRIMARY KEY, 

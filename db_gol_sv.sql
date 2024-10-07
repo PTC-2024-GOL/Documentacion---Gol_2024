@@ -708,7 +708,7 @@ END
 $$
 DELIMITER ;
 
-ALTER VIEW vista_detalle_entrenamiento AS
+CREATE VIEW vista_detalle_entrenamiento AS
 SELECT
     e.id_equipo,
     dc.id_tarea,
