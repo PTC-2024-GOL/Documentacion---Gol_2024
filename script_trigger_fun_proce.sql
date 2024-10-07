@@ -729,8 +729,20 @@ CREATE PROCEDURE insertar_tipologia(
     IN p_tipologia VARCHAR(60)
 )
 BEGIN
+	DECLARE nombre_count INT;
+
+    -- Verificar si el nombre ya existe
+    SELECT COUNT(*) INTO nombre_count
+    FROM tipologias
+    WHERE tipologia = p_tipologia;
+
+    -- Si existe un duplicado, generar un error
+    IF nombre_count > 0 THEN
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'nombre de la tipología ya existe';
+    ELSE
     INSERT INTO tipologias (tipologia)
     VALUES (p_tipologia);
+    END IF;
 END;
 $$
 DELIMITER ;
@@ -742,9 +754,22 @@ CREATE PROCEDURE actualizar_tipologia(
     IN p_nueva_tipologia VARCHAR(60)
 )
 BEGIN
+	DECLARE nombre_count INT;
+
+    -- Verificar si el nombre ya existe
+	SELECT COUNT(*) INTO nombre_count
+	FROM tipologias
+	WHERE tipologia = p_nueva_tipologia
+	AND id_tipologia <> p_id_tipologia;
+
+    -- Si existe un duplicado, generar un error
+    IF nombre_count > 0 THEN
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'nombre de la tipología ya existe';
+    ELSE
     UPDATE tipologias
     SET tipologia = p_nueva_tipologia
     WHERE id_tipologia = p_id_tipologia;
+    END IF;
 END;
 $$
 DELIMITER ;
