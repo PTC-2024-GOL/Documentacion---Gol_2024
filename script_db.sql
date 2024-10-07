@@ -174,7 +174,7 @@ CREATE TABLE detalles_cuerpos_tecnicos(
 CREATE TABLE equipos(
   id_equipo INT AUTO_INCREMENT PRIMARY KEY, 
   nombre_equipo VARCHAR(50) NOT NULL, 
-  CONSTRAINT uq_nombre_equipo_unico UNIQUE(nombre_equipo), 
+  CONSTRAINT uq_nombre_equipo UNIQUE(nombre_equipo),
   genero_equipo ENUM('Masculino ', 'Femenino') NOT NULL,
   telefono_contacto VARCHAR(14) NULL, 
   id_cuerpo_tecnico INT NULL, 
