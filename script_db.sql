@@ -861,6 +861,7 @@ END //
 
 DELIMITER ;
 
+DROP EVENT IF EXISTS enviar_notificacion_cumpleanios;
 DELIMITER //
 CREATE EVENT enviar_notificacion_cumpleanios
 ON SCHEDULE EVERY 1 DAY
@@ -871,13 +872,14 @@ BEGIN
     SELECT 
         'Feliz Cumpleaños', 
         CONCAT('¡Feliz cumpleaños, ', j.nombre_jugador, ' ', j.apellido_jugador, '!'),
-        'Cumpleaños', 
+        'Eventos', 
         j.id_jugador
     FROM jugadores j
     WHERE DATE_FORMAT(j.fecha_nacimiento_jugador, '%m-%d') = DATE_FORMAT(CURDATE(), '%m-%d');
 END//
 DELIMITER ;
 
+DROP EVENT IF EXISTS enviar_notificacion_entrenamiento;
 DELIMITER //
 CREATE EVENT enviar_notificacion_entrenamiento
 ON SCHEDULE EVERY 1 DAY
@@ -888,7 +890,7 @@ BEGIN
     SELECT 
         'Entrenamiento programado', 
         CONCAT('Tienes un entrenamiento programado hoy, ', e.sesion, '.'),
-        'Entrenamiento', 
+        'Eventos', 
         j.id_jugador,
         e.id_entrenamiento
     FROM entrenamientos e
