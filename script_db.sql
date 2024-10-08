@@ -664,6 +664,19 @@ id_test BIGINT NOT NULL,
 CONSTRAINT fk_test_respuesta FOREIGN KEY (id_test) REFERENCES test(id_test)
 );
 
+CREATE TABLE notificaciones (
+id_notificacion BIGINT AUTO_INCREMENT PRIMARY KEY,
+titulo VARCHAR(200) NOT NULL,
+mensaje TEXT NOT NULL,
+fecha_notificacion DATETIME NOT NULL DEFAULT NOW(),
+tipo_notificacion ENUM('Registro medico', 'Test', 'Entrenamiento', 'Eventos', 'Partido'),
+id_jugador INT NOT NULL,
+CONSTRAINT fk_jugador_notificacion FOREIGN KEY (id_jugador) REFERENCES jugadores(id_jugador),
+visto BOOLEAN NULL DEFAULT 0,
+evento INT NULL
+);
+
+SET GLOBAL event_scheduler = ON;
 
 -- TRIGGERS, FUNCIONES Y PROCEDIMIENTOS ALMACENADOS
 
