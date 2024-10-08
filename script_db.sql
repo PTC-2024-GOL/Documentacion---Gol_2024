@@ -664,6 +664,7 @@ id_test BIGINT NOT NULL,
 CONSTRAINT fk_test_respuesta FOREIGN KEY (id_test) REFERENCES test(id_test)
 );
 
+
 CREATE TABLE notificaciones (
 id_notificacion BIGINT AUTO_INCREMENT PRIMARY KEY,
 titulo VARCHAR(200) NOT NULL,
@@ -677,6 +678,227 @@ evento INT NULL
 );
 
 SET GLOBAL event_scheduler = ON;
+
+SELECT * FROM notificaciones;
+
+DROP EVENT IF EXISTS generar_recap_mensual;
+CREATE EVENT IF NOT EXISTS generar_recap_mensual
+ON SCHEDULE EVERY 1 MONTH
+STARTS (CURRENT_DATE + INTERVAL (1 - DAY(CURRENT_DATE)) DAY + INTERVAL 1 DAY)
+DO
+  INSERT INTO notificaciones (titulo, mensaje, tipo_notificacion, id_jugador)
+  SELECT 
+    'Tu recap mensual está listo', 
+    'Puedes ver tu RECAP de este mes presionando aquí', 
+    'Eventos', 
+    pp.id_jugador
+  FROM participaciones_partidos pp
+  INNER JOIN partidos p ON pp.id_partido = p.id_partido
+  WHERE p.fecha_partido BETWEEN DATE_SUB(LAST_DAY(CURRENT_DATE - INTERVAL 1 MONTH), INTERVAL DAY(LAST_DAY(CURRENT_DATE - INTERVAL 1 MONTH)) - 1 DAY)
+    AND LAST_DAY(CURRENT_DATE - INTERVAL 1 MONTH)
+  GROUP BY pp.id_jugador
+  HAVING COUNT(pp.id_partido) > 0;
+  
+DELIMITER //
+DROP TRIGGER IF EXISTS insertar_notificacion_registro_medico;
+CREATE TRIGGER insertar_notificacion_registro_medico
+AFTER INSERT ON registros_medicos
+FOR EACH ROW
+BEGIN
+  INSERT INTO notificaciones (titulo, mensaje, tipo_notificacion, id_jugador)
+  VALUES (
+    'Nuevo registro médico', 
+    CONCAT('Se ha registrado un nuevo reporte médico para ti. Fecha del reporte: ', NEW.fecha_registro),
+    'Registro medico', 
+    NEW.id_jugador
+  );
+END//
+
+DELIMITER;
+
+DELIMITER //
+DROP TRIGGER IF EXISTS notificacion_nuevo_entrenamiento;
+CREATE TRIGGER notificacion_nuevo_entrenamiento
+AFTER INSERT ON entrenamientos
+FOR EACH ROW
+BEGIN
+  -- Insertar notificación para cada jugador del equipo relacionado con el entrenamiento
+  INSERT INTO notificaciones (titulo, mensaje, tipo_notificacion, id_jugador, evento)
+  SELECT 
+    'Nuevo entrenamiento programado', 
+    CONCAT('Se ha programado un nuevo entrenamiento para el ', NEW.fecha_entrenamiento, '. Sesión: ', NEW.sesion), 
+    'Entrenamiento', 
+    pe.id_jugador,
+    NEW.id_jornada
+  FROM plantillas_equipos pe
+  WHERE pe.id_equipo = NEW.id_equipo;
+END//
+DELIMITER;
+
+DELIMITER //
+DROP TRIGGER IF EXISTS notificacion_gol_jugador;
+CREATE TRIGGER notificacion_gol_jugador
+AFTER INSERT ON detalles_goles
+FOR EACH ROW
+BEGIN
+  DECLARE id_jugador INT;
+  DECLARE id_partido INT;
+
+  -- Obtener id_jugador y id_partido desde participaciones_partidos
+  SELECT pp.id_jugador, pp.id_partido 
+  INTO id_jugador, id_partido
+  FROM participaciones_partidos pp
+  WHERE pp.id_participacion = NEW.id_participacion;
+
+  -- Insertar notificación para el jugador que marcó el gol
+  INSERT INTO notificaciones (titulo, mensaje, tipo_notificacion, id_jugador, evento)
+  VALUES (
+    '¡Gol anotado!', 
+    'Felicidades, has anotado un gol en tu último partido.', 
+    'Partido', 
+    id_jugador, 
+    id_partido
+  );
+END//
+
+DELIMITER ;
+
+DELIMITER //
+DROP TRIGGER IF EXISTS notificacion_amonestacion_jugador;
+CREATE TRIGGER notificacion_amonestacion_jugador
+AFTER INSERT ON detalles_amonestaciones
+FOR EACH ROW
+BEGIN
+  DECLARE id_jugador INT;
+  DECLARE id_partido INT;
+
+  -- Obtener id_jugador y id_partido desde participaciones_partidos
+  SELECT pp.id_jugador, pp.id_partido 
+  INTO id_jugador, id_partido
+  FROM participaciones_partidos pp
+  WHERE pp.id_participacion = NEW.id_participacion;
+
+  -- Insertar notificación para el jugador que recibió la amonestación
+  INSERT INTO notificaciones (titulo, mensaje, tipo_notificacion, id_jugador, evento)
+  VALUES (
+    'Amonestación recibida', 
+    CONCAT('Has recibido una ', NEW.amonestacion, ' en tu último partido.'), 
+    'Partido', 
+    id_jugador, 
+    id_partido
+  );
+END//
+DELIMITER ;
+DROP TRIGGER IF EXISTS notificacion_estado_convocatoria;
+DELIMITER //
+CREATE TRIGGER notificacion_estado_convocatoria
+AFTER INSERT ON convocatorias_partidos
+FOR EACH ROW
+BEGIN
+  -- Si el jugador está convocado
+  IF NEW.estado_convocado = 1 THEN
+    INSERT INTO notificaciones (titulo, mensaje, tipo_notificacion, id_jugador, evento)
+    VALUES (
+      'Convocatoria para el partido', 
+      'Has sido convocado para el próximo partido.', 
+      'Partido', 
+      NEW.id_jugador, 
+      NEW.id_partido
+    );
+  -- Si el jugador no está convocado
+  ELSE
+    INSERT INTO notificaciones (titulo, mensaje, tipo_notificacion, id_jugador, evento)
+    VALUES (
+      'No convocado para el partido', 
+      'No has sido convocado para el próximo partido.', 
+      'Partido', 
+      NEW.id_jugador, 
+      NEW.id_partido
+    );
+  END IF;
+END//
+
+DELIMITER ;
+DROP EVENT IF EXISTS enviar_test_post_partido;
+DELIMITER //
+CREATE EVENT enviar_test_post_partido
+ON SCHEDULE EVERY 1 DAY
+STARTS CURRENT_DATE + INTERVAL 1 DAY + INTERVAL '07:30' HOUR_MINUTE
+DO
+BEGIN
+  INSERT INTO notificaciones (titulo, mensaje, tipo_notificacion, id_jugador, evento)
+  SELECT 
+    'Test post-partido disponible', 
+    'Tienes disponible un test post-partido.', 
+    'Test', 
+    p.id_jugador, 
+    p.id_partido
+  FROM participaciones_partidos p
+  WHERE p.id_partido IN (
+    SELECT id_partido FROM partidos WHERE DATE(fecha_partido) = CURDATE() - INTERVAL 1 DAY
+  );
+END //
+
+DELIMITER ;
+
+DROP EVENT IF EXISTS enviar_test_post_entrenamiento;
+DELIMITER //
+CREATE EVENT enviar_test_post_entrenamiento
+ON SCHEDULE EVERY 1 DAY
+STARTS CURRENT_DATE + INTERVAL 1 DAY + INTERVAL '07:30' HOUR_MINUTE
+DO
+BEGIN
+  INSERT INTO notificaciones (titulo, mensaje, tipo_notificacion, id_jugador, evento)
+  SELECT 
+    'Test post-entrenamiento disponible', 
+    'Tienes disponible un test post-entrenamiento.', 
+    'Test', 
+    a.id_jugador, 
+    a.id_entrenamiento
+  FROM asistencias a
+  WHERE DATE(a.fecha_asistencia) = CURDATE() - INTERVAL 1 DAY;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+CREATE EVENT enviar_notificacion_cumpleanios
+ON SCHEDULE EVERY 1 DAY
+STARTS CURRENT_DATE + INTERVAL '07:30' HOUR_MINUTE
+DO
+BEGIN
+    INSERT INTO notificaciones (titulo, mensaje, tipo_notificacion, id_jugador)
+    SELECT 
+        'Feliz Cumpleaños', 
+        CONCAT('¡Feliz cumpleaños, ', j.nombre_jugador, ' ', j.apellido_jugador, '!'),
+        'Cumpleaños', 
+        j.id_jugador
+    FROM jugadores j
+    WHERE DATE_FORMAT(j.fecha_nacimiento_jugador, '%m-%d') = DATE_FORMAT(CURDATE(), '%m-%d');
+END//
+DELIMITER ;
+
+DELIMITER //
+CREATE EVENT enviar_notificacion_entrenamiento
+ON SCHEDULE EVERY 1 DAY
+STARTS CURRENT_DATE + INTERVAL '07:30' HOUR_MINUTE
+DO
+BEGIN
+    INSERT INTO notificaciones (titulo, mensaje, tipo_notificacion, id_jugador, evento)
+    SELECT 
+        'Entrenamiento programado', 
+        CONCAT('Tienes un entrenamiento programado hoy, ', e.sesion, '.'),
+        'Entrenamiento', 
+        j.id_jugador,
+        e.id_entrenamiento
+    FROM entrenamientos e
+    JOIN jugadores j ON j.id_jugador = e.id_jugador -- Asegúrate de tener un campo para relacionar jugadores con entrenamientos
+    WHERE e.fecha_entrenamiento = CURDATE();
+END//
+
+DELIMITER ;
+
+SELECT * FROM notificaciones;
 
 -- TRIGGERS, FUNCIONES Y PROCEDIMIENTOS ALMACENADOS
 
