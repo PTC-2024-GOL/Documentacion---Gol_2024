@@ -1999,6 +1999,18 @@ CREATE PROCEDURE insertar_jornada(
     IN p_fecha_fin DATE
 )
 BEGIN
+    DECLARE jornada_count INT;
+
+    -- Validar que no exista una jornada con el mismo nombre o número en la misma plantilla
+    SELECT COUNT(*) INTO jornada_count
+    FROM jornadas
+    WHERE (nombre_jornada = p_nombre_jornada OR numero_jornada = p_numero_jornada)
+    AND id_plantilla = p_id_plantilla;
+
+    IF jornada_count > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El nombre o número de jornada ya existe para esta plantilla';
+    END IF;
+
     -- Validar las fechas
     IF p_fecha_inicio >= p_fecha_fin THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La fecha de inicio debe ser anterior a la fecha de fin';
@@ -2009,6 +2021,7 @@ BEGIN
     VALUES (p_nombre_jornada, p_numero_jornada, p_id_plantilla, p_fecha_inicio, p_fecha_fin);
 END //
 DELIMITER ;
+
 
 
 DROP PROCEDURE IF EXISTS actualizar_jornada;
@@ -2022,6 +2035,18 @@ CREATE PROCEDURE actualizar_jornada(
     IN p_fecha_fin DATE
 )
 BEGIN
+    DECLARE jornada_count INT;
+
+    -- Validar que no exista otra jornada con el mismo nombre o número en la misma plantilla
+    SELECT COUNT(*) INTO jornada_count
+    FROM jornadas
+    WHERE (nombre_jornada = p_nombre_jornada OR numero_jornada = p_numero_jornada)
+    AND id_plantilla = p_id_plantilla
+    AND id_jornada != p_id_jornada;
+
+    IF jornada_count > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El nombre o número de jornada ya existe para esta plantilla';
+    END IF;
 
     -- Validar las fechas
     IF p_fecha_inicio >= p_fecha_fin THEN
@@ -2038,7 +2063,6 @@ BEGIN
     WHERE id_jornada = p_id_jornada;
 END //
 DELIMITER ;
-
 
 DELIMITER //
 CREATE PROCEDURE sp_eliminar_jornada (IN p_id_jornada INT)
