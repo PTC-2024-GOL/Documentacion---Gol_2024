@@ -2234,7 +2234,7 @@ BEGIN
 END //
 DELIMITER ;
 
--- Procedimiento para insertar registros_medicos
+-- Procedimiento para insertar registros_medicos con verificación de duplicados
 DELIMITER //
 CREATE PROCEDURE sp_insertar_registro_medico (
     IN p_id_jugador INT,
@@ -2245,12 +2245,26 @@ CREATE PROCEDURE sp_insertar_registro_medico (
     IN p_retorno_partido INT
 )
 BEGIN
-    INSERT INTO registros_medicos(id_jugador, fecha_lesion, dias_lesionado, id_lesion, retorno_entreno, retorno_partido)
-    VALUES (p_id_jugador, p_fecha_lesion, p_dias_lesionado, p_id_lesion, p_retorno_entreno, p_retorno_partido);
+    DECLARE record_count INT;
+ 
+    -- Verificar si el registro ya existe
+    SELECT COUNT(*) INTO record_count
+    FROM registros_medicos
+    WHERE id_jugador = p_id_jugador
+      AND fecha_lesion = p_fecha_lesion
+      AND id_lesion = p_id_lesion;
+ 
+    -- Si existe un duplicado, generar un error
+    IF record_count > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El registro médico ya existe';
+    ELSE
+        INSERT INTO registros_medicos (id_jugador, fecha_lesion, dias_lesionado, id_lesion, retorno_entreno, retorno_partido)
+        VALUES (p_id_jugador, p_fecha_lesion, p_dias_lesionado, p_id_lesion, p_retorno_entreno, p_retorno_partido);
+    END IF;
 END //
 DELIMITER ;
-
--- Procedimiento para actualizar registros_medicos
+ 
+-- Procedimiento para actualizar registros_medicos con verificación de duplicados
 DELIMITER //
 CREATE PROCEDURE sp_actualizar_registro_medico (
     IN p_id_registro_medico INT,
@@ -2262,9 +2276,29 @@ CREATE PROCEDURE sp_actualizar_registro_medico (
     IN p_retorno_partido INT
 )
 BEGIN
-    UPDATE registros_medicos
-    SET id_jugador = p_id_jugador, fecha_lesion = p_fecha_lesion, dias_lesionado = p_dias_lesionado, id_lesion = p_id_lesion, retorno_entreno = p_retorno_entreno, retorno_partido = p_retorno_partido
-    WHERE id_registro_medico = p_id_registro_medico;
+    DECLARE record_count INT;
+ 
+    -- Verificar si el registro ya existe para otro registro médico
+    SELECT COUNT(*) INTO record_count
+    FROM registros_medicos
+    WHERE id_jugador = p_id_jugador
+      AND fecha_lesion = p_fecha_lesion
+      AND id_lesion = p_id_lesion
+      AND id_registro_medico <> p_id_registro_medico;
+ 
+    -- Si existe un duplicado, generar un error
+    IF record_count > 0 THEN
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT = 'El registro médico ya existe';
+    ELSE
+        UPDATE registros_medicos
+        SET id_jugador = p_id_jugador,
+            fecha_lesion = p_fecha_lesion,
+            dias_lesionado = p_dias_lesionado,
+            id_lesion = p_id_lesion,
+            retorno_entreno = p_retorno_entreno,
+            retorno_partido = p_retorno_partido
+        WHERE id_registro_medico = p_id_registro_medico;
+    END IF;
 END //
 DELIMITER ;
 
