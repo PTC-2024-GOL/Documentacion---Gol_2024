@@ -5084,3 +5084,25 @@ END//
 DELIMITER ;
 
 SELECT * FROM notificaciones;
+
+DELIMITER //
+CREATE TRIGGER after_asistencia_insert
+AFTER INSERT ON asistencias
+FOR EACH ROW
+BEGIN
+  -- Insertar un nuevo test para el jugador después de que se registre una asistencia
+  INSERT INTO test (id_jugador, fecha, id_entrenamiento)
+  VALUES (NEW.id_jugador, NEW.fecha_asistencia, NEW.id_entrenamiento);
+END//
+
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER after_participacion_insert
+AFTER INSERT ON participaciones_partidos
+FOR EACH ROW
+BEGIN
+  INSERT INTO test (id_jugador, fecha, id_partido)
+  VALUES (NEW.id_jugador, (SELECT fecha_partido FROM partidos WHERE id_partido = NEW.id_partido), NEW.id_partido);
+END//
+DELIMITER ;
