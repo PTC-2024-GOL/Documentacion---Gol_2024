@@ -4150,7 +4150,8 @@ SELECT
     i.nombre_rival AS nombre_rival,
     p.tipo_resultado_partido,
     e.id_equipo,
-    d.id_tecnico
+    d.id_tecnico,
+    v.autorizacion_prediccion
 FROM
     partidos p
 INNER JOIN
@@ -4159,6 +4160,8 @@ INNER JOIN
 	rivales i ON p.id_rival = i.id_rival
 INNER JOIN
     detalles_cuerpos_tecnicos d ON e.id_cuerpo_tecnico = d.id_cuerpo_tecnico
+INNER JOIN
+	vista_autorizacion_prediccion v ON p.id_partido = v.id_partido
 ORDER BY p.fecha_partido DESC;
 
 -- VISTA PARA SELECT DE PARTIDOS CON IMAGENES
