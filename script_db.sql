@@ -5086,13 +5086,51 @@ DELIMITER ;
 SELECT * FROM notificaciones;
 
 DELIMITER //
+DROP TRIGGER IF EXISTS after_asistencia_insert;
 CREATE TRIGGER after_asistencia_insert
 AFTER INSERT ON asistencias
 FOR EACH ROW
 BEGIN
-  -- Insertar un nuevo test para el jugador después de que se registre una asistencia
-  INSERT INTO test (id_jugador, fecha, id_entrenamiento)
-  VALUES (NEW.id_jugador, NEW.fecha_asistencia, NEW.id_entrenamiento);
+  -- Validar si la asistencia es "Asistencia"
+  IF NEW.asistencia = 'Asistencia' THEN
+    INSERT INTO test (id_jugador, fecha, id_entrenamiento)
+    VALUES (NEW.id_jugador, NEW.fecha_asistencia, NEW.id_entrenamiento);
+  END IF;
+END//
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER after_asistencia_update
+AFTER UPDATE ON asistencias
+FOR EACH ROW
+BEGIN
+  IF NEW.asistencia = 'Asistencia' THEN
+    IF NOT EXISTS (
+      SELECT 1 
+      FROM test 
+      WHERE id_jugador = NEW.id_jugador
+      AND id_entrenamiento = NEW.id_entrenamiento
+      AND fecha = NEW.fecha_asistencia
+    ) THEN
+    INSERT INTO test (id_jugador, fecha, id_entrenamiento)
+      VALUES (NEW.id_jugador, NEW.fecha_asistencia, NEW.id_entrenamiento);
+    END IF;
+  ELSEIF OLD.asistencia = 'Asistencia' AND NEW.asistencia != 'Asistencia' THEN
+    IF EXISTS (
+      SELECT 1 
+      FROM test 
+      WHERE id_jugador = OLD.id_jugador
+      AND id_entrenamiento = OLD.id_entrenamiento
+      AND fecha = OLD.fecha_asistencia
+    ) THEN
+      DELETE FROM test 
+      WHERE id_jugador = OLD.id_jugador
+      AND id_entrenamiento = OLD.id_entrenamiento
+      AND fecha = OLD.fecha_asistencia;
+    END IF;
+  END IF;
 END//
 
 DELIMITER ;
