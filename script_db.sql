@@ -3647,18 +3647,13 @@ CREATE PROCEDURE Asistencia(
     IN p_asistencia_bool BOOL
 )
 BEGIN
-    DECLARE v_id INT;
-    DECLARE done INT DEFAULT 0;
-    DECLARE v_id_asistencia INT;
-    DECLARE v_exists INT;
-    DECLARE v_exists2 INT;
     DECLARE v_fecha DATE;
 
-	-- Verificar la fecha del partido por el (id_partido)
-	SELECT fecha_entrenamiento INTO v_fecha 
-	FROM entrenamientos
-	WHERE id_entrenamiento = p_id_entrenamiento;
-	
+    -- Verificar la fecha del entrenamiento por el (id_entrenamiento)
+    SELECT fecha_entrenamiento INTO v_fecha 
+    FROM entrenamientos
+    WHERE id_entrenamiento = p_id_entrenamiento;
+
     IF (p_asistencia_bool = 1) THEN
         -- Actualizar el registro
         UPDATE asistencias
@@ -3668,31 +3663,15 @@ BEGIN
             asistencia = p_asistencia,
             observacion_asistencia = p_observacion
         WHERE id_asistencia = p_id_asistencia;
-        
-        -- Actualizamos el test
-        IF p_asistencia = 'Asistencia' THEN
-            -- Insertar en test si asistió
-            INSERT INTO test (id_jugador, fecha, id_entrenamiento) 
-            VALUES (p_id_jugador, v_fecha, p_id_entrenamiento);
-        ELSE            
-				-- Eliminar de test si no asistió
-            DELETE FROM test WHERE id_jugador = p_id_jugador AND id_entrenamiento = p_id_entrenamiento;
-        END IF;
     ELSE
         -- Insertar un nuevo registro
         INSERT INTO asistencias (id_jugador, id_horario, asistencia, observacion_asistencia, id_entrenamiento)
         VALUES (p_id_jugador, p_id_horario, p_asistencia, p_observacion, p_id_entrenamiento);
-			
-			-- Actualizamos el test
-        IF p_asistencia = 'Asistencia' THEN
-            -- Insertar en test si asistió
-            INSERT INTO test (id_jugador, fecha, id_entrenamiento) 
-            VALUES (p_id_jugador, v_fecha, p_id_entrenamiento);
-        END IF;
     END IF;
 END$$
 
 DELIMITER ;
+
 
 
 -- ---Vista para ver las asistecias y los jugadores
