@@ -4053,23 +4053,10 @@ BEGIN
             SET id_partido = p_id_partido, id_jugador = p_id_jugador, estado_convocado = p_estado_convocado
             WHERE id_convocatoria = v_id_convocatoria;
             
-            	IF p_estado_convocado = 0 THEN
-            		-- Eliminar de test si no está convocado
-            		DELETE FROM test WHERE id_jugador = p_id_jugador AND id_partido = p_id_partido;
-        			ELSE
-            		-- Insertar en test si está convocado
-            		INSERT INTO test (id_jugador, fecha, id_partido) 
-            		VALUES (p_id_jugador, v_fecha, p_id_partido);
-        			END IF;
         ELSE
             -- Insertar una nueva fila en convocatorias_partidos
             INSERT INTO convocatorias_partidos (id_partido, id_jugador, estado_convocado)
             VALUES (p_id_partido, p_id_jugador, p_estado_convocado);
-        			IF p_estado_convocado = 1 THEN
-            		-- Insertar en test si está convocado
-            		INSERT INTO test (id_jugador, fecha, id_partido) 
-            		VALUES (p_id_jugador, v_fecha, p_id_partido);
-        			END IF;
         END IF;
     END IF;
 END
