@@ -3102,7 +3102,7 @@ DELIMITER ;
 -- ------------------------------------------------------------------------PARTIDOS----------------------------------------------------------------
 -- Vista para partidos:
 DROP VIEW IF EXISTS vista_detalle_partidos;
-ALTER VIEW vista_detalle_partidos AS
+CREATE VIEW vista_detalle_partidos AS
 SELECT
     p.id_partido,
     DATE_FORMAT(p.fecha_partido, '%e de %M del %Y') AS fecha,
@@ -3141,24 +3141,30 @@ SELECT
     r.id_rival,
     r.nombre_rival,
     p.id_partido,
-    COUNT(DISTINCT p.id_partido) AS partidos_jugados_equipo,
+    -- Conteo de partidos jugados por el equipo (total, no por partido)
+    (SELECT COUNT(*) FROM partidos p1 WHERE p1.id_equipo = e.id_equipo) AS partidos_jugados_equipo,
+    -- Conteo de partidos jugados por el rival (total, no por partido)
     (SELECT COUNT(*) FROM partidos p2 WHERE p2.id_rival = r.id_rival) AS partidos_jugados_rival,
+    -- Conteo de características analizadas a nivel de equipo
     (SELECT COUNT(*) 
      FROM caracteristicas_analisis ca 
      WHERE ca.id_jugador IN (SELECT pe.id_jugador 
                              FROM plantillas_equipos pe 
                              WHERE pe.id_equipo = e.id_equipo)) AS caracteristicas_analizadas,
+    -- Conteo de registros contestados a nivel de equipo
     (SELECT COUNT(*) 
      FROM test t 
      WHERE t.id_jugador IN (SELECT pe.id_jugador 
                             FROM plantillas_equipos pe 
                             WHERE pe.id_equipo = e.id_equipo) 
      AND t.contestado = 1) AS registros_contestados,
+    -- Evaluar autorización basándose en las condiciones a nivel de equipo y rival
     CASE 
-        WHEN COUNT(DISTINCT p.id_partido) >= 3 AND 
-             (SELECT COUNT(*) FROM partidos p2 WHERE p2.id_rival = r.id_rival) >= 3 AND 
-             (SELECT COUNT(*) FROM caracteristicas_analisis ca WHERE ca.id_jugador IN (SELECT pe.id_jugador FROM plantillas_equipos pe WHERE pe.id_equipo = e.id_equipo)) > 0 AND 
-             (SELECT COUNT(*) FROM test t WHERE t.id_jugador IN (SELECT pe.id_jugador FROM plantillas_equipos pe WHERE pe.id_equipo = e.id_equipo) AND t.contestado = 1) >= 10
+        WHEN 
+            (SELECT COUNT(*) FROM partidos p1 WHERE p1.id_equipo = e.id_equipo) >= 3 AND 
+            (SELECT COUNT(*) FROM partidos p2 WHERE p2.id_rival = r.id_rival) >= 3 AND 
+            (SELECT COUNT(*) FROM caracteristicas_analisis ca WHERE ca.id_jugador IN (SELECT pe.id_jugador FROM plantillas_equipos pe WHERE pe.id_equipo = e.id_equipo)) > 0 AND 
+            (SELECT COUNT(*) FROM test t WHERE t.id_jugador IN (SELECT pe.id_jugador FROM plantillas_equipos pe WHERE pe.id_equipo = e.id_equipo) AND t.contestado = 1) >= 10
         THEN 'true'
         ELSE 'false'
     END AS autorizacion_prediccion
@@ -3169,9 +3175,10 @@ JOIN
 JOIN 
     rivales r ON p.id_rival = r.id_rival
 GROUP BY 
-    e.id_equipo, r.id_rival;
+    e.id_equipo, r.id_rival, p.id_partido;
 
-SELECT autorizacion_prediccion FROM vista_autorizacion_prediccion WHERE id_partido = 6;
+
+SELECT * FROM vista_autorizacion_prediccion WHERE id_partido = 6;
 -- PROCEDIMIENTO ALMACENADO DE PARTIDOS
 
 DELIMITER $$
