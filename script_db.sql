@@ -679,7 +679,6 @@ evento INT NULL
 
 -- TRIGGERS, FUNCIONES Y PROCEDIMIENTOS ALMACENADOS
 
-USE db_gol_sv;
 
 -- TRIGGER
 -- Cuando se haga un insert en la tabla registro médico, automaticamente el campo de estado en la tabla jugador
@@ -3100,39 +3099,6 @@ $$
 DELIMITER ;
 
 -- ------------------------------------------------------------------------PARTIDOS----------------------------------------------------------------
--- Vista para partidos:
-DROP VIEW IF EXISTS vista_detalle_partidos;
-CREATE VIEW vista_detalle_partidos AS
-SELECT
-    p.id_partido,
-    DATE_FORMAT(p.fecha_partido, '%e de %M del %Y') AS fecha,
-    p.fecha_partido,
-    p.localidad_partido,
-    p.resultado_partido,
-    i.logo_rival,
-    e.logo_equipo,
-    e.nombre_equipo,
-    i.nombre_rival AS nombre_rival,
-    p.tipo_resultado_partido,
-    e.id_equipo,
-    i.id_rival,
-    e.id_categoria,
-    c.nombre_categoria,
-    v.autorizacion_prediccion
-FROM
-    partidos p
-INNER JOIN
-    equipos e ON p.id_equipo = e.id_equipo
-INNER JOIN
-	rivales i ON p.id_rival = i.id_rival
-INNER JOIN
-    categorias c ON e.id_categoria = c.id_categoria
-INNER JOIN
-	vista_autorizacion_prediccion v ON p.id_partido = v.id_partido
-ORDER BY p.fecha_partido DESC;
-
-SELECT * FROM vista_detalle_partidos WHERE id_partido = 6;
-
 -- Vista para saber si un partido tiene los datos necesarios para ser predecido
 CREATE VIEW vista_autorizacion_prediccion AS
 SELECT 
@@ -3178,7 +3144,35 @@ GROUP BY
     e.id_equipo, r.id_rival, p.id_partido;
 
 
-SELECT * FROM vista_autorizacion_prediccion WHERE id_partido = 6;
+
+CREATE VIEW vista_detalle_partidos AS
+SELECT
+    p.id_partido,
+    DATE_FORMAT(p.fecha_partido, '%e de %M del %Y') AS fecha,
+    p.fecha_partido,
+    p.localidad_partido,
+    p.resultado_partido,
+    i.logo_rival,
+    e.logo_equipo,
+    e.nombre_equipo,
+    i.nombre_rival AS nombre_rival,
+    p.tipo_resultado_partido,
+    e.id_equipo,
+    i.id_rival,
+    e.id_categoria,
+    c.nombre_categoria,
+    v.autorizacion_prediccion
+FROM
+    partidos p
+INNER JOIN
+    equipos e ON p.id_equipo = e.id_equipo
+INNER JOIN
+	rivales i ON p.id_rival = i.id_rival
+INNER JOIN
+    categorias c ON e.id_categoria = c.id_categoria
+INNER JOIN
+	vista_autorizacion_prediccion v ON p.id_partido = v.id_partido
+ORDER BY p.fecha_partido DESC;
 -- PROCEDIMIENTO ALMACENADO DE PARTIDOS
 
 DELIMITER $$
@@ -4089,7 +4083,6 @@ INNER JOIN posiciones po ON j.id_posicion_principal = po.id_posicion
 GROUP BY JUGADOR ORDER BY TOTAL_ASISTENCIAS DESC;
 
 -- TRIGGERS, FUNCIONES Y PROCEDIMIENTOS ALMACENADOS TECNICOS
-USE db_gol_sv;
 
 -- VISTAS PARA EQUIPOS
 CREATE VIEW vista_equipos_tecnicos AS
@@ -4259,7 +4252,7 @@ JOIN
     jugadores j ON j.id_jugador = pe.id_jugador;
     
     -- TRIGGERS, FUNCIONES Y PROCEDIMIENTOS ALMACENADOS JUGADORES
-USE db_gol_sv;
+
 -- Vista para partidos:
 DROP VIEW IF EXISTS vista_detalle_partidos_jugadores;
 CREATE VIEW vista_detalle_partidos_jugadores AS
@@ -4595,6 +4588,22 @@ INSERT INTO jugadores (dorsal_jugador, nombre_jugador, apellido_jugador, estatus
 	(15, 'Luis', 'Gómez', 'Activo', '2001-12-30', 'Masculino', 'Ambidiestro', 'Ninguna', 3, 2,'Luigi', 'clave789', 'default.png', '5678-1234', '8765-4321', 'Diabetes tipo 2', 'B+', 'luis.gomez@gmail.com'),
 	(23, 'Ana', 'López', 'Baja definitiva', '1997-08-15', 'Femenino', 'Zurdo', 'Beca completa', 4, 3, 'Anita', 'clave012', 'default.png', '8765-1234', '1234-8765', 'Ninguna', 'AB+', 'ana.lopez@gmail.com'),
 	(18, 'María', 'Ramírez', 'Activo', '2000-04-25', 'Femenino', 'Diestro', 'Ninguna', 5, 4, 'Mari', 'clave345', 'default.png', '2345-6789', '6789-2345', 'Fractura reciente', 'O-', 'maria.ramirez@gmail.com');
+	
+INSERT INTO jugadores (dorsal_jugador, nombre_jugador, apellido_jugador, estatus_jugador, fecha_nacimiento_jugador, genero_jugador, perfil_jugador, becado, id_posicion_principal, id_posicion_secundaria, alias_jugador, clave_jugador, foto_jugador, telefono, telefono_de_emergencia, observacion_medica, tipo_sangre, correo_jugador)
+VALUES 
+    (11, 'Sofía', 'González', 'Activo', '1999-01-12', 'Femenino', 'Diestro', 'Beca completa', 2, 1, 'Sofi', 'clave987', 'default.png', '1234-1122', '3344-5566', 'Ninguna', 'A-', 'sofia.gonzalez@gmail.com'),
+    (12, 'Miguel', 'Sánchez', 'Baja temporal', '1996-06-20', 'Masculino', 'Zurdo', 'Media beca', 3, 2, 'Micky', 'clave654', 'default.png', '2233-4455', '5566-7788', 'Ninguna', 'O+', 'miguel.sanchez@gmail.com'),
+    (13, 'Valentina', 'Hernández', 'Activo', '2002-11-05', 'Femenino', 'Ambidiestro', 'Ninguna', 1, 3, 'Vale', 'clave321', 'default.png', '4455-6677', '7788-9900', 'Hipertensión', 'AB-', 'valentina.hernandez@gmail.com'),
+    (14, 'David', 'Torres', 'Activo', '1994-02-28', 'Masculino', 'Diestro', 'Beca completa', 2, 1, 'Dave', 'clave234', 'default.png', '5566-7788', '9900-2233', 'Ninguna', 'B+', 'david.torres@gmail.com'),
+    (15, 'Camila', 'Cruz', 'Baja definitiva', '1998-09-30', 'Femenino', 'Zurdo', 'Media beca', 3, 2, 'Cami', 'clave456', 'default.png', '6677-8899', '2233-4455', 'Alergia a polvo', 'O-', 'camila.cruz@gmail.com'),
+    (16, 'Javier', 'Morales', 'Activo', '2000-03-14', 'Masculino', 'Diestro', 'Ninguna', 4, 3, 'Javi', 'clave012', 'default.png', '7788-9900', '4455-6677', 'Ninguna', 'A+', 'javier.morales@gmail.com'),
+    (17, 'Lucía', 'Pérez', 'Baja temporal', '1997-07-18', 'Femenino', 'Ambidiestro', 'Beca completa', 1, 2, 'Luci', 'clave789', 'default.png', '8899-0011', '6677-8899', 'Ninguna', 'AB+', 'lucia.perez@gmail.com'),
+    (18, 'Diego', 'Jiménez', 'Activo', '1995-04-24', 'Masculino', 'Zurdo', 'Ninguna', 2, 1, 'Dieguito', 'clave543', 'default.png', '9900-1122', '0011-2233', 'Falta de hierro', 'O+', 'diego.jimenez@gmail.com'),
+    (19, 'Gabriela', 'Salazar', 'Activo', '2003-03-11', 'Femenino', 'Diestro', 'Beca completa', 2, 1, 'Gabi', 'clave258', 'default.png', '1357-2468', '8642-7531', 'Ninguna', 'A+', 'gabriela.salazar@gmail.com'),
+    (20, 'Andrés', 'Vásquez', 'Baja temporal', '1998-08-14', 'Masculino', 'Ambidiestro', 'Media beca', 3, 2, 'Andy', 'clave369', 'default.png', '1470-2589', '9630-7412', 'Fractura en el pie', 'B-', 'andres.vasquez@gmail.com'),
+    (21, 'Patricia', 'Flores', 'Activo', '1996-12-20', 'Femenino', 'Zurdo', 'Ninguna', 1, 3, 'Pati', 'clave159', 'default.png', '2589-4561', '7530-1478', 'Ninguna', 'AB+', 'patricia.flores@gmail.com'),
+    (22, 'Roberto', 'Castillo', 'Baja definitiva', '1994-05-05', 'Masculino', 'Diestro', 'Beca completa', 2, 1, 'Robo', 'clave753', 'default.png', '3210-4567', '7654-3210', 'Alergia alimentaria', 'O-', 'roberto.castillo@gmail.com');
+
     
 INSERT INTO estados_fisicos_jugadores (id_jugador, altura_jugador, peso_jugador, indice_masa_corporal)
 	VALUES 
@@ -4618,7 +4627,19 @@ INSERT INTO plantillas_equipos (id_plantilla, id_jugador, id_temporada, id_equip
 	(2, 2, 2, 2),
 	(3, 3, 3, 3),
 	(4, 4, 4, 4),
-	(5, 5, 5, 5);
+	(5, 5, 5, 5),
+	(1, 6, 1, 1),
+	(1, 7, 1, 1),
+	(1, 8, 1, 1),
+	(1, 9, 1, 1),
+	(1, 10, 1, 1),
+	(1, 11, 1, 1),
+	(1, 12, 1, 1),
+	(1, 13, 1, 1),
+	(1, 14, 1, 1),
+	(1, 15, 1, 1),
+	(1, 16, 1, 1),
+	(1, 17, 1, 1);
 
 INSERT INTO jornadas (nombre_jornada, numero_jornada, id_plantilla, fecha_inicio_jornada, fecha_fin_jornada)
 	VALUES 
@@ -4634,7 +4655,15 @@ INSERT INTO entrenamientos (fecha_entrenamiento, sesion, id_jornada, id_equipo, 
 	('2024-09-02', 'Sesion 2', 2, 2, 2),
 	('2024-09-03', 'Sesion 3', 3, 3, 3),
 	('2024-09-04', 'Sesion 1', 4, 4, 4),
-	('2024-09-05', 'Sesion 2', 5, 5, 5);
+	('2024-09-05', 'Sesion 2', 5, 5, 5),
+	('2024-10-03', 'Sesion 2', 1, 1, 2),
+    ('2024-10-06', 'Sesion 3', 1, 1, 3),
+    ('2024-10-09', 'Sesion 1', 1, 1, 4),
+    ('2024-10-12', 'Sesion 2', 1, 1, 5),
+    ('2024-09-27', 'Sesion 1', 1, 1, 1),
+    ('2024-09-24', 'Sesion 2', 1, 1, 2),
+    ('2024-09-21', 'Sesion 3', 1, 1, 3),
+    ('2024-09-18', 'Sesion 1', 1, 1, 4);
     
 INSERT INTO caracteristicas_jugadores (nombre_caracteristica_jugador, clasificacion_caracteristica_jugador)
 	VALUES 
@@ -4653,21 +4682,149 @@ INSERT INTO caracteristicas_analisis (nota_caracteristica_analisis, id_jugador, 
 	(8.000, 5, 5, 5);
     
 INSERT INTO asistencias (id_jugador, id_horario, asistencia, id_entrenamiento)
-	VALUES 
-	(1, 1, 'Asistencia', 1),
-	(2, 2, 'Ausencia injustificada', 2),
-	(3, 3, 'Enfermedad', 3),
-	(4, 4, 'Estudio', 4),
-	(5, 5, 'Trabajo', 5);
+VALUES 
+    (1, 1, 'Asistencia', 1),
+    	(2, 2, 'Ausencia injustificada', 10),
+	(3, 3, 'Enfermedad', 11),
+	(4, 4, 'Estudio', 12),
+	(5, 5, 'Trabajo', 13),
+    (1, 2, 'Asistencia', 2),
+    (1, 3, 'Asistencia', 3),
+    (1, 4, 'Asistencia', 4),
+    (1, 5, 'Asistencia', 5),
+    (1, 1, 'Asistencia', 6),
+    (1, 2, 'Asistencia', 7),
+    (1, 3, 'Asistencia', 8),
+    (1, 4, 'Asistencia', 9),
+    
+    (6, 1, 'Asistencia', 1),
+    (6, 2, 'Asistencia', 2),
+    (6, 3, 'Asistencia', 3),
+    (6, 4, 'Asistencia', 4),
+    (6, 5, 'Asistencia', 5),
+    (6, 1, 'Asistencia', 6),
+    (6, 2, 'Asistencia', 7),
+    (6, 3, 'Asistencia', 8),
+    (6, 4, 'Asistencia', 9),
+    
+    (7, 1, 'Asistencia', 1),
+    (7, 2, 'Asistencia', 2),
+    (7, 3, 'Asistencia', 3),
+    (7, 4, 'Asistencia', 4),
+    (7, 5, 'Asistencia', 5),
+    (7, 1, 'Asistencia', 6),
+    (7, 2, 'Asistencia', 7),
+    (7, 3, 'Asistencia', 8),
+    (7, 4, 'Asistencia', 9),
+
+    (8, 1, 'Asistencia', 1),
+    (8, 2, 'Asistencia', 2),
+    (8, 3, 'Asistencia', 3),
+    (8, 4, 'Asistencia', 4),
+    (8, 5, 'Asistencia', 5),
+    (8, 1, 'Asistencia', 6),
+    (8, 2, 'Asistencia', 7),
+    (8, 3, 'Asistencia', 8),
+    (8, 4, 'Asistencia', 9),
+
+    (9, 1, 'Asistencia', 1),
+    (9, 2, 'Asistencia', 2),
+    (9, 3, 'Asistencia', 3),
+    (9, 4, 'Asistencia', 4),
+    (9, 5, 'Asistencia', 5),
+    (9, 1, 'Asistencia', 6),
+    (9, 2, 'Asistencia', 7),
+    (9, 3, 'Asistencia', 8),
+    (9, 4, 'Asistencia', 9),
+
+    (10, 1, 'Asistencia', 1),
+    (10, 2, 'Asistencia', 2),
+    (10, 3, 'Asistencia', 3),
+    (10, 4, 'Asistencia', 4),
+    (10, 5, 'Asistencia', 5),
+    (10, 1, 'Asistencia', 6),
+    (10, 2, 'Asistencia', 7),
+    (10, 3, 'Asistencia', 8),
+    (10, 4, 'Asistencia', 9),
+
+    (11, 1, 'Asistencia', 1),
+    (11, 2, 'Asistencia', 2),
+    (11, 3, 'Asistencia', 3),
+    (11, 4, 'Asistencia', 4),
+    (11, 5, 'Asistencia', 5),
+    (11, 1, 'Asistencia', 6),
+    (11, 2, 'Asistencia', 7),
+    (11, 3, 'Asistencia', 8),
+    (11, 4, 'Asistencia', 9),
+
+    (12, 1, 'Asistencia', 1),
+    (12, 2, 'Asistencia', 2),
+    (12, 3, 'Asistencia', 3),
+    (12, 4, 'Asistencia', 4),
+    (12, 5, 'Asistencia', 5),
+    (12, 1, 'Asistencia', 6),
+    (12, 2, 'Asistencia', 7),
+    (12, 3, 'Asistencia', 8),
+    (12, 4, 'Asistencia', 9),
+
+    (13, 1, 'Asistencia', 1),
+    (13, 2, 'Asistencia', 2),
+    (13, 3, 'Asistencia', 3),
+    (13, 4, 'Asistencia', 4),
+    (13, 5, 'Asistencia', 5),
+    (13, 1, 'Asistencia', 6),
+    (13, 2, 'Asistencia', 7),
+    (13, 3, 'Asistencia', 8),
+    (13, 4, 'Asistencia', 9),
+
+    (14, 1, 'Asistencia', 1),
+    (14, 2, 'Asistencia', 2),
+    (14, 3, 'Asistencia', 3),
+    (14, 4, 'Asistencia', 4),
+    (14, 5, 'Asistencia', 5),
+    (14, 1, 'Asistencia', 6),
+    (14, 2, 'Asistencia', 7),
+    (14, 3, 'Asistencia', 8),
+    (14, 4, 'Asistencia', 9),
+
+    (15, 1, 'Asistencia', 1),
+    (15, 2, 'Asistencia', 2),
+    (15, 3, 'Asistencia', 3),
+    (15, 4, 'Asistencia', 4),
+    (15, 5, 'Asistencia', 5),
+    (15, 1, 'Asistencia', 6),
+    (15, 2, 'Asistencia', 7),
+    (15, 3, 'Asistencia', 8),
+    (15, 4, 'Asistencia', 9),
+
+    (16, 1, 'Asistencia', 1),
+    (16, 2, 'Asistencia', 2),
+    (16, 3, 'Asistencia', 3),
+    (16, 4, 'Asistencia', 4),
+    (16, 5, 'Asistencia', 5),
+    (16, 1, 'Asistencia', 6),
+    (16, 2, 'Asistencia', 7),
+    (16, 3, 'Asistencia', 8),
+    (16, 4, 'Asistencia', 9),
+
+    (17, 1, 'Asistencia', 1),
+    (17, 2, 'Asistencia', 2),
+    (17, 3, 'Asistencia', 3),
+    (17, 4, 'Asistencia', 4),
+    (17, 5, 'Asistencia', 5),
+    (17, 1, 'Asistencia', 6),
+    (17, 2, 'Asistencia', 7),
+    (17, 3, 'Asistencia', 8),
+    (17, 4, 'Asistencia', 9);
     
 INSERT INTO temas_contenidos (momento_juego, zona_campo)
-	VALUES 
-	('Ofensivo', 'Zona 1'),
-	('Defensivo', 'Zona 2'),
-	('Transición defensiva', 'Zona 3'),
-	('Balón parado ofensivo', 'Zona 1'),
-	('Balón parado defensivo', 'Zona 2');
-    
+VALUES 
+    ('Ofensivo', 'Zona 1'),
+    ('Defensivo', 'Zona 2'),
+    ('Transición defensiva', 'Zona 3'),
+    ('Balón parado ofensivo', 'Zona 1'),
+    ('Balón parado defensivo', 'Zona 2');
+
 INSERT INTO sub_temas_contenidos (sub_tema_contenido, id_tema_contenido)
 	VALUES 
 	('Control del balón', 1),
@@ -4714,7 +4871,12 @@ INSERT INTO partidos (id_jornada, id_equipo, fecha_partido, cancha_partido, resu
 	(2, 2, '2024-09-20 20:00:00', 'Estadio Secundario', '1-1', 'Visitante', 'Empate', 2),
 	(3, 3, '2024-09-25 17:00:00', 'Estadio Tercero', '0-3', 'Local', 'Derrota', 3),
 	(4, 4, '2024-09-30 19:00:00', 'Estadio Principal', '4-0', 'Local', 'Victoria', 4),
-	(5, 5, '2024-10-05 16:00:00', 'Estadio Secundario', '2-2', 'Visitante', 'Empate', 5);
+	(5, 5, '2024-10-05 16:00:00', 'Estadio Secundario', '2-2', 'Visitante', 'Empate', 5),
+	  (1, 1, '2024-09-10 18:00:00', 'Estadio Principal', '3-1', 'Local', 'Victoria', 1),
+    (1, 1, '2024-09-14 20:00:00', 'Estadio Secundario', '2-2', 'Visitante', 'Empate', 2),
+    (1, 1, '2024-09-18 17:30:00', 'Estadio Tercero', '1-4', 'Local', 'Derrota', 3),
+    (1, 1, '2024-09-22 19:00:00', 'Estadio Principal', '0-2', 'Local', 'Derrota', 4),
+    (1, 1, '2024-09-28 16:00:00', 'Estadio Secundario', '1-0', 'Visitante', 'Victoria', 5);
     
 INSERT INTO convocatorias_partidos (id_partido, id_jugador, estado_convocado)
 	VALUES
@@ -4830,206 +4992,202 @@ INSERT INTO palmares (id_equipo, id_temporada, lugar) VALUES
 
 
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (1, '2024-09-01', TRUE, 1, NULL),
-       (1, '2024-09-05', TRUE, 6, NULL),
-       (1, '2024-09-09', TRUE, 7, NULL),
-       (1, '2024-09-13', TRUE, 8, NULL),
-       (1, '2024-09-17', TRUE, 9, NULL);
+VALUES (1, '2024-09-01', TRUE, 6, NULL),
+       (1, '2024-09-05', TRUE, 7, NULL),
+       (1, '2024-09-09', TRUE, 8, NULL),
+       (1, '2024-09-13', TRUE, 9, NULL),
+       (1, '2024-09-17', TRUE, 10, NULL);
 
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (2, '2024-09-02', TRUE, 1, NULL),
-       (2, '2024-09-06', TRUE, 6, NULL),
-       (2, '2024-09-10', TRUE, 7, NULL),
-       (2, '2024-09-14', TRUE, 8, NULL),
-       (2, '2024-09-18', TRUE, 9, NULL);
+VALUES (6, '2024-09-02', TRUE, 6, NULL),
+       (6, '2024-09-06', TRUE, 7, NULL),
+       (6, '2024-09-10', TRUE, 8, NULL),
+       (6, '2024-09-14', TRUE, 9, NULL),
+       (6, '2024-09-18', TRUE, 10, NULL);
 
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (3, '2024-09-03', TRUE, 1, NULL),
-       (3, '2024-09-07', TRUE, 6, NULL),
-       (3, '2024-09-11', TRUE, 7, NULL),
-       (3, '2024-09-15', TRUE, 8, NULL),
-       (3, '2024-09-19', TRUE, 9, NULL);
+VALUES (7, '2024-09-03', TRUE, 6, NULL),
+       (7, '2024-09-07', TRUE, 7, NULL),
+       (7, '2024-09-11', TRUE, 8, NULL),
+       (7, '2024-09-15', TRUE, 9, NULL),
+       (7, '2024-09-19', TRUE, 10, NULL);
 
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (5, '2024-09-04', TRUE, 1, NULL),
-       (5, '2024-09-08', TRUE, 6, NULL),
-       (5, '2024-09-12', TRUE, 7, NULL),
-       (5, '2024-09-16', TRUE, 8, NULL),
-       (5, '2024-09-20', TRUE, 9, NULL);
+VALUES 
+(8, '2024-09-06', TRUE, 6, NULL),
+(8, '2024-09-10', TRUE, 7, NULL),
+(8, '2024-09-14', TRUE, 8, NULL),
+(8, '2024-09-18', TRUE, 9, NULL),
+(8, '2024-09-22', TRUE, 10, NULL);
 
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (7, '2024-09-05', TRUE, 1, NULL),
-       (7, '2024-09-09', TRUE, 6, NULL),
-       (7, '2024-09-13', TRUE, 7, NULL),
-       (7, '2024-09-17', TRUE, 8, NULL),
-       (7, '2024-09-21', TRUE, 9, NULL);
+VALUES 
+(9, '2024-09-07', TRUE, 6, NULL),
+(9, '2024-09-11', TRUE, 7, NULL),
+(9, '2024-09-15', TRUE, 8, NULL),
+(9, '2024-09-19', TRUE, 9, NULL),
+(9, '2024-09-23', TRUE, 10, NULL);
 
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (8, '2024-09-06', TRUE, 1, NULL),
-       (8, '2024-09-10', TRUE, 6, NULL),
-       (8, '2024-09-14', TRUE, 7, NULL),
-       (8, '2024-09-18', TRUE, 8, NULL),
-       (8, '2024-09-22', TRUE, 9, NULL);
+VALUES 
+(10, '2024-09-08', TRUE, 6, NULL),
+(10, '2024-09-12', TRUE, 7, NULL),
+(10, '2024-09-16', TRUE, 8, NULL),
+(10, '2024-09-20', TRUE, 9, NULL),
+(10, '2024-09-24', TRUE, 10, NULL);
 
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (11, '2024-09-07', TRUE, 1, NULL),
-       (11, '2024-09-11', TRUE, 6, NULL),
-       (11, '2024-09-15', TRUE, 7, NULL),
-       (11, '2024-09-19', TRUE, 8, NULL),
-       (11, '2024-09-23', TRUE, 9, NULL);
+VALUES 
+(11, '2024-09-09', TRUE, 6, NULL),
+(11, '2024-09-13', TRUE, 7, NULL),
+(11, '2024-09-17', TRUE, 8, NULL),
+(11, '2024-09-21', TRUE, 9, NULL),
+(11, '2024-09-25', TRUE, 10, NULL);
 
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (12, '2024-09-08', TRUE, 1, NULL),
-       (12, '2024-09-12', TRUE, 6, NULL),
-       (12, '2024-09-16', TRUE, 7, NULL),
-       (12, '2024-09-20', TRUE, 8, NULL),
-       (12, '2024-09-24', TRUE, 9, NULL);
+VALUES 
+(12, '2024-09-10', TRUE, 6, NULL),
+(12, '2024-09-14', TRUE, 7, NULL),
+(12, '2024-09-18', TRUE, 8, NULL),
+(12, '2024-09-22', TRUE, 9, NULL),
+(12, '2024-09-26', TRUE, 10, NULL);
 
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (10, '2024-09-09', TRUE, 1, NULL),
-       (10, '2024-09-13', TRUE, 6, NULL),
-       (10, '2024-09-17', TRUE, 7, NULL),
-       (10, '2024-09-21', TRUE, 8, NULL),
-       (10, '2024-09-25', TRUE, 9, NULL);
+VALUES 
+(13, '2024-09-11', TRUE, 6, NULL),
+(13, '2024-09-15', TRUE, 7, NULL),
+(13, '2024-09-19', TRUE, 8, NULL),
+(13, '2024-09-23', TRUE, 9, NULL),
+(13, '2024-09-27', TRUE, 10, NULL);
 
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (4, '2024-09-10', TRUE, 1, NULL),
-       (4, '2024-09-14', TRUE, 6, NULL),
-       (4, '2024-09-18', TRUE, 7, NULL),
-       (4, '2024-09-22', TRUE, 8, NULL),
-       (4, '2024-09-26', TRUE, 9, NULL);
+VALUES 
+(14, '2024-09-12', TRUE, 6, NULL),
+(14, '2024-09-16', TRUE, 7, NULL),
+(14, '2024-09-20', TRUE, 8, NULL),
+(14, '2024-09-24', TRUE, 9, NULL),
+(14, '2024-09-28', TRUE, 10, NULL);
 
-INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (6, '2024-09-11', TRUE, 1, NULL),
-       (6, '2024-09-15', TRUE, 6, NULL),
-       (6, '2024-09-19', TRUE, 7, NULL),
-       (6, '2024-09-23', TRUE, 8, NULL),
-       (6, '2024-09-27', TRUE, 9, NULL);
 
-INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (13, '2024-09-12', TRUE, 1, NULL),
-       (13, '2024-09-16', TRUE, 6, NULL),
-       (13, '2024-09-20', TRUE, 7, NULL),
-       (13, '2024-09-24', TRUE, 8, NULL),
-       (13, '2024-09-28', TRUE, 9, NULL);
-
-INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (14, '2024-09-13', TRUE, 1, NULL),
-       (14, '2024-09-17', TRUE, 6, NULL),
-       (14, '2024-09-21', TRUE, 7, NULL),
-       (14, '2024-09-25', TRUE, 8, NULL),
-       (14, '2024-09-29', TRUE, 9, NULL);
 
 -- ENTRENAMIENTOS:
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (1, '2024-09-01', TRUE, NULL, 32),
-       (1, '2024-09-05', TRUE, NULL, 31),
-       (1, '2024-09-09', TRUE, NULL, 26),
-       (1, '2024-09-13', TRUE, NULL, 27),
-       (1, '2024-09-17', TRUE, NULL, 29),
-       (1, '2024-09-21', TRUE, NULL, 28),
-       (1, '2024-09-25', TRUE, NULL, 25),
-       (1, '2024-09-29', TRUE, NULL, 22),
-       (1, '2024-10-03', TRUE, NULL, 24);
+VALUES (1, '2024-09-01', TRUE, NULL, 1),
+       (1, '2024-09-05', TRUE, NULL, 6),
+       (1, '2024-09-09', TRUE, NULL, 7),
+       (1, '2024-09-13', TRUE, NULL, 8),
+       (1, '2024-09-17', TRUE, NULL, 9),
+       (1, '2024-09-21', TRUE, NULL, 10),
+       (1, '2024-09-25', TRUE, NULL, 11),
+       (1, '2024-09-29', TRUE, NULL, 12),
+       (1, '2024-10-03', TRUE, NULL, 13);
 
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (2, '2024-09-02', TRUE, NULL, 32),
-       (2, '2024-09-06', TRUE, NULL, 31),
-       (2, '2024-09-10', TRUE, NULL, 26),
-       (2, '2024-09-14', TRUE, NULL, 27),
-       (2, '2024-09-18', TRUE, NULL, 29),
-       (2, '2024-09-22', TRUE, NULL, 28),
-       (2, '2024-09-26', TRUE, NULL, 25),
-       (2, '2024-09-30', TRUE, NULL, 22),
-       (2, '2024-10-04', TRUE, NULL, 24);
+VALUES (6, '2024-09-02', TRUE, NULL, 1),
+       (6, '2024-09-06', TRUE, NULL, 6),
+       (6, '2024-09-10', TRUE, NULL, 7),
+       (6, '2024-09-14', TRUE, NULL, 8),
+       (6, '2024-09-18', TRUE, NULL, 9),
+       (6, '2024-09-22', TRUE, NULL, 10),
+       (6, '2024-09-26', TRUE, NULL, 11),
+       (6, '2024-09-30', TRUE, NULL, 12),
+       (6, '2024-10-04', TRUE, NULL, 13);
 
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (3, '2024-09-03', TRUE, NULL, 32),
-       (3, '2024-09-07', TRUE, NULL, 31),
-       (3, '2024-09-11', TRUE, NULL, 26),
-       (3, '2024-09-15', TRUE, NULL, 27),
-       (3, '2024-09-19', TRUE, NULL, 29),
-       (3, '2024-09-23', TRUE, NULL, 28),
-       (3, '2024-09-27', TRUE, NULL, 25),
-       (3, '2024-10-01', TRUE, NULL, 22),
-       (3, '2024-10-05', TRUE, NULL, 24);
+VALUES (7, '2024-09-03', TRUE, NULL, 1),
+       (7, '2024-09-07', TRUE, NULL, 6),
+       (7, '2024-09-11', TRUE, NULL, 7),
+       (7, '2024-09-15', TRUE, NULL, 8),
+       (7, '2024-09-19', TRUE, NULL, 9),
+       (7, '2024-09-23', TRUE, NULL, 10),
+       (7, '2024-09-27', TRUE, NULL, 11),
+       (7, '2024-10-01', TRUE, NULL, 12),
+       (7, '2024-10-05', TRUE, NULL, 13);
 
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (5, '2024-09-04', TRUE, NULL, 32),
-       (5, '2024-09-08', TRUE, NULL, 31),
-       (5, '2024-09-12', TRUE, NULL, 26),
-       (5, '2024-09-16', TRUE, NULL, 27),
-       (5, '2024-09-20', TRUE, NULL, 29),
-       (5, '2024-09-24', TRUE, NULL, 28),
-       (5, '2024-09-28', TRUE, NULL, 25),
-       (5, '2024-10-02', TRUE, NULL, 22),
-       (5, '2024-10-06', TRUE, NULL, 24);
+VALUES 
+(8, '2024-09-04', TRUE, NULL, 1),
+       (8, '2024-09-08', TRUE, NULL, 6),
+       (8, '2024-09-12', TRUE, NULL, 7),
+       (8, '2024-09-16', TRUE, NULL, 8),
+       (8, '2024-09-20', TRUE, NULL, 9),
+       (8, '2024-09-24', TRUE, NULL, 10),
+       (8, '2024-09-28', TRUE, NULL, 11),
+       (8, '2024-10-02', TRUE, NULL, 12),
+       (8, '2024-10-06', TRUE, NULL, 13);
 
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (7, '2024-09-05', TRUE, NULL, 32),
-       (7, '2024-09-09', TRUE, NULL, 31),
-       (7, '2024-09-13', TRUE, NULL, 26),
-       (7, '2024-09-17', TRUE, NULL, 27),
-       (7, '2024-09-21', TRUE, NULL, 29),
-       (7, '2024-09-25', TRUE, NULL, 28),
-       (7, '2024-09-29', TRUE, NULL, 25),
-       (7, '2024-10-03', TRUE, NULL, 22),
-       (7, '2024-10-07', TRUE, NULL, 24);
+VALUES 
+(9, '2024-09-05', TRUE, NULL, 1),
+       (9, '2024-09-09', TRUE, NULL, 6),
+       (9, '2024-09-13', TRUE, NULL, 7),
+       (9, '2024-09-17', TRUE, NULL, 8),
+       (9, '2024-09-21', TRUE, NULL, 9),
+       (9, '2024-09-25', TRUE, NULL, 10),
+       (9, '2024-09-29', TRUE, NULL, 11),
+       (9, '2024-10-03', TRUE, NULL, 12),
+       (9, '2024-10-07', TRUE, NULL, 13);
 
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (8, '2024-09-06', TRUE, NULL, 32),
-       (8, '2024-09-10', TRUE, NULL, 31),
-       (8, '2024-09-14', TRUE, NULL, 26),
-       (8, '2024-09-18', TRUE, NULL, 27),
-       (8, '2024-09-22', TRUE, NULL, 29),
-       (8, '2024-09-26', TRUE, NULL, 28),
-       (8, '2024-09-30', TRUE, NULL, 25),
-       (8, '2024-10-04', TRUE, NULL, 22),
-       (8, '2024-10-08', TRUE, NULL, 24);
+VALUES 
+(10, '2024-09-06', TRUE, NULL, 1),
+       (10, '2024-09-10', TRUE, NULL, 6),
+       (10, '2024-09-14', TRUE, NULL, 7),
+       (10, '2024-09-18', TRUE, NULL, 8),
+       (10, '2024-09-22', TRUE, NULL, 9),
+       (10, '2024-09-26', TRUE, NULL, 10),
+       (10, '2024-09-30', TRUE, NULL, 11),
+       (10, '2024-10-04', TRUE, NULL, 12),
+       (10, '2024-10-08', TRUE, NULL, 13);
 
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (11, '2024-09-07', TRUE, NULL, 32),
-       (11, '2024-09-11', TRUE, NULL, 31),
-       (11, '2024-09-15', TRUE, NULL, 26),
-       (11, '2024-09-19', TRUE, NULL, 27),
-       (11, '2024-09-23', TRUE, NULL, 29),
-       (11, '2024-09-27', TRUE, NULL, 28),
-       (11, '2024-10-01', TRUE, NULL, 25),
-       (11, '2024-10-05', TRUE, NULL, 22),
-       (11, '2024-10-09', TRUE, NULL, 24);
+VALUES 
+(11, '2024-09-07', TRUE, NULL, 1),
+       (11, '2024-09-11', TRUE, NULL, 6),
+       (11, '2024-09-15', TRUE, NULL, 7),
+       (11, '2024-09-19', TRUE, NULL, 8),
+       (11, '2024-09-23', TRUE, NULL, 9),
+       (11, '2024-09-27', TRUE, NULL, 10),
+       (11, '2024-10-01', TRUE, NULL, 11),
+       (11, '2024-10-05', TRUE, NULL, 12),
+       (11, '2024-10-09', TRUE, NULL, 13);
 
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (12, '2024-09-08', TRUE, NULL, 32),
-       (12, '2024-09-12', TRUE, NULL, 31),
-       (12, '2024-09-16', TRUE, NULL, 26),
-       (12, '2024-09-20', TRUE, NULL, 27),
-       (12, '2024-09-24', TRUE, NULL, 29),
-       (12, '2024-09-28', TRUE, NULL, 28),
-       (12, '2024-10-02', TRUE, NULL, 25),
-       (12, '2024-10-06', TRUE, NULL, 22),
-       (12, '2024-10-10', TRUE, NULL, 24);
+VALUES 
+(12, '2024-09-08', TRUE, NULL, 1),
+       (12, '2024-09-12', TRUE, NULL, 6),
+       (12, '2024-09-16', TRUE, NULL, 7),
+       (12, '2024-09-20', TRUE, NULL, 8),
+       (12, '2024-09-24', TRUE, NULL, 9),
+       (12, '2024-09-28', TRUE, NULL, 10),
+       (12, '2024-10-02', TRUE, NULL, 11),
+       (12, '2024-10-06', TRUE, NULL, 12),
+       (12, '2024-10-10', TRUE, NULL, 13);
 
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (10, '2024-09-09', TRUE, NULL, 32),
-       (10, '2024-09-13', TRUE, NULL, 31),
-       (10, '2024-09-17', TRUE, NULL, 26),
-       (10, '2024-09-21', TRUE, NULL, 27),
-       (10, '2024-09-25', TRUE, NULL, 29),
-       (10, '2024-09-29', TRUE, NULL, 28),
-       (10, '2024-10-03', TRUE, NULL, 25),
-       (10, '2024-10-07', TRUE, NULL, 22),
-       (10, '2024-10-11', TRUE, NULL, 24);
+VALUES 
+(13, '2024-09-09', TRUE, NULL, 1),
+       (13, '2024-09-13', TRUE, NULL, 6),
+       (13, '2024-09-17', TRUE, NULL, 7),
+       (13, '2024-09-21', TRUE, NULL, 8),
+       (13, '2024-09-25', TRUE, NULL, 9),
+       (13, '2024-09-29', TRUE, NULL, 10),
+       (13, '2024-10-03', TRUE, NULL, 11),
+       (13, '2024-10-07', TRUE, NULL, 12),
+       (13, '2024-10-11', TRUE, NULL, 13);
 
 INSERT INTO test (id_jugador, fecha, contestado, id_partido, id_entrenamiento)
-VALUES (4, '2024-09-10', TRUE, NULL, 32),
-       (4, '2024-09-14', TRUE, NULL, 31),
-       (4, '2024-09-18', TRUE, NULL, 26),
-       (4, '2024-09-22', TRUE, NULL, 27),
-       (4, '2024-09-26', TRUE, NULL, 29),
-       (4, '2024-09-30', TRUE, NULL, 28),
-       (4, '2024-10-04', TRUE, NULL, 25),
-       (4, '2024-10-08', TRUE, NULL, 22),
-       (4, '2024-10-12', TRUE, NULL, 24);
+VALUES 
+(14, '2024-09-10', TRUE, NULL, 1),
+       (14, '2024-09-14', TRUE, NULL, 6),
+       (14, '2024-09-18', TRUE, NULL, 7),
+       (14, '2024-09-22', TRUE, NULL, 8),
+       (14, '2024-09-26', TRUE, NULL, 9),
+       (14, '2024-09-30', TRUE, NULL, 10),
+       (14, '2024-10-04', TRUE, NULL, 11),
+       (14, '2024-10-08', TRUE, NULL, 12),
+       (14, '2024-10-12', TRUE, NULL, 13);
+
 
 -- Inserts para el id_test 1
 INSERT INTO respuesta_test (pregunta, respuesta, id_test)
@@ -6864,1359 +7022,6 @@ VALUES
 ('¿Sientes alguna rigidez muscular?', 8, 140),
 ('¿Cómo sientes tu ánimo en general?', 9, 140);
 
--- Inserts para el id_test 141
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 141),
-('¿Cómo te sientes mentalmente hoy?', 7, 141),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 141),
-('¿Cómo es tu nivel de energía actual?', 5, 141),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 141),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 141),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 141),
-('¿Sientes alguna rigidez muscular?', 7, 141),
-('¿Cómo sientes tu ánimo en general?', 8, 141);
-
--- Inserts para el id_test 142
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 142),
-('¿Cómo te sientes mentalmente hoy?', 8, 142),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 142),
-('¿Cómo es tu nivel de energía actual?', 6, 142),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 142),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 142),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 142),
-('¿Sientes alguna rigidez muscular?', 8, 142),
-('¿Cómo sientes tu ánimo en general?', 9, 142);
-
--- Inserts para el id_test 143
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 143),
-('¿Cómo te sientes mentalmente hoy?', 7, 143),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 143),
-('¿Cómo es tu nivel de energía actual?', 5, 143),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 143),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 143),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 143),
-('¿Sientes alguna rigidez muscular?', 7, 143),
-('¿Cómo sientes tu ánimo en general?', 8, 143);
-
--- Inserts para el id_test 144
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 144),
-('¿Cómo te sientes mentalmente hoy?', 8, 144),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 144),
-('¿Cómo es tu nivel de energía actual?', 6, 144),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 144),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 144),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 144),
-('¿Sientes alguna rigidez muscular?', 8, 144),
-('¿Cómo sientes tu ánimo en general?', 9, 144);
-
--- Inserts para el id_test 145
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 145),
-('¿Cómo te sientes mentalmente hoy?', 7, 145),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 145),
-('¿Cómo es tu nivel de energía actual?', 5, 145),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 145),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 145),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 145),
-('¿Sientes alguna rigidez muscular?', 7, 145),
-('¿Cómo sientes tu ánimo en general?', 8, 145);
-
--- Inserts para el id_test 146
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 146),
-('¿Cómo te sientes mentalmente hoy?', 8, 146),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 146),
-('¿Cómo es tu nivel de energía actual?', 6, 146),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 146),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 146),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 146),
-('¿Sientes alguna rigidez muscular?', 8, 146),
-('¿Cómo sientes tu ánimo en general?', 9, 146);
-
--- Inserts para el id_test 147
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 147),
-('¿Cómo te sientes mentalmente hoy?', 7, 147),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 147),
-('¿Cómo es tu nivel de energía actual?', 5, 147),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 147),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 147),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 147),
-('¿Sientes alguna rigidez muscular?', 7, 147),
-('¿Cómo sientes tu ánimo en general?', 8, 147);
-
--- Inserts para el id_test 148
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 148),
-('¿Cómo te sientes mentalmente hoy?', 8, 148),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 148),
-('¿Cómo es tu nivel de energía actual?', 6, 148),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 148),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 148),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 148),
-('¿Sientes alguna rigidez muscular?', 8, 148),
-('¿Cómo sientes tu ánimo en general?', 9, 148);
-
--- Inserts para el id_test 149
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 149),
-('¿Cómo te sientes mentalmente hoy?', 7, 149),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 149),
-('¿Cómo es tu nivel de energía actual?', 5, 149),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 149),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 149),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 149),
-('¿Sientes alguna rigidez muscular?', 7, 149),
-('¿Cómo sientes tu ánimo en general?', 8, 149);
-
--- Inserts para el id_test 150
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 150),
-('¿Cómo te sientes mentalmente hoy?', 8, 150),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 150),
-('¿Cómo es tu nivel de energía actual?', 6, 150),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 150),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 150),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 150),
-('¿Sientes alguna rigidez muscular?', 8, 150),
-('¿Cómo sientes tu ánimo en general?', 9, 150);
-
--- Inserts para el id_test 151
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 151),
-('¿Cómo te sientes mentalmente hoy?', 7, 151),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 151),
-('¿Cómo es tu nivel de energía actual?', 5, 151),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 151),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 151),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 151),
-('¿Sientes alguna rigidez muscular?', 7, 151),
-('¿Cómo sientes tu ánimo en general?', 8, 151);
-
--- Inserts para el id_test 152
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 152),
-('¿Cómo te sientes mentalmente hoy?', 8, 152),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 152),
-('¿Cómo es tu nivel de energía actual?', 6, 152),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 152),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 152),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 152),
-('¿Sientes alguna rigidez muscular?', 8, 152),
-('¿Cómo sientes tu ánimo en general?', 9, 152);
-
--- Inserts para el id_test 153
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 153),
-('¿Cómo te sientes mentalmente hoy?', 7, 153),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 153),
-('¿Cómo es tu nivel de energía actual?', 5, 153),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 153),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 153),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 153),
-('¿Sientes alguna rigidez muscular?', 7, 153),
-('¿Cómo sientes tu ánimo en general?', 8, 153);
-
--- Inserts para el id_test 154
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 154),
-('¿Cómo te sientes mentalmente hoy?', 8, 154),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 154),
-('¿Cómo es tu nivel de energía actual?', 6, 154),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 154),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 154),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 154),
-('¿Sientes alguna rigidez muscular?', 8, 154),
-('¿Cómo sientes tu ánimo en general?', 9, 154);
-
--- Inserts para el id_test 155
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 155),
-('¿Cómo te sientes mentalmente hoy?', 7, 155),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 155),
-('¿Cómo es tu nivel de energía actual?', 5, 155),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 155),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 155),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 155),
-('¿Sientes alguna rigidez muscular?', 7, 155),
-('¿Cómo sientes tu ánimo en general?', 8, 155);
-
--- Inserts para el id_test 156
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 156),
-('¿Cómo te sientes mentalmente hoy?', 8, 156),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 156),
-('¿Cómo es tu nivel de energía actual?', 6, 156),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 156),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 156),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 156),
-('¿Sientes alguna rigidez muscular?', 8, 156),
-('¿Cómo sientes tu ánimo en general?', 9, 156);
-
--- Inserts para el id_test 157
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 157),
-('¿Cómo te sientes mentalmente hoy?', 7, 157),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 157),
-('¿Cómo es tu nivel de energía actual?', 5, 157),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 157),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 157),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 157),
-('¿Sientes alguna rigidez muscular?', 7, 157),
-('¿Cómo sientes tu ánimo en general?', 8, 157);
-
--- Inserts para el id_test 158
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 158),
-('¿Cómo te sientes mentalmente hoy?', 8, 158),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 158),
-('¿Cómo es tu nivel de energía actual?', 6, 158),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 158),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 158),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 158),
-('¿Sientes alguna rigidez muscular?', 8, 158),
-('¿Cómo sientes tu ánimo en general?', 9, 158);
-
--- Inserts para el id_test 159
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 159),
-('¿Cómo te sientes mentalmente hoy?', 7, 159),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 159),
-('¿Cómo es tu nivel de energía actual?', 5, 159),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 159),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 159),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 159),
-('¿Sientes alguna rigidez muscular?', 7, 159),
-('¿Cómo sientes tu ánimo en general?', 8, 159);
-
--- Inserts para el id_test 160
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 160),
-('¿Cómo te sientes mentalmente hoy?', 8, 160),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 160),
-('¿Cómo es tu nivel de energía actual?', 6, 160),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 160),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 160),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 160),
-('¿Sientes alguna rigidez muscular?', 8, 160),
-('¿Cómo sientes tu ánimo en general?', 9, 160);
-
--- Inserts para el id_test 161
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 161),
-('¿Cómo te sientes mentalmente hoy?', 7, 161),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 161),
-('¿Cómo es tu nivel de energía actual?', 5, 161),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 161),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 161),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 161),
-('¿Sientes alguna rigidez muscular?', 7, 161),
-('¿Cómo sientes tu ánimo en general?', 8, 161);
-
--- Inserts para el id_test 162
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 162),
-('¿Cómo te sientes mentalmente hoy?', 8, 162),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 162),
-('¿Cómo es tu nivel de energía actual?', 6, 162),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 162),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 162),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 162),
-('¿Sientes alguna rigidez muscular?', 8, 162),
-('¿Cómo sientes tu ánimo en general?', 9, 162);
-
--- Inserts para el id_test 163
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 163),
-('¿Cómo te sientes mentalmente hoy?', 7, 163),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 163),
-('¿Cómo es tu nivel de energía actual?', 5, 163),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 163),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 163),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 163),
-('¿Sientes alguna rigidez muscular?', 7, 163),
-('¿Cómo sientes tu ánimo en general?', 8, 163);
-
--- Inserts para el id_test 164
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 164),
-('¿Cómo te sientes mentalmente hoy?', 8, 164),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 164),
-('¿Cómo es tu nivel de energía actual?', 6, 164),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 164),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 164),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 164),
-('¿Sientes alguna rigidez muscular?', 8, 164),
-('¿Cómo sientes tu ánimo en general?', 9, 164);
-
--- Inserts para el id_test 165
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 165),
-('¿Cómo te sientes mentalmente hoy?', 7, 165),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 165),
-('¿Cómo es tu nivel de energía actual?', 5, 165),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 165),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 165),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 165),
-('¿Sientes alguna rigidez muscular?', 7, 165),
-('¿Cómo sientes tu ánimo en general?', 8, 165);
-
--- Inserts para el id_test 166
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 166),
-('¿Cómo te sientes mentalmente hoy?', 8, 166),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 166),
-('¿Cómo es tu nivel de energía actual?', 6, 166),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 166),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 166),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 166),
-('¿Sientes alguna rigidez muscular?', 8, 166),
-('¿Cómo sientes tu ánimo en general?', 9, 166);
-
--- Inserts para el id_test 167
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 167),
-('¿Cómo te sientes mentalmente hoy?', 7, 167),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 167),
-('¿Cómo es tu nivel de energía actual?', 5, 167),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 167),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 167),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 167),
-('¿Sientes alguna rigidez muscular?', 7, 167),
-('¿Cómo sientes tu ánimo en general?', 8, 167);
-
--- Inserts para el id_test 168
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 168),
-('¿Cómo te sientes mentalmente hoy?', 8, 168),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 168),
-('¿Cómo es tu nivel de energía actual?', 6, 168),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 168),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 168),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 168),
-('¿Sientes alguna rigidez muscular?', 8, 168),
-('¿Cómo sientes tu ánimo en general?', 9, 168);
-
--- Inserts para el id_test 169
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 169),
-('¿Cómo te sientes mentalmente hoy?', 7, 169),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 169),
-('¿Cómo es tu nivel de energía actual?', 5, 169),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 169),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 169),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 169),
-('¿Sientes alguna rigidez muscular?', 7, 169),
-('¿Cómo sientes tu ánimo en general?', 8, 169);
-
--- Inserts para el id_test 170
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 170),
-('¿Cómo te sientes mentalmente hoy?', 8, 170),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 170),
-('¿Cómo es tu nivel de energía actual?', 6, 170),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 170),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 170),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 170),
-('¿Sientes alguna rigidez muscular?', 8, 170),
-('¿Cómo sientes tu ánimo en general?', 9, 170);
-
--- Inserts para el id_test 171
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 171),
-('¿Cómo te sientes mentalmente hoy?', 7, 171),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 171),
-('¿Cómo es tu nivel de energía actual?', 5, 171),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 171),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 171),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 171),
-('¿Sientes alguna rigidez muscular?', 7, 171),
-('¿Cómo sientes tu ánimo en general?', 8, 171);
-
--- Inserts para el id_test 172
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 172),
-('¿Cómo te sientes mentalmente hoy?', 8, 172),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 172),
-('¿Cómo es tu nivel de energía actual?', 6, 172),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 172),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 172),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 172),
-('¿Sientes alguna rigidez muscular?', 8, 172),
-('¿Cómo sientes tu ánimo en general?', 9, 172);
-
--- Inserts para el id_test 173
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 173),
-('¿Cómo te sientes mentalmente hoy?', 7, 173),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 173),
-('¿Cómo es tu nivel de energía actual?', 5, 173),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 173),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 173),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 173),
-('¿Sientes alguna rigidez muscular?', 7, 173),
-('¿Cómo sientes tu ánimo en general?', 8, 173);
-
--- Inserts para el id_test 174
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 174),
-('¿Cómo te sientes mentalmente hoy?', 8, 174),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 174),
-('¿Cómo es tu nivel de energía actual?', 6, 174),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 174),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 174),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 174),
-('¿Sientes alguna rigidez muscular?', 8, 174),
-('¿Cómo sientes tu ánimo en general?', 9, 174);
-
--- Inserts para el id_test 175
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 175),
-('¿Cómo te sientes mentalmente hoy?', 7, 175),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 175),
-('¿Cómo es tu nivel de energía actual?', 5, 175),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 175),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 175),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 175),
-('¿Sientes alguna rigidez muscular?', 7, 175),
-('¿Cómo sientes tu ánimo en general?', 8, 175);
-
--- Inserts para el id_test 176
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 176),
-('¿Cómo te sientes mentalmente hoy?', 8, 176),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 176),
-('¿Cómo es tu nivel de energía actual?', 6, 176),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 176),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 176),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 176),
-('¿Sientes alguna rigidez muscular?', 8, 176),
-('¿Cómo sientes tu ánimo en general?', 9, 176);
-
--- Inserts para el id_test 177
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 177),
-('¿Cómo te sientes mentalmente hoy?', 7, 177),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 177),
-('¿Cómo es tu nivel de energía actual?', 5, 177),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 177),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 177),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 177),
-('¿Sientes alguna rigidez muscular?', 7, 177),
-('¿Cómo sientes tu ánimo en general?', 8, 177);
-
--- Inserts para el id_test 178
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 178),
-('¿Cómo te sientes mentalmente hoy?', 8, 178),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 178),
-('¿Cómo es tu nivel de energía actual?', 6, 178),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 178),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 178),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 178),
-('¿Sientes alguna rigidez muscular?', 8, 178),
-('¿Cómo sientes tu ánimo en general?', 9, 178);
-
--- Inserts para el id_test 179
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 179),
-('¿Cómo te sientes mentalmente hoy?', 7, 179),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 179),
-('¿Cómo es tu nivel de energía actual?', 5, 179),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 179),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 179),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 179),
-('¿Sientes alguna rigidez muscular?', 7, 179),
-('¿Cómo sientes tu ánimo en general?', 8, 179);
-
--- Inserts para el id_test 180
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 180),
-('¿Cómo te sientes mentalmente hoy?', 8, 180),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 180),
-('¿Cómo es tu nivel de energía actual?', 6, 180),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 180),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 180),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 180),
-('¿Sientes alguna rigidez muscular?', 8, 180),
-('¿Cómo sientes tu ánimo en general?', 9, 180);
-
--- Inserts para el id_test 181
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 181),
-('¿Cómo te sientes mentalmente hoy?', 7, 181),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 181),
-('¿Cómo es tu nivel de energía actual?', 5, 181),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 181),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 181),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 181),
-('¿Sientes alguna rigidez muscular?', 7, 181),
-('¿Cómo sientes tu ánimo en general?', 8, 181);
-
--- Inserts para el id_test 182
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 182),
-('¿Cómo te sientes mentalmente hoy?', 8, 182),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 182),
-('¿Cómo es tu nivel de energía actual?', 6, 182),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 182),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 182),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 182),
-('¿Sientes alguna rigidez muscular?', 8, 182),
-('¿Cómo sientes tu ánimo en general?', 9, 182);
-
--- Inserts para el id_test 183
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 183),
-('¿Cómo te sientes mentalmente hoy?', 7, 183),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 183),
-('¿Cómo es tu nivel de energía actual?', 5, 183),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 183),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 183),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 183),
-('¿Sientes alguna rigidez muscular?', 7, 183),
-('¿Cómo sientes tu ánimo en general?', 8, 183);
-
--- Inserts para el id_test 184
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 184),
-('¿Cómo te sientes mentalmente hoy?', 8, 184),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 184),
-('¿Cómo es tu nivel de energía actual?', 6, 184),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 184),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 184),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 184),
-('¿Sientes alguna rigidez muscular?', 8, 184),
-('¿Cómo sientes tu ánimo en general?', 9, 184);
-
--- Inserts para el id_test 185
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 185),
-('¿Cómo te sientes mentalmente hoy?', 7, 185),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 185),
-('¿Cómo es tu nivel de energía actual?', 5, 185),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 185),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 185),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 185),
-('¿Sientes alguna rigidez muscular?', 7, 185),
-('¿Cómo sientes tu ánimo en general?', 8, 185);
-
--- Inserts para el id_test 186
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 186),
-('¿Cómo te sientes mentalmente hoy?', 8, 186),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 186),
-('¿Cómo es tu nivel de energía actual?', 6, 186),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 186),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 186),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 186),
-('¿Sientes alguna rigidez muscular?', 8, 186),
-('¿Cómo sientes tu ánimo en general?', 9, 186);
-
--- Inserts para el id_test 187
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 187),
-('¿Cómo te sientes mentalmente hoy?', 7, 187),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 187),
-('¿Cómo es tu nivel de energía actual?', 5, 187),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 187),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 187),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 187),
-('¿Sientes alguna rigidez muscular?', 7, 187),
-('¿Cómo sientes tu ánimo en general?', 8, 187);
-
--- Inserts para el id_test 188
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 188),
-('¿Cómo te sientes mentalmente hoy?', 8, 188),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 188),
-('¿Cómo es tu nivel de energía actual?', 6, 188),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 188),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 188),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 188),
-('¿Sientes alguna rigidez muscular?', 8, 188),
-('¿Cómo sientes tu ánimo en general?', 9, 188);
-
--- Inserts para el id_test 189
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 189),
-('¿Cómo te sientes mentalmente hoy?', 7, 189),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 189),
-('¿Cómo es tu nivel de energía actual?', 5, 189),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 189),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 189),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 189),
-('¿Sientes alguna rigidez muscular?', 7, 189),
-('¿Cómo sientes tu ánimo en general?', 8, 189);
-
--- Inserts para el id_test 190
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 190),
-('¿Cómo te sientes mentalmente hoy?', 8, 190),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 190),
-('¿Cómo es tu nivel de energía actual?', 6, 190),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 190),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 190),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 190),
-('¿Sientes alguna rigidez muscular?', 8, 190),
-('¿Cómo sientes tu ánimo en general?', 9, 190);
-
--- Inserts para el id_test 191
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 191),
-('¿Cómo te sientes mentalmente hoy?', 7, 191),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 191),
-('¿Cómo es tu nivel de energía actual?', 5, 191),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 191),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 191),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 191),
-('¿Sientes alguna rigidez muscular?', 7, 191),
-('¿Cómo sientes tu ánimo en general?', 8, 191);
-
--- Inserts para el id_test 192
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 192),
-('¿Cómo te sientes mentalmente hoy?', 8, 192),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 192),
-('¿Cómo es tu nivel de energía actual?', 6, 192),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 192),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 192),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 192),
-('¿Sientes alguna rigidez muscular?', 8, 192),
-('¿Cómo sientes tu ánimo en general?', 9, 192);
-
--- Inserts para el id_test 193
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 193),
-('¿Cómo te sientes mentalmente hoy?', 7, 193),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 193),
-('¿Cómo es tu nivel de energía actual?', 5, 193),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 193),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 193),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 193),
-('¿Sientes alguna rigidez muscular?', 7, 193),
-('¿Cómo sientes tu ánimo en general?', 8, 193);
-
--- Inserts para el id_test 194
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 194),
-('¿Cómo te sientes mentalmente hoy?', 8, 194),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 194),
-('¿Cómo es tu nivel de energía actual?', 6, 194),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 194),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 194),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 194),
-('¿Sientes alguna rigidez muscular?', 8, 194),
-('¿Cómo sientes tu ánimo en general?', 9, 194);
-
--- Inserts para el id_test 195
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 195),
-('¿Cómo te sientes mentalmente hoy?', 7, 195),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 195),
-('¿Cómo es tu nivel de energía actual?', 5, 195),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 195),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 195),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 195),
-('¿Sientes alguna rigidez muscular?', 7, 195),
-('¿Cómo sientes tu ánimo en general?', 8, 195);
-
--- Inserts para el id_test 196
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 196),
-('¿Cómo te sientes mentalmente hoy?', 8, 196),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 196),
-('¿Cómo es tu nivel de energía actual?', 6, 196),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 196),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 196),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 196),
-('¿Sientes alguna rigidez muscular?', 8, 196),
-('¿Cómo sientes tu ánimo en general?', 9, 196);
-
--- Inserts para el id_test 197
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 197),
-('¿Cómo te sientes mentalmente hoy?', 7, 197),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 197),
-('¿Cómo es tu nivel de energía actual?', 5, 197),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 197),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 197),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 197),
-('¿Sientes alguna rigidez muscular?', 7, 197),
-('¿Cómo sientes tu ánimo en general?', 8, 197);
-
--- Inserts para el id_test 198
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 198),
-('¿Cómo te sientes mentalmente hoy?', 8, 198),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 198),
-('¿Cómo es tu nivel de energía actual?', 6, 198),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 198),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 198),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 198),
-('¿Sientes alguna rigidez muscular?', 8, 198),
-('¿Cómo sientes tu ánimo en general?', 9, 198);
-
--- Inserts para el id_test 199
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 199),
-('¿Cómo te sientes mentalmente hoy?', 7, 199),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 199),
-('¿Cómo es tu nivel de energía actual?', 5, 199),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 199),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 199),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 199),
-('¿Sientes alguna rigidez muscular?', 7, 199),
-('¿Cómo sientes tu ánimo en general?', 8, 199);
-
--- Inserts para el id_test 200
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 200),
-('¿Cómo te sientes mentalmente hoy?', 8, 200),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 200),
-('¿Cómo es tu nivel de energía actual?', 6, 200),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 200),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 200),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 200),
-('¿Sientes alguna rigidez muscular?', 8, 200),
-('¿Cómo sientes tu ánimo en general?', 9, 200);
-
--- Inserts para el id_test 201
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 201),
-('¿Cómo te sientes mentalmente hoy?', 7, 201),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 201),
-('¿Cómo es tu nivel de energía actual?', 5, 201),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 201),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 201),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 201),
-('¿Sientes alguna rigidez muscular?', 7, 201),
-('¿Cómo sientes tu ánimo en general?', 8, 201);
-
--- Inserts para el id_test 202
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 202),
-('¿Cómo te sientes mentalmente hoy?', 8, 202),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 202),
-('¿Cómo es tu nivel de energía actual?', 6, 202),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 202),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 202),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 202),
-('¿Sientes alguna rigidez muscular?', 8, 202),
-('¿Cómo sientes tu ánimo en general?', 9, 202);
-
--- Inserts para el id_test 203
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 203),
-('¿Cómo te sientes mentalmente hoy?', 7, 203),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 203),
-('¿Cómo es tu nivel de energía actual?', 5, 203),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 203),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 203),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 203),
-('¿Sientes alguna rigidez muscular?', 7, 203),
-('¿Cómo sientes tu ánimo en general?', 8, 203);
-
--- Inserts para el id_test 204
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 204),
-('¿Cómo te sientes mentalmente hoy?', 8, 204),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 204),
-('¿Cómo es tu nivel de energía actual?', 6, 204),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 204),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 204),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 204),
-('¿Sientes alguna rigidez muscular?', 8, 204),
-('¿Cómo sientes tu ánimo en general?', 9, 204);
-
--- Inserts para el id_test 205
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 205),
-('¿Cómo te sientes mentalmente hoy?', 7, 205),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 205),
-('¿Cómo es tu nivel de energía actual?', 5, 205),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 205),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 205),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 205),
-('¿Sientes alguna rigidez muscular?', 7, 205),
-('¿Cómo sientes tu ánimo en general?', 8, 205);
-
--- Inserts para el id_test 206
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 206),
-('¿Cómo te sientes mentalmente hoy?', 8, 206),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 206),
-('¿Cómo es tu nivel de energía actual?', 6, 206),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 206),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 206),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 206),
-('¿Sientes alguna rigidez muscular?', 8, 206),
-('¿Cómo sientes tu ánimo en general?', 9, 206);
-
--- Inserts para el id_test 207
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 207),
-('¿Cómo te sientes mentalmente hoy?', 7, 207),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 207),
-('¿Cómo es tu nivel de energía actual?', 5, 207),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 207),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 207),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 207),
-('¿Sientes alguna rigidez muscular?', 7, 207),
-('¿Cómo sientes tu ánimo en general?', 8, 207);
-
--- Inserts para el id_test 208
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 208),
-('¿Cómo te sientes mentalmente hoy?', 8, 208),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 208),
-('¿Cómo es tu nivel de energía actual?', 6, 208),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 208),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 208),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 208),
-('¿Sientes alguna rigidez muscular?', 8, 208),
-('¿Cómo sientes tu ánimo en general?', 9, 208);
-
--- Inserts para el id_test 209
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 209),
-('¿Cómo te sientes mentalmente hoy?', 7, 209),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 209),
-('¿Cómo es tu nivel de energía actual?', 5, 209),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 209),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 209),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 209),
-('¿Sientes alguna rigidez muscular?', 7, 209),
-('¿Cómo sientes tu ánimo en general?', 8, 209);
-
--- Inserts para el id_test 210
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 210),
-('¿Cómo te sientes mentalmente hoy?', 8, 210),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 210),
-('¿Cómo es tu nivel de energía actual?', 6, 210),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 210),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 210),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 210),
-('¿Sientes alguna rigidez muscular?', 8, 210),
-('¿Cómo sientes tu ánimo en general?', 9, 210);
-
--- Inserts para el id_test 211
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 211),
-('¿Cómo te sientes mentalmente hoy?', 7, 211),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 211),
-('¿Cómo es tu nivel de energía actual?', 5, 211),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 211),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 211),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 211),
-('¿Sientes alguna rigidez muscular?', 7, 211),
-('¿Cómo sientes tu ánimo en general?', 8, 211);
-
--- Inserts para el id_test 212
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 212),
-('¿Cómo te sientes mentalmente hoy?', 8, 212),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 212),
-('¿Cómo es tu nivel de energía actual?', 6, 212),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 212),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 212),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 212),
-('¿Sientes alguna rigidez muscular?', 8, 212),
-('¿Cómo sientes tu ánimo en general?', 9, 212);
-
--- Inserts para el id_test 213
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 213),
-('¿Cómo te sientes mentalmente hoy?', 7, 213),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 213),
-('¿Cómo es tu nivel de energía actual?', 5, 213),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 213),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 213),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 213),
-('¿Sientes alguna rigidez muscular?', 7, 213),
-('¿Cómo sientes tu ánimo en general?', 8, 213);
-
--- Inserts para el id_test 214
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 214),
-('¿Cómo te sientes mentalmente hoy?', 8, 214),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 214),
-('¿Cómo es tu nivel de energía actual?', 6, 214),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 214),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 214),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 214),
-('¿Sientes alguna rigidez muscular?', 8, 214),
-('¿Cómo sientes tu ánimo en general?', 9, 214);
-
--- Inserts para el id_test 215
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 215),
-('¿Cómo te sientes mentalmente hoy?', 7, 215),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 215),
-('¿Cómo es tu nivel de energía actual?', 5, 215),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 215),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 215),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 215),
-('¿Sientes alguna rigidez muscular?', 7, 215),
-('¿Cómo sientes tu ánimo en general?', 8, 215);
-
--- Inserts para el id_test 216
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 216),
-('¿Cómo te sientes mentalmente hoy?', 8, 216),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 216),
-('¿Cómo es tu nivel de energía actual?', 6, 216),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 216),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 216),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 216),
-('¿Sientes alguna rigidez muscular?', 8, 216),
-('¿Cómo sientes tu ánimo en general?', 9, 216);
-
--- Inserts para el id_test 217
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 217),
-('¿Cómo te sientes mentalmente hoy?', 7, 217),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 217),
-('¿Cómo es tu nivel de energía actual?', 5, 217),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 217),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 217),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 217),
-('¿Sientes alguna rigidez muscular?', 7, 217),
-('¿Cómo sientes tu ánimo en general?', 8, 217);
-
--- Inserts para el id_test 218
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 218),
-('¿Cómo te sientes mentalmente hoy?', 8, 218),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 218),
-('¿Cómo es tu nivel de energía actual?', 6, 218),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 218),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 218),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 218),
-('¿Sientes alguna rigidez muscular?', 8, 218),
-('¿Cómo sientes tu ánimo en general?', 9, 218);
-
--- Inserts para el id_test 219
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 219),
-('¿Cómo te sientes mentalmente hoy?', 7, 219),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 219),
-('¿Cómo es tu nivel de energía actual?', 5, 219),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 219),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 219),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 219),
-('¿Sientes alguna rigidez muscular?', 7, 219),
-('¿Cómo sientes tu ánimo en general?', 8, 219);
-
--- Inserts para el id_test 220
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 220),
-('¿Cómo te sientes mentalmente hoy?', 8, 220),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 220),
-('¿Cómo es tu nivel de energía actual?', 6, 220),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 220),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 220),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 220),
-('¿Sientes alguna rigidez muscular?', 8, 220),
-('¿Cómo sientes tu ánimo en general?', 9, 220);
-
--- Inserts para el id_test 221
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 221),
-('¿Cómo te sientes mentalmente hoy?', 7, 221),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 221),
-('¿Cómo es tu nivel de energía actual?', 5, 221),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 221),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 221),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 221),
-('¿Sientes alguna rigidez muscular?', 7, 221),
-('¿Cómo sientes tu ánimo en general?', 8, 221);
-
--- Inserts para el id_test 222
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 222),
-('¿Cómo te sientes mentalmente hoy?', 8, 222),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 222),
-('¿Cómo es tu nivel de energía actual?', 6, 222),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 222),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 222),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 222),
-('¿Sientes alguna rigidez muscular?', 8, 222),
-('¿Cómo sientes tu ánimo en general?', 9, 222);
-
--- Inserts para el id_test 223
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 223),
-('¿Cómo te sientes mentalmente hoy?', 7, 223),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 223),
-('¿Cómo es tu nivel de energía actual?', 5, 223),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 223),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 223),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 223),
-('¿Sientes alguna rigidez muscular?', 7, 223),
-('¿Cómo sientes tu ánimo en general?', 8, 223);
-
--- Inserts para el id_test 224
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 224),
-('¿Cómo te sientes mentalmente hoy?', 8, 224),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 224),
-('¿Cómo es tu nivel de energía actual?', 6, 224),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 224),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 224),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 224),
-('¿Sientes alguna rigidez muscular?', 8, 224),
-('¿Cómo sientes tu ánimo en general?', 9, 224);
-
--- Inserts para el id_test 225
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 225),
-('¿Cómo te sientes mentalmente hoy?', 7, 225),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 225),
-('¿Cómo es tu nivel de energía actual?', 5, 225),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 225),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 225),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 225),
-('¿Sientes alguna rigidez muscular?', 7, 225),
-('¿Cómo sientes tu ánimo en general?', 8, 225);
-
--- Inserts para el id_test 226
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 226),
-('¿Cómo te sientes mentalmente hoy?', 8, 226),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 226),
-('¿Cómo es tu nivel de energía actual?', 6, 226),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 226),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 226),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 226),
-('¿Sientes alguna rigidez muscular?', 8, 226),
-('¿Cómo sientes tu ánimo en general?', 9, 226);
-
--- Inserts para el id_test 227
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 227),
-('¿Cómo te sientes mentalmente hoy?', 7, 227),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 227),
-('¿Cómo es tu nivel de energía actual?', 5, 227),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 227),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 227),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 227),
-('¿Sientes alguna rigidez muscular?', 7, 227),
-('¿Cómo sientes tu ánimo en general?', 8, 227);
-
--- Inserts para el id_test 228
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 228),
-('¿Cómo te sientes mentalmente hoy?', 8, 228),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 228),
-('¿Cómo es tu nivel de energía actual?', 6, 228),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 228),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 228),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 228),
-('¿Sientes alguna rigidez muscular?', 8, 228),
-('¿Cómo sientes tu ánimo en general?', 9, 228);
-
--- Inserts para el id_test 229
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 229),
-('¿Cómo te sientes mentalmente hoy?', 7, 229),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 229),
-('¿Cómo es tu nivel de energía actual?', 5, 229),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 229),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 229),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 229),
-('¿Sientes alguna rigidez muscular?', 7, 229),
-('¿Cómo sientes tu ánimo en general?', 8, 229);
-
--- Inserts para el id_test 230
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 230),
-('¿Cómo te sientes mentalmente hoy?', 8, 230),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 230),
-('¿Cómo es tu nivel de energía actual?', 6, 230),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 230),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 230),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 230),
-('¿Sientes alguna rigidez muscular?', 8, 230),
-('¿Cómo sientes tu ánimo en general?', 9, 230);
-
--- Inserts para el id_test 231
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 231),
-('¿Cómo te sientes mentalmente hoy?', 7, 231),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 231),
-('¿Cómo es tu nivel de energía actual?', 5, 231),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 231),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 231),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 231),
-('¿Sientes alguna rigidez muscular?', 7, 231),
-('¿Cómo sientes tu ánimo en general?', 8, 231);
-
--- Inserts para el id_test 232
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 232),
-('¿Cómo te sientes mentalmente hoy?', 8, 232),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 232),
-('¿Cómo es tu nivel de energía actual?', 6, 232),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 232),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 232),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 232),
-('¿Sientes alguna rigidez muscular?', 8, 232),
-('¿Cómo sientes tu ánimo en general?', 9, 232);
-
--- Inserts para el id_test 233
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 233),
-('¿Cómo te sientes mentalmente hoy?', 7, 233),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 233),
-('¿Cómo es tu nivel de energía actual?', 5, 233),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 233),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 233),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 233),
-('¿Sientes alguna rigidez muscular?', 7, 233),
-('¿Cómo sientes tu ánimo en general?', 8, 233);
-
--- Inserts para el id_test 234
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 234),
-('¿Cómo te sientes mentalmente hoy?', 8, 234),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 234),
-('¿Cómo es tu nivel de energía actual?', 6, 234),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 234),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 234),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 234),
-('¿Sientes alguna rigidez muscular?', 8, 234),
-('¿Cómo sientes tu ánimo en general?', 9, 234);
-
--- Inserts para el id_test 235
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 235),
-('¿Cómo te sientes mentalmente hoy?', 7, 235),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 235),
-('¿Cómo es tu nivel de energía actual?', 5, 235),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 235),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 235),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 235),
-('¿Sientes alguna rigidez muscular?', 7, 235),
-('¿Cómo sientes tu ánimo en general?', 8, 235);
-
--- Inserts para el id_test 236
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 236),
-('¿Cómo te sientes mentalmente hoy?', 8, 236),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 236),
-('¿Cómo es tu nivel de energía actual?', 6, 236),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 236),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 236),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 236),
-('¿Sientes alguna rigidez muscular?', 8, 236),
-('¿Cómo sientes tu ánimo en general?', 9, 236);
-
--- Inserts para el id_test 237
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 237),
-('¿Cómo te sientes mentalmente hoy?', 7, 237),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 237),
-('¿Cómo es tu nivel de energía actual?', 5, 237),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 237),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 237),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 237),
-('¿Sientes alguna rigidez muscular?', 7, 237),
-('¿Cómo sientes tu ánimo en general?', 8, 237);
-
--- Inserts para el id_test 238
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 238),
-('¿Cómo te sientes mentalmente hoy?', 8, 238),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 238),
-('¿Cómo es tu nivel de energía actual?', 6, 238),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 238),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 238),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 238),
-('¿Sientes alguna rigidez muscular?', 8, 238),
-('¿Cómo sientes tu ánimo en general?', 9, 238);
-
--- Inserts para el id_test 239
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 239),
-('¿Cómo te sientes mentalmente hoy?', 7, 239),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 239),
-('¿Cómo es tu nivel de energía actual?', 5, 239),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 239),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 239),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 239),
-('¿Sientes alguna rigidez muscular?', 7, 239),
-('¿Cómo sientes tu ánimo en general?', 8, 239);
-
--- Inserts para el id_test 240
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 240),
-('¿Cómo te sientes mentalmente hoy?', 8, 240),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 240),
-('¿Cómo es tu nivel de energía actual?', 6, 240),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 240),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 240),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 240),
-('¿Sientes alguna rigidez muscular?', 8, 240),
-('¿Cómo sientes tu ánimo en general?', 9, 240);
-
--- Inserts para el id_test 241
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 241),
-('¿Cómo te sientes mentalmente hoy?', 7, 241),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 241),
-('¿Cómo es tu nivel de energía actual?', 5, 241),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 241),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 241),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 241),
-('¿Sientes alguna rigidez muscular?', 7, 241),
-('¿Cómo sientes tu ánimo en general?', 8, 241);
-
--- Inserts para el id_test 242
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 242),
-('¿Cómo te sientes mentalmente hoy?', 8, 242),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 242),
-('¿Cómo es tu nivel de energía actual?', 6, 242),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 242),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 242),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 242),
-('¿Sientes alguna rigidez muscular?', 8, 242),
-('¿Cómo sientes tu ánimo en general?', 9, 242);
-
--- Inserts para el id_test 243
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 8, 243),
-('¿Cómo te sientes mentalmente hoy?', 7, 243),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 6, 243),
-('¿Cómo es tu nivel de energía actual?', 5, 243),
-('¿Tienes alguna molestia o dolor físico hoy?', 4, 243),
-('¿Cómo calificarías tu apetito el día de hoy?', 8, 243),
-('¿Cuánta motivación sientes para entrenar hoy?', 6, 243),
-('¿Sientes alguna rigidez muscular?', 7, 243),
-('¿Cómo sientes tu ánimo en general?', 8, 243);
-
--- Inserts para el id_test 244
-INSERT INTO respuesta_test (pregunta, respuesta, id_test)
-VALUES 
-('¿Cómo te sientes físicamente hoy?', 9, 244),
-('¿Cómo te sientes mentalmente hoy?', 8, 244),
-('¿Cómo calificas la calidad de tu sueño la noche pasada?', 7, 244),
-('¿Cómo es tu nivel de energía actual?', 6, 244),
-('¿Tienes alguna molestia o dolor físico hoy?', 5, 244),
-('¿Cómo calificarías tu apetito el día de hoy?', 9, 244),
-('¿Cuánta motivación sientes para entrenar hoy?', 7, 244),
-('¿Sientes alguna rigidez muscular?', 8, 244),
-('¿Cómo sientes tu ánimo en general?', 9, 244);
-
-
 SET GLOBAL event_scheduler = ON;
 
 SELECT * FROM notificaciones;
@@ -8625,70 +7430,3 @@ GROUP BY
     p.id_partido, p.id_equipo, j.id_jugador
 HAVING
     promedio > 0;
-
--- Vista para saber si un partido tiene los datos necesarios para ser predecido
-CREATE VIEW vista_autorizacion_prediccion AS
-SELECT 
-    e.id_equipo,
-    e.nombre_equipo,
-    r.id_rival,
-    r.nombre_rival,
-    p.id_partido,
-    COUNT(DISTINCT p.id_partido) AS partidos_jugados_equipo,
-    (SELECT COUNT(*) FROM partidos p2 WHERE p2.id_rival = r.id_rival) AS partidos_jugados_rival,
-    (SELECT COUNT(*) 
-     FROM caracteristicas_analisis ca 
-     WHERE ca.id_jugador IN (SELECT pe.id_jugador 
-                             FROM plantillas_equipos pe 
-                             WHERE pe.id_equipo = e.id_equipo)) AS caracteristicas_analizadas,
-    (SELECT COUNT(*) 
-     FROM test t 
-     WHERE t.id_jugador IN (SELECT pe.id_jugador 
-                            FROM plantillas_equipos pe 
-                            WHERE pe.id_equipo = e.id_equipo) 
-     AND t.contestado = 1) AS registros_contestados,
-    CASE 
-        WHEN COUNT(DISTINCT p.id_partido) >= 3 AND 
-             (SELECT COUNT(*) FROM partidos p2 WHERE p2.id_rival = r.id_rival) >= 3 AND 
-             (SELECT COUNT(*) FROM caracteristicas_analisis ca WHERE ca.id_jugador IN (SELECT pe.id_jugador FROM plantillas_equipos pe WHERE pe.id_equipo = e.id_equipo)) > 0 AND 
-             (SELECT COUNT(*) FROM test t WHERE t.id_jugador IN (SELECT pe.id_jugador FROM plantillas_equipos pe WHERE pe.id_equipo = e.id_equipo) AND t.contestado = 1) >= 10
-        THEN 'true'
-        ELSE 'false'
-    END AS autorizacion_prediccion
-FROM 
-    equipos e
-JOIN 
-    partidos p ON e.id_equipo = p.id_equipo
-JOIN 
-    rivales r ON p.id_rival = r.id_rival
-GROUP BY 
-    e.id_equipo, r.id_rival;
-
-CREATE VIEW vista_detalle_partidos AS
-SELECT
-    p.id_partido,
-    DATE_FORMAT(p.fecha_partido, '%e de %M del %Y') AS fecha,
-    p.fecha_partido,
-    p.localidad_partido,
-    p.resultado_partido,
-    i.logo_rival,
-    e.logo_equipo,
-    e.nombre_equipo,
-    i.nombre_rival AS nombre_rival,
-    p.tipo_resultado_partido,
-    e.id_equipo,
-    i.id_rival,
-    e.id_categoria,
-    c.nombre_categoria,
-    v.autorizacion_prediccion
-FROM
-    partidos p
-INNER JOIN
-    equipos e ON p.id_equipo = e.id_equipo
-INNER JOIN
-	rivales i ON p.id_rival = i.id_rival
-INNER JOIN
-    categorias c ON e.id_categoria = c.id_categoria
-INNER JOIN
-	vista_autorizacion_prediccion v ON p.id_partido = v.id_partido
-ORDER BY p.fecha_partido DESC;
