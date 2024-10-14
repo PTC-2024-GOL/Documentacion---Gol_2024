@@ -3267,10 +3267,7 @@ DROP VIEW IF EXISTS vista_jugadores_por_equipo2;
 -- VER JUGADORES POR EQUIPO
 CREATE VIEW vista_jugadores_por_equipo2 AS
     SELECT DISTINCT
-        cp.id_convocatoria,
-        cp.id_partido,
-        cp.id_jugador,
-        cp.estado_convocado,
+        pe.id_jugador,
         pt.id_equipo,
         j.nombre_jugador,
         j.apellido_jugador,
@@ -3280,12 +3277,12 @@ CREATE VIEW vista_jugadores_por_equipo2 AS
         p.posicion,
         p.area_de_juego,
         j.estatus_jugador
-FROM convocatorias_partidos cp
+FROM plantillas_equipos pe
 INNER JOIN
-    jugadores j ON cp.id_jugador = j.id_jugador
+    jugadores j ON pe.id_jugador = j.id_jugador
 INNER JOIN
     posiciones p ON j.id_posicion_principal = p.id_posicion
-LEFT JOIN plantillas_equipos pt ON pt.id_jugador = cp.id_jugador
+LEFT JOIN plantillas_equipos pt ON pt.id_jugador = pe.id_jugador
 GROUP BY nombre_jugador, apellido_jugador;
 
 -- Vista para ver los tipos de goles de un jugador
