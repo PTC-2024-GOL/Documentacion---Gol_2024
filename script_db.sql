@@ -7059,7 +7059,7 @@ BEGIN
   );
 END//
 
-DELIMITER;
+DELIMITER ;
 
 DELIMITER //
 DROP TRIGGER IF EXISTS notificacion_nuevo_entrenamiento;
@@ -7078,7 +7078,7 @@ BEGIN
   FROM plantillas_equipos pe
   WHERE pe.id_equipo = NEW.id_equipo;
 END//
-DELIMITER;
+DELIMITER ;
 
 DELIMITER //
 DROP TRIGGER IF EXISTS notificacion_gol_jugador;
